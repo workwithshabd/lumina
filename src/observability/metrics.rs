@@ -1,10 +1,37 @@
 use axum::response::IntoResponse;
 use axum::routing::get;
 use axum::Router;
-use metrics_exporter_prometheus::{PrometheusBuilder, PrometheusHandle};
+use metrics_exporter_prometheus::{Matcher, PrometheusBuilder, PrometheusHandle};
 use std::sync::OnceLock;
 
 static PROMETHEUS_HANDLE: OnceLock<PrometheusHandle> = OnceLock::new();
+
+/// Explicit histogram bucket boundaries from 1 ms to 30 s.
+pub const DURATION_BUCKETS: &[f64] = &[
+    0.001, 0.002, 0.005, 0.010, 0.025, 0.050, 0.075, 0.100, 0.250, 0.500, 0.750, 1.0, 2.5,
+    5.0, 10.0, 15.0, 30.0,
+];
+
+/// Pre-registers all application counters and base gauges at 0 on startup
+/// so that Prometheus scrapes immediately expose all series without waiting for events.
+pub fn preregister_metrics() {
+    metrics::counter!("atihsrah_ssrf_blocked_total").absolute(0);
+    metrics::counter!("atihsrah_rate_limited_total").absolute(0);
+    metrics::counter!("atihsrah_signature_invalid_total").absolute(0);
+    metrics::counter!("atihsrah_oversize_not_cached_total").absolute(0);
+    metrics::counter!("atihsrah_output_larger_than_source_total").absolute(0);
+    metrics::counter!("atihsrah_source_rejected_total", "reason" => "disallowed_origin").absolute(0);
+    metrics::counter!("atihsrah_cache_hits_total").absolute(0);
+    metrics::counter!("atihsrah_cache_misses_total").absolute(0);
+    metrics::counter!("atihsrah_cache_hit_bytes_total").absolute(0);
+    metrics::counter!("atihsrah_response_bytes_total").absolute(0);
+
+    metrics::gauge!("atihsrah_cache_size_bytes").set(0.0);
+    metrics::gauge!("atihsrah_cache_entries").set(0.0);
+    metrics::gauge!("atihsrah_inflight_requests").set(0.0);
+    metrics::gauge!("atihsrah_inflight_transforms").set(0.0);
+    metrics::gauge!("atihsrah_transform_queue_depth").set(0.0);
+}
 
 /// Initializes and installs the global Prometheus metrics recorder.
 ///
@@ -12,9 +39,35 @@ static PROMETHEUS_HANDLE: OnceLock<PrometheusHandle> = OnceLock::new();
 pub fn init_prometheus() -> PrometheusHandle {
     PROMETHEUS_HANDLE
         .get_or_init(|| {
-            PrometheusBuilder::new()
+            let mut builder = PrometheusBuilder::new();
+            for metric_name in &[
+                "atihsrah_request_duration_seconds",
+                "atihsrah_fetch_duration_seconds",
+                "atihsrah_decode_duration_seconds",
+                "atihsrah_transform_duration_seconds",
+                "atihsrah_encode_duration_seconds",
+            ] {
+                builder = builder
+                    .set_buckets_for_metric(
+                        Matcher::Full((*metric_name).to_string()),
+                        DURATION_BUCKETS,
+                    )
+                    .expect("failed to set buckets for metric");
+            }
+            builder = builder
+                .set_buckets_for_metric(
+                    Matcher::Suffix("_duration_seconds".to_string()),
+                    DURATION_BUCKETS,
+                )
+                .expect("failed to set suffix buckets");
+
+            let handle = builder
                 .install_recorder()
-                .expect("failed to install Prometheus recorder")
+                .expect("failed to install Prometheus recorder");
+
+            preregister_metrics();
+
+            handle
         })
         .clone()
 }
@@ -33,7 +86,7 @@ pub fn create_metrics_router(
             let s = state.clone();
             async move {
                 if let Some(ref st) = s {
-                    st.sync_cache_gauges();
+                    st.sync_cache_gauges().await;
                 }
                 h.render().into_response()
             }
@@ -119,12 +172,16 @@ pub fn record_output_larger_than_source() {
     metrics::counter!("atihsrah_output_larger_than_source_total").increment(1);
 }
 
-/// Updates gauges related to cache size, entry count, and hit ratios.
-pub fn update_cache_gauges(size_bytes: u64, entries: u64, hit_ratio: f64, byte_hit_ratio: f64) {
+/// Records a source URL rejection due to origin allowlist, scheme, or port restrictions.
+pub fn record_source_rejected(reason: &'static str) {
+    metrics::counter!("atihsrah_source_rejected_total", "reason" => reason).increment(1);
+    record_error("source_not_allowed");
+}
+
+/// Updates gauges related to cache size and entry count.
+pub fn update_cache_gauges(size_bytes: u64, entries: u64) {
     metrics::gauge!("atihsrah_cache_size_bytes").set(size_bytes as f64);
     metrics::gauge!("atihsrah_cache_entries").set(entries as f64);
-    metrics::gauge!("atihsrah_cache_hit_ratio").set(hit_ratio);
-    metrics::gauge!("atihsrah_cache_byte_hit_ratio").set(byte_hit_ratio);
 }
 
 /// Updates gauges related to concurrency and queue depths.

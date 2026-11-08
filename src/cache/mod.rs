@@ -80,6 +80,12 @@ impl ImageCache {
     pub fn entry_count(&self) -> u64 {
         self.cache.entry_count()
     }
+
+    /// Explicitly runs pending maintenance and eviction tasks so entry count
+    /// and weighted size are up-to-date synchronously at scrape time.
+    pub async fn run_pending_tasks(&self) {
+        self.cache.run_pending_tasks().await;
+    }
 }
 
 /// Parameter bundle for generating a deterministic, canonical cache key.

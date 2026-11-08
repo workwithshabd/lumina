@@ -7,6 +7,24 @@ The project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 
 ## [Unreleased]
 
+### Prometheus Metrics, Scrape-Time Cache Sync & Grafana Dashboard (2026-11-08)
+- **Synchronous Cache Gauge Scrape (`await cache.run_pending_tasks()`)**:
+  - `atihsrah_cache_entries` and `atihsrah_cache_size_bytes` now await `cache.run_pending_tasks().await` at scrape time prior to querying Moka LRU statistics, ensuring immediate post-transform scrapes accurately reflect cached entries and memory size without delay.
+- **Histogram Quantiles with Explicit Duration Buckets**:
+  - Configured `metrics-exporter-prometheus` with fine bucket boundaries from 1 ms to 30 s (`0.001` to `30.0` seconds) for all `*_duration_seconds` metrics (`atihsrah_request_duration_seconds`, `atihsrah_fetch_duration_seconds`, `atihsrah_decode_duration_seconds`, `atihsrah_transform_duration_seconds`, `atihsrah_encode_duration_seconds`). All latency metrics now export standard `_bucket{le="..."}`, `_sum`, and `_count` series for `histogram_quantile(..., rate(..._bucket[5m]))` evaluation.
+- **Replaced Ratio Gauges with Prometheus Counters**:
+  - Deprecated and removed gauges:
+    - Old: `atihsrah_cache_hit_ratio` (gauge) &rarr; New: `atihsrah_cache_hits_total` (counter) and `atihsrah_cache_misses_total` (counter).
+    - Old: `atihsrah_cache_byte_hit_ratio` (gauge) &rarr; New: `atihsrah_cache_hit_bytes_total` (counter) and `atihsrah_response_bytes_total` (counter).
+  - Ratios are now computed dynamically in PromQL dashboard expressions:
+    - Request Hit Ratio: `sum(rate(atihsrah_cache_hits_total[5m])) / (sum(rate(atihsrah_cache_hits_total[5m])) + sum(rate(atihsrah_cache_misses_total[5m]))) * 100`
+    - Byte Hit Ratio: `sum(rate(atihsrah_cache_hit_bytes_total[5m])) / sum(rate(atihsrah_response_bytes_total[5m])) * 100`
+- **Pre-Registered Startup Counters & Origin Security Tracking**:
+  - Pre-registered all counters (`atihsrah_ssrf_blocked_total`, `atihsrah_rate_limited_total`, `atihsrah_signature_invalid_total`, `atihsrah_oversize_not_cached_total`, `atihsrah_output_larger_than_source_total`, `atihsrah_cache_hits_total`, `atihsrah_cache_misses_total`, `atihsrah_cache_hit_bytes_total`, `atihsrah_response_bytes_total`, `atihsrah_source_rejected_total`) at 0 so all series exist on clean scrapes before traffic.
+  - Added `atihsrah_source_rejected_total{reason}` counter tracking disallowed origin, scheme, and port rejections.
+- **Official Grafana Dashboard**:
+  - Added `monitoring/grafana-dashboard.json` covering throughput, cache ratios, p50/p90/p99 latency quantiles, stage breakdowns, concurrency, and security defense events.
+
 ### Audit Remediation, Async DNS Offload & Local macOS Benchmark Suite (2026-11-08)
 - **Non-Blocking Async DNS Resolution**:
   - Wrapped synchronous DNS lookups in `src/fetch/resolver.rs` in `tokio::task::spawn_blocking`, eliminating async worker stalling on Tokio worker threads while retaining 100% of IPv4/IPv6 private IP filtering, link-local metadata protection, and DNS-rebinding prevention.

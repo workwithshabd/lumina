@@ -272,12 +272,20 @@ async fn test_metrics_appear_and_move() {
         "Missing atihsrah_cache_entries gauge:\n{metrics_text}"
     );
     assert!(
-        metrics_text.contains("atihsrah_cache_hit_ratio"),
-        "Missing atihsrah_cache_hit_ratio gauge:\n{metrics_text}"
+        metrics_text.contains("atihsrah_cache_hits_total"),
+        "Missing atihsrah_cache_hits_total counter:\n{metrics_text}"
     );
     assert!(
-        metrics_text.contains("atihsrah_cache_byte_hit_ratio"),
-        "Missing atihsrah_cache_byte_hit_ratio gauge:\n{metrics_text}"
+        metrics_text.contains("atihsrah_cache_misses_total"),
+        "Missing atihsrah_cache_misses_total counter:\n{metrics_text}"
+    );
+    assert!(
+        metrics_text.contains("atihsrah_cache_hit_bytes_total"),
+        "Missing atihsrah_cache_hit_bytes_total counter:\n{metrics_text}"
+    );
+    assert!(
+        metrics_text.contains("atihsrah_response_bytes_total"),
+        "Missing atihsrah_response_bytes_total counter:\n{metrics_text}"
     );
     assert!(
         metrics_text.contains("atihsrah_inflight_requests"),

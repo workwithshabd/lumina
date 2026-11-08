@@ -196,33 +196,23 @@ impl AppState {
         self.cache_hits.fetch_add(1, Ordering::SeqCst);
         self.cache_hit_bytes.fetch_add(bytes, Ordering::SeqCst);
         self.total_served_bytes.fetch_add(bytes, Ordering::SeqCst);
-        self.sync_cache_gauges();
+        metrics::counter!("atihsrah_cache_hits_total").increment(1);
+        metrics::counter!("atihsrah_cache_hit_bytes_total").increment(bytes);
+        metrics::counter!("atihsrah_response_bytes_total").increment(bytes);
     }
 
     pub fn record_cache_miss(&self, bytes: u64) {
         self.cache_misses.fetch_add(1, Ordering::SeqCst);
         self.total_served_bytes.fetch_add(bytes, Ordering::SeqCst);
-        self.sync_cache_gauges();
+        metrics::counter!("atihsrah_cache_misses_total").increment(1);
+        metrics::counter!("atihsrah_response_bytes_total").increment(bytes);
     }
 
-    pub fn sync_cache_gauges(&self) {
-        let hits = self.cache_hits.load(Ordering::Relaxed) as f64;
-        let misses = self.cache_misses.load(Ordering::Relaxed) as f64;
-        let total_reqs = hits + misses;
-        let hit_ratio = if total_reqs > 0.0 {
-            hits / total_reqs
-        } else {
-            0.0
-        };
-
-        let hit_b = self.cache_hit_bytes.load(Ordering::Relaxed) as f64;
-        let total_b = self.total_served_bytes.load(Ordering::Relaxed) as f64;
-        let byte_hit_ratio = if total_b > 0.0 { hit_b / total_b } else { 0.0 };
-
+    pub async fn sync_cache_gauges(&self) {
+        self.cache.run_pending_tasks().await;
         let size_bytes = self.cache.weighted_size();
         let entries = self.cache.entry_count();
-
-        update_cache_gauges(size_bytes, entries, hit_ratio, byte_hit_ratio);
+        update_cache_gauges(size_bytes, entries);
     }
 }
 

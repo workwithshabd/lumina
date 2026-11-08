@@ -136,6 +136,16 @@ pub async fn transform_handler(
                         Some(client_ip),
                     );
                 }
+                AppError::SourceNotAllowed(reason) => {
+                    crate::observability::record_source_rejected("disallowed_origin");
+                    crate::observability::log_security_event(
+                        &request_id,
+                        "source_rejected",
+                        reason,
+                        src_sha.as_deref(),
+                        Some(client_ip),
+                    );
+                }
                 _ => {
                     crate::observability::record_error(err.code());
                     crate::observability::log_error(&request_id, err.code(), &err.to_string());

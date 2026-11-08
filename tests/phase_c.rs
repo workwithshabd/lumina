@@ -175,12 +175,20 @@ async fn test_metrics_prefixed_with_atihsrah() {
         "Expected 'atihsrah_cache_entries' in metrics output:\n{text}"
     );
     assert!(
-        text.contains("atihsrah_cache_hit_ratio"),
-        "Expected 'atihsrah_cache_hit_ratio' in metrics output:\n{text}"
+        text.contains("atihsrah_cache_hits_total"),
+        "Expected 'atihsrah_cache_hits_total' in metrics output:\n{text}"
     );
     assert!(
-        text.contains("atihsrah_cache_byte_hit_ratio"),
-        "Expected 'atihsrah_cache_byte_hit_ratio' in metrics output:\n{text}"
+        text.contains("atihsrah_cache_misses_total"),
+        "Expected 'atihsrah_cache_misses_total' in metrics output:\n{text}"
+    );
+    assert!(
+        text.contains("atihsrah_cache_hit_bytes_total"),
+        "Expected 'atihsrah_cache_hit_bytes_total' in metrics output:\n{text}"
+    );
+    assert!(
+        text.contains("atihsrah_response_bytes_total"),
+        "Expected 'atihsrah_response_bytes_total' in metrics output:\n{text}"
     );
 
     // Assert that unprefixed metrics do NOT appear

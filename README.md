@@ -278,6 +278,57 @@ When `format=auto` (the default) is requested, the output format is determined d
 
 ---
 
+## Observability & Prometheus Metrics
+
+Atihsrah serves Prometheus metrics on an isolated internal port (`ATIHSRAH_METRICS_BIND`, default `127.0.0.1:9090/metrics`), separating telemetry scraping from user-facing image traffic.
+
+### Exported Metrics Schema
+
+| Metric | Type | Description |
+|---|---|---|
+| `atihsrah_requests_total` | Counter | Total processed transform requests with labels `status_class` ("2xx", "4xx", "5xx") and `cache_result` ("hit", "miss", "none"). |
+| `atihsrah_request_duration_seconds` | Histogram | End-to-end request duration exported with fine explicit buckets (1 ms to 30 s), `_sum`, and `_count`. |
+| `atihsrah_fetch_duration_seconds` | Histogram | Duration of upstream origin source image fetching. |
+| `atihsrah_decode_duration_seconds` | Histogram | Duration of image decoding prior to transform. |
+| `atihsrah_transform_duration_seconds` | Histogram | Duration of resizing, cropping, and fitting. |
+| `atihsrah_encode_duration_seconds` | Histogram | Duration of encoding output formats (AVIF, WebP, JPEG, PNG). |
+| `atihsrah_cache_hits_total` | Counter | Total cache hit requests. |
+| `atihsrah_cache_misses_total` | Counter | Total cache miss requests. |
+| `atihsrah_cache_hit_bytes_total` | Counter | Total response bytes served directly from the cache. |
+| `atihsrah_response_bytes_total` | Counter | Total response bytes served across all requests. |
+| `atihsrah_cache_size_bytes` | Gauge | Current byte memory footprint of cached images (synchronized after `cache.run_pending_tasks().await` at scrape time). |
+| `atihsrah_cache_entries` | Gauge | Total count of resident cache entries (synchronized after `cache.run_pending_tasks().await` at scrape time). |
+| `atihsrah_source_rejected_total` | Counter | Security rejections for source origins or schemes with label `reason` (e.g. `disallowed_origin`). |
+| `atihsrah_ssrf_blocked_total` | Counter | Total requests blocked by private IP / SSRF defense layers. |
+| `atihsrah_rate_limited_total` | Counter | Total requests rejected with HTTP 429 due to token bucket rate limits. |
+| `atihsrah_signature_invalid_total` | Counter | Total requests rejected due to signature mismatch or expiration. |
+| `atihsrah_oversize_not_cached_total` | Counter | Images exceeding single-entry cache allocation limits. |
+| `atihsrah_output_larger_than_source_total` | Counter | Transforms where output exceeded source file byte length. |
+| `atihsrah_inflight_requests` | Gauge | Current active in-flight HTTP connections. |
+| `atihsrah_inflight_transforms` | Gauge | Current active image processing operations on the blocking pool. |
+| `atihsrah_transform_queue_depth` | Gauge | Current queue depth of transform requests awaiting a worker slot. |
+
+### PromQL Examples
+
+- **p95 Latency**:
+  ```promql
+  histogram_quantile(0.95, sum(rate(atihsrah_request_duration_seconds_bucket[5m])) by (le))
+  ```
+- **Cache Request Hit Ratio (%)**:
+  ```promql
+  sum(rate(atihsrah_cache_hits_total[5m])) / (sum(rate(atihsrah_cache_hits_total[5m])) + sum(rate(atihsrah_cache_misses_total[5m]))) * 100
+  ```
+- **Cache Byte Hit Ratio (%)**:
+  ```promql
+  sum(rate(atihsrah_cache_hit_bytes_total[5m])) / sum(rate(atihsrah_response_bytes_total[5m])) * 100
+  ```
+
+### Grafana Dashboard
+
+A complete production dashboard is provided at [`monitoring/grafana-dashboard.json`](monitoring/grafana-dashboard.json). It visualizes request throughput, cache hit ratios, p50/p90/p99 latency quantiles, pipeline stage breakdown, memory utilization, and security blocks.
+
+---
+
 ## Known Limitations
 
 1. **AVIF Encoding CPU Overhead**:
