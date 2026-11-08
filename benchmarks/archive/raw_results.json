@@ -1,0 +1,225 @@
+{
+  "scenario_1_cold_requests": {
+    "atihsrah": {
+      "jpeg": {
+        "status": 200,
+        "bytes": 36717,
+        "duration_ms": 44.77
+      },
+      "png": {
+        "status": 200,
+        "bytes": 368373,
+        "duration_ms": 34.93
+      },
+      "webp": {
+        "status": 200,
+        "bytes": 453734,
+        "duration_ms": 36.41
+      },
+      "avif": {
+        "status": 200,
+        "bytes": 4560,
+        "duration_ms": 296.44
+      }
+    },
+    "imgproxy": {
+      "jpeg": {
+        "status": 200,
+        "bytes": 25066,
+        "duration_ms": 27.91
+      },
+      "png": {
+        "status": 200,
+        "bytes": 199259,
+        "duration_ms": 31.95
+      },
+      "webp": {
+        "status": 200,
+        "bytes": 6634,
+        "duration_ms": 46.12
+      },
+      "avif": {
+        "status": 200,
+        "bytes": 14438,
+        "duration_ms": 37.48
+      }
+    }
+  },
+  "scenario_2_warm_cache": {
+    "atihsrah": {
+      "min_ms": 1.34,
+      "p50_ms": 1.67,
+      "p90_ms": 1.93,
+      "p95_ms": 2.09,
+      "p99_ms": 2.3,
+      "mean_ms": 1.68
+    },
+    "imgproxy": {
+      "min_ms": 45.06,
+      "p50_ms": 45.6,
+      "p90_ms": 46.66,
+      "p95_ms": 46.76,
+      "p99_ms": 47.86,
+      "mean_ms": 45.75
+    }
+  },
+  "scenario_3_concurrent_same_url": {
+    "atihsrah": {
+      "concurrency": 100,
+      "duration_ms": 154.26,
+      "success_count": 100,
+      "origin_fetches": 1,
+      "coalesced": true
+    },
+    "imgproxy": {
+      "concurrency": 100,
+      "duration_ms": 2383.76,
+      "success_count": 100,
+      "origin_fetches": 100
+    }
+  },
+  "scenario_4_concurrent_different_urls": {
+    "atihsrah": {
+      "total_seconds": 4.38,
+      "throughput_rps": 22.82,
+      "p50_ms": 185.46,
+      "p95_ms": 2739.89,
+      "p99_ms": 4381.46,
+      "success_count": 100
+    },
+    "imgproxy": {
+      "total_seconds": 1.19,
+      "throughput_rps": 83.89,
+      "p50_ms": 498.79,
+      "p95_ms": 690.65,
+      "p99_ms": 735.82,
+      "success_count": 100
+    }
+  },
+  "scenario_5_slow_origin": {
+    "atihsrah": {
+      "status": 200,
+      "duration_s": 2.03
+    },
+    "imgproxy": {
+      "status": 200,
+      "duration_s": 2.04
+    }
+  },
+  "scenario_6_failing_origin": {
+    "atihsrah": {
+      "status": 502,
+      "is_502_bad_gateway": true,
+      "error_code": "FETCH_FAILED",
+      "structured_error": {
+        "error": "Failed to fetch source image: Origin returned unsuccessful HTTP status: 500 Internal Server Error",
+        "code": "FETCH_FAILED",
+        "request_id": "01M6H264Q5HSBDFYDF5MRVDVM1",
+        "hint": "The origin server could not be reached or returned an error."
+      }
+    },
+    "imgproxy": {
+      "status": 502,
+      "body": "Source is unreachable"
+    }
+  },
+  "scenario_7_sustained_load": {
+    "duration_s": 60,
+    "sample_interval_s": 10,
+    "samples": [
+      {
+        "elapsed_s": 0,
+        "atihsrah_rss_mb": 476.7,
+        "imgproxy_rss_mb": 82.66
+      },
+      {
+        "elapsed_s": 10,
+        "atihsrah_rss_mb": 476.7,
+        "imgproxy_rss_mb": 56.06
+      },
+      {
+        "elapsed_s": 20,
+        "atihsrah_rss_mb": 476.7,
+        "imgproxy_rss_mb": 53.84
+      },
+      {
+        "elapsed_s": 30,
+        "atihsrah_rss_mb": 476.7,
+        "imgproxy_rss_mb": 53.84
+      },
+      {
+        "elapsed_s": 40,
+        "atihsrah_rss_mb": 476.7,
+        "imgproxy_rss_mb": 53.84
+      },
+      {
+        "elapsed_s": 50,
+        "atihsrah_rss_mb": 478.6,
+        "imgproxy_rss_mb": 53.83
+      },
+      {
+        "elapsed_s": 60,
+        "atihsrah_rss_mb": 480.0,
+        "imgproxy_rss_mb": 53.83
+      }
+    ],
+    "final_atihsrah_rss_mb": 480.0,
+    "final_imgproxy_rss_mb": 53.83
+  },
+  "scenario_8_avif_vs_webp": [
+    {
+      "image": "01_landscape.png",
+      "webp_ms": 38.2,
+      "webp_bytes": 453734,
+      "avif_ms": 294.9,
+      "avif_bytes": 4560,
+      "byte_delta_percent": -99.0,
+      "cpu_time_ratio": 7.71
+    },
+    {
+      "image": "04_night_skyline.jpg",
+      "webp_ms": 28.5,
+      "webp_bytes": 252094,
+      "avif_ms": 315.1,
+      "avif_bytes": 34935,
+      "byte_delta_percent": -86.1,
+      "cpu_time_ratio": 11.04
+    },
+    {
+      "image": "07_smooth_gradient.png",
+      "webp_ms": 33.3,
+      "webp_bytes": 112624,
+      "avif_ms": 354.3,
+      "avif_bytes": 1887,
+      "byte_delta_percent": -98.3,
+      "cpu_time_ratio": 10.63
+    },
+    {
+      "image": "09_ui_desktop.png",
+      "webp_ms": 24.2,
+      "webp_bytes": 1160,
+      "avif_ms": 193.4,
+      "avif_bytes": 1209,
+      "byte_delta_percent": 4.2,
+      "cpu_time_ratio": 7.98
+    },
+    {
+      "image": "17_noise_grain.png",
+      "webp_ms": 21.6,
+      "webp_bytes": 270374,
+      "avif_ms": 248.4,
+      "avif_bytes": 38213,
+      "byte_delta_percent": -85.9,
+      "cpu_time_ratio": 11.52
+    }
+  ],
+  "scenario_9_corpus_summary": {
+    "total_images": 20,
+    "avg_atihsrah_bytes": 143330.7,
+    "avg_imgproxy_bytes": 18190.1,
+    "avg_atihsrah_ssim": 0.7717,
+    "avg_imgproxy_ssim": 0.8154,
+    "avg_atihsrah_vmaf": 46.58,
+    "avg_imgproxy_vmaf": 41.46
+  }
+}

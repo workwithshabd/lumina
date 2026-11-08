@@ -1,0 +1,74 @@
+version: '3.8'
+
+# Production Docker Compose Deployment for Atihsrah
+#
+# Prerequisites:
+# 1. Generate a secure 32-byte signing key:
+#    export ATIHSRAH_SIGNING_KEY=$(openssl rand -hex 32)
+# 2. Never commit raw signing keys to version control.
+
+services:
+  atihsrah:
+    image: atihsrah:latest
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      # Server Bind Address
+      ATIHSRAH_BIND: "0.0.0.0:8080"
+
+      # Authentication Mode & Master Signing Key (Injected from shell environment or Docker secret)
+      ATIHSRAH_AUTH_MODE: "signed"
+      ATIHSRAH_SIGNING_KEY: "${ATIHSRAH_SIGNING_KEY:?Error: ATIHSRAH_SIGNING_KEY must be set via env or secret}"
+
+      # Allowed Public HTTPS Origins (Required, strictly HTTPS)
+      ALLOWED_ORIGINS: "https://assets.mycompany.com,https://s3.amazonaws.com"
+
+      # Granular Private Origins (Optional): Allows internal service fetching (e.g. MinIO)
+      # Format: "host:port;ca=/path/to/ca.crt"
+      ATIHSRAH_PRIVATE_ORIGINS: "minio.internal.net:9000;ca=/etc/ssl/certs/internal-ca.crt"
+
+      # Resource Limits & Performance Configuration
+      CACHE_MAX_SIZE_MB: "500"
+      CACHE_SINGLE_ENTRY_MAX_MB: "10"
+      CACHE_TTL_SECS: "86400"
+      MAX_SOURCE_FETCH_MB: "20"
+      MAX_SOURCE_DIMENSION: "8000"
+      MAX_OUTPUT_DIMENSION: "4096"
+      MAX_PROCESSING_MEMORY_MB: "512"
+      MAX_CONCURRENT_TRANSFORMS: "4"
+      SOURCE_FETCH_TIMEOUT_SECS: "15"
+      SOURCE_CONNECT_TIMEOUT_SECS: "5"
+
+      # Pure-Rust Image Encoding Optimization
+      ATIHSRAH_AVIF_SPEED: "6"
+      ATIHSRAH_DISTINCT_COLOR_THRESHOLD: "256"
+      ATIHSRAH_MAX_RETRY_PIXELS: "16777216"
+
+      # Observability
+      LOG_LEVEL: "info"
+      ATIHSRAH_ENABLE_DEBUG_HEADERS: "false"
+
+    volumes:
+      # Mount internal CA certificate for private origin TLS verification
+      - ./certs/internal-ca.crt:/etc/ssl/certs/internal-ca.crt:ro
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 1024M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+

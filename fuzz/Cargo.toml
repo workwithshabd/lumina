@@ -1,0 +1,42 @@
+[package]
+name = "atihsrah-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+
+[dependencies.atihsrah]
+path = ".."
+
+[[bin]]
+name = "fuzz_query_parser"
+path = "fuzz_targets/fuzz_query_parser.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "fuzz_canonical_builder"
+path = "fuzz_targets/fuzz_canonical_builder.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "fuzz_url_validator"
+path = "fuzz_targets/fuzz_url_validator.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "fuzz_image_probe"
+path = "fuzz_targets/fuzz_image_probe.rs"
+test = false
+doc = false
+bench = false

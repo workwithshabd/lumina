@@ -1,0 +1,28 @@
+services:
+  atihsrah:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: atihsrah:latest
+    container_name: atihsrah
+    restart: unless-stopped
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+    ports:
+      # Public HTTP image proxy endpoint
+      - "8080:8080"
+      # Prometheus metrics endpoint strictly bound to localhost for internal scraping
+      - "127.0.0.1:9090:9090"
+    env_file:
+      - .env
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+

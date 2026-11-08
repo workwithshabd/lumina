@@ -1,0 +1,21 @@
+id,filename,category,dimensions,source_url,license,license_notes,sha256
+img_01,kodim01.png,photo,768x512,https://r0k.us/graphics/kodak/kodak/kodim01.png,Public Domain,"Kodak True Color Lossless Suite",a56e27cbf5f843c048b6af1d6e090760e9c92fadba88b7dee0205918a37523bd
+img_02,kodim02.png,photo,768x512,https://r0k.us/graphics/kodak/kodak/kodim02.png,Public Domain,"Kodak True Color Lossless Suite",4f4b74a79237e311d72cad958237b5f7088d8bce1c82305ebefe1a70e3022dfd
+img_03,kodim03.png,photo,768x512,https://r0k.us/graphics/kodak/kodak/kodim03.png,Public Domain,"Kodak True Color Lossless Suite",e25ca1ff2f0c0cb5fdfd5f9b0a0bb21ac4c3de3c84a67f35b09a85d3306249db
+img_04,kodim04.png,photo,512x768,https://r0k.us/graphics/kodak/kodak/kodim04.png,Public Domain,"Kodak True Color Lossless Suite",e3b946107c5d3441c022f678d0c3caf1e224d81b1604ba840a4f88e562de61aa
+img_05,kodim05.png,photo,768x512,https://r0k.us/graphics/kodak/kodak/kodim05.png,Public Domain,"Kodak True Color Lossless Suite",10349e963c5c813d327852f82c1795fa4148d69fedffc4c589bee458e3ac3d53
+img_06,kodim07.png,photo,768x512,https://r0k.us/graphics/kodak/kodak/kodim07.png,Public Domain,"Kodak True Color Lossless Suite",b77d3f006f42414bb242222e0482e750c0fb9e5ee8d4bed2f6f11c5605fe54a4
+img_07,kodim08.png,photo,768x512,https://r0k.us/graphics/kodak/kodak/kodim08.png,Public Domain,"Kodak True Color Lossless Suite",ba23983c76b4832ee0e8af0592664756841a16779acd69f792e268fb6d13d6e7
+img_08,kodim13.png,photo,768x512,https://r0k.us/graphics/kodak/kodak/kodim13.png,Public Domain,"Kodak True Color Lossless Suite",bc34a3ce58dea09dce1704c997171602de90cb34d0c8503a988b77f473d39b08
+img_09,kodim14.png,photo,768x512,https://r0k.us/graphics/kodak/kodak/kodim14.png,Public Domain,"Kodak True Color Lossless Suite",55a94550ff18f3246c4074fd32b77b0c74447c26b6ad274d564d999c0450ba6e
+img_10,kodim15.png,photo,768x512,https://r0k.us/graphics/kodak/kodak/kodim15.png,Public Domain,"Kodak True Color Lossless Suite",7538cbb80cb9103606c48b806eae57d56c885c7f90b9b3be70a41160f9cbb683
+img_11,kodim17.png,photo,512x768,https://r0k.us/graphics/kodak/kodak/kodim17.png,Public Domain,"Kodak True Color Lossless Suite",37afcc89fbdcb76d9518e04b2fc011027e2f4cd14b3b2f83cefd721641a47c5b
+img_12,kodim19.png,photo,512x768,https://r0k.us/graphics/kodak/kodak/kodim19.png,Public Domain,"Kodak True Color Lossless Suite",b7450b264b1b0a411390d8931b112c27905a992520fc90569dc4b920aa32bbdc
+img_13,kodim20.png,photo,768x512,https://r0k.us/graphics/kodak/kodak/kodim20.png,Public Domain,"Kodak True Color Lossless Suite",3b46c71e3b92a563820ba32936be8330c586c41f938efd94be938386aae4328a
+img_14,kodim23.png,photo,768x512,https://r0k.us/graphics/kodak/kodak/kodim23.png,Public Domain,"Kodak True Color Lossless Suite",e3111a2fd4da24af15d6459ef9eacfe54106b38e27b4a21821b75c3f5d2d5baf
+img_15,moraine_lake.jpg,photo,2048x1536,https://upload.wikimedia.org/wikipedia/commons/c/c5/Moraine_Lake_17092005.jpg,Public Domain,"Wikimedia Commons, photo by Gorgo",adb3041e3ac2de4cf3e7c3d186ea2c39a1a811b4a5fff4f888a6711579833d5f
+img_16,kde_spectacle.png,ui_screenshot,952x447,https://upload.wikimedia.org/wikipedia/commons/9/97/KDE_Spectacle.png,LGPL-2.0-or-later,"Wikimedia Commons, KDE Project",3e2940df7470cf9292ec3e1696fc0c29498054b8f0a95b48b3ef437c49cae2d7
+img_17,training_module.png,ui_screenshot,642x545,https://upload.wikimedia.org/wikipedia/commons/8/85/Training_module_screenshot_1.png,CC-BY-SA-4.0,"Wikimedia Commons, Wikimedia Foundation",3205c0f384d4249335196e47b814bf4e4561d366dd8efe4fae3da1a593a89a66
+img_18,python_logo_alpha.png,alpha,580x164,https://raw.githubusercontent.com/python/pythondotorg/main/static/img/python-logo.png,PSF,"Python Software Foundation trademark policy / open web asset",9c121e619bfe02eaba582d7080eea46fd53ec0b50717e6794a948fada4ae8f3c
+img_19,alacritty_logo_alpha.png,alpha,64x64,https://raw.githubusercontent.com/alacritty/alacritty/master/extra/logo/compat/alacritty-term.png,Apache-2.0,"Alacritty project open asset",60527e638bb4365c2e022ddc4d1296cc870e9ec2c85694dc4bb780cda449e999
+img_20,world_map_graphic.png,graphic,1280x836,https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/World_map_-_low_resolution.svg/1280px-World_map_-_low_resolution.svg.png,Public Domain,"Wikimedia Commons vector projection",92c8ea5d370e8f23abe38cc2d9aefb4a46cfa1ad238ab0701443109aab71093e

@@ -1,0 +1,352 @@
+{
+  "vectors": [
+    {
+      "id": "vec_01_plain_ascii",
+      "description": "Basic ASCII parameters",
+      "type": "positive",
+      "key": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "kid": null,
+      "params": {
+        "src": "https://images.example.com/photo.jpg",
+        "w": "800"
+      },
+      "exp": 1772543600,
+      "now_secs": 1772540000,
+      "canonical_string": "GET\n/transform\n1772543600\nexp=1772543600\nsrc=https%3A%2F%2Fimages.example.com%2Fphoto.jpg\nw=800",
+      "expected_sig": "9bc2ed959db82ae798f7ae9888d11679fbddb69b29c5803a08483b559dfc0368",
+      "raw_query": "src=https%3A%2F%2Fimages.example.com%2Fphoto.jpg&w=800&exp=1772543600&sig=9bc2ed959db82ae798f7ae9888d11679fbddb69b29c5803a08483b559dfc0368",
+      "expected_error": null
+    },
+    {
+      "id": "vec_02_spaces",
+      "description": "Spaces in image filename",
+      "type": "positive",
+      "key": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "kid": null,
+      "params": {
+        "src": "https://images.example.com/my summer photo.jpg",
+        "w": "400"
+      },
+      "exp": 1772543600,
+      "now_secs": 1772540000,
+      "canonical_string": "GET\n/transform\n1772543600\nexp=1772543600\nsrc=https%3A%2F%2Fimages.example.com%2Fmy%20summer%20photo.jpg\nw=400",
+      "expected_sig": "93e531c8b6197dfa9f3f2bfe788c0e53a845f355031df12c3c8e4967bb07d75d",
+      "raw_query": "src=https%3A%2F%2Fimages.example.com%2Fmy%20summer%20photo.jpg&w=400&exp=1772543600&sig=93e531c8b6197dfa9f3f2bfe788c0e53a845f355031df12c3c8e4967bb07d75d",
+      "expected_error": null
+    },
+    {
+      "id": "vec_03_plus_sign",
+      "description": "Plus signs in filename and query",
+      "type": "positive",
+      "key": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "kid": null,
+      "params": {
+        "src": "https://images.example.com/c++_guide+v2.png",
+        "w": "600"
+      },
+      "exp": 1772543600,
+      "now_secs": 1772540000,
+      "canonical_string": "GET\n/transform\n1772543600\nexp=1772543600\nsrc=https%3A%2F%2Fimages.example.com%2Fc%2B%2B_guide%2Bv2.png\nw=600",
+      "expected_sig": "c3e625781ea5b9a1744204045617d719dd69ddf327597b183ffc7e936af46760",
+      "raw_query": "src=https%3A%2F%2Fimages.example.com%2Fc%2B%2B_guide%2Bv2.png&w=600&exp=1772543600&sig=c3e625781ea5b9a1744204045617d719dd69ddf327597b183ffc7e936af46760",
+      "expected_error": null
+    },
+    {
+      "id": "vec_04_tilde",
+      "description": "Tilde character in user path",
+      "type": "positive",
+      "key": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "kid": null,
+      "params": {
+        "src": "https://images.example.com/~user/avatar~1.jpg",
+        "w": "200"
+      },
+      "exp": 1772543600,
+      "now_secs": 1772540000,
+      "canonical_string": "GET\n/transform\n1772543600\nexp=1772543600\nsrc=https%3A%2F%2Fimages.example.com%2F~user%2Favatar~1.jpg\nw=200",
+      "expected_sig": "edd95603ea65ffa40ddd74ebaffdba233729aab2f7ba055a5279f6da08c50287",
+      "raw_query": "src=https%3A%2F%2Fimages.example.com%2F~user%2Favatar~1.jpg&w=200&exp=1772543600&sig=edd95603ea65ffa40ddd74ebaffdba233729aab2f7ba055a5279f6da08c50287",
+      "expected_error": null
+    },
+    {
+      "id": "vec_05_parentheses",
+      "description": "Parentheses in filename",
+      "type": "positive",
+      "key": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "kid": null,
+      "params": {
+        "src": "https://images.example.com/chart(final).png",
+        "w": "500"
+      },
+      "exp": 1772543600,
+      "now_secs": 1772540000,
+      "canonical_string": "GET\n/transform\n1772543600\nexp=1772543600\nsrc=https%3A%2F%2Fimages.example.com%2Fchart%28final%29.png\nw=500",
+      "expected_sig": "bfd5638218f87fb0b65f8287779536ae9f8899b6c49e518cc6b29344237d6b62",
+      "raw_query": "src=https%3A%2F%2Fimages.example.com%2Fchart%28final%29.png&w=500&exp=1772543600&sig=bfd5638218f87fb0b65f8287779536ae9f8899b6c49e518cc6b29344237d6b62",
+      "expected_error": null
+    },
+    {
+      "id": "vec_06_asterisk",
+      "description": "Asterisk in value",
+      "type": "positive",
+      "key": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "kid": null,
+      "params": {
+        "src": "https://images.example.com/star*burst.jpg",
+        "w": "300"
+      },
+      "exp": 1772543600,
+      "now_secs": 1772540000,
+      "canonical_string": "GET\n/transform\n1772543600\nexp=1772543600\nsrc=https%3A%2F%2Fimages.example.com%2Fstar%2Aburst.jpg\nw=300",
+      "expected_sig": "76f932654a274182663c5394301eec3b1be3e8ebfbe4b6b7232682ecd4f56798",
+      "raw_query": "src=https%3A%2F%2Fimages.example.com%2Fstar%2Aburst.jpg&w=300&exp=1772543600&sig=76f932654a274182663c5394301eec3b1be3e8ebfbe4b6b7232682ecd4f56798",
+      "expected_error": null
+    },
+    {
+      "id": "vec_07_exclamation",
+      "description": "Exclamation mark in value",
+      "type": "positive",
+      "key": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "kid": null,
+      "params": {
+        "src": "https://images.example.com/wow!look.jpg",
+        "w": "350"
+      },
+      "exp": 1772543600,
+      "now_secs": 1772540000,
+      "canonical_string": "GET\n/transform\n1772543600\nexp=1772543600\nsrc=https%3A%2F%2Fimages.example.com%2Fwow%21look.jpg\nw=350",
+      "expected_sig": "a9376e9bc8c310d1038d8bbea063c1cb5f1e7d1a0733d259b526b11920abd25c",
+      "raw_query": "src=https%3A%2F%2Fimages.example.com%2Fwow%21look.jpg&w=350&exp=1772543600&sig=a9376e9bc8c310d1038d8bbea063c1cb5f1e7d1a0733d259b526b11920abd25c",
+      "expected_error": null
+    },
+    {
+      "id": "vec_08_single_quote",
+      "description": "Single quote in value",
+      "type": "positive",
+      "key": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "kid": null,
+      "params": {
+        "src": "https://images.example.com/cat's_cradle.jpg",
+        "w": "450"
+      },
+      "exp": 1772543600,
+      "now_secs": 1772540000,
+      "canonical_string": "GET\n/transform\n1772543600\nexp=1772543600\nsrc=https%3A%2F%2Fimages.example.com%2Fcat%27s_cradle.jpg\nw=450",
+      "expected_sig": "4c25d2e22d666fcc15eaa0d7b9a5c471f7f402d16a1eac15039e5e18c125c567",
+      "raw_query": "src=https%3A%2F%2Fimages.example.com%2Fcat%27s_cradle.jpg&w=450&exp=1772543600&sig=4c25d2e22d666fcc15eaa0d7b9a5c471f7f402d16a1eac15039e5e18c125c567",
+      "expected_error": null
+    },
+    {
+      "id": "vec_09_unicode_japanese",
+      "description": "UTF-8 multibyte Japanese characters",
+      "type": "positive",
+      "key": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "kid": null,
+      "params": {
+        "src": "https://images.example.com/\u5bcc\u58eb\u5c71.jpg",
+        "w": "800"
+      },
+      "exp": 1772543600,
+      "now_secs": 1772540000,
+      "canonical_string": "GET\n/transform\n1772543600\nexp=1772543600\nsrc=https%3A%2F%2Fimages.example.com%2F%E5%AF%8C%E5%A3%AB%E5%B1%B1.jpg\nw=800",
+      "expected_sig": "3bf7e7b200d9a65cb79f345a72b50b7516d58263030c33102529b989818ba499",
+      "raw_query": "src=https%3A%2F%2Fimages.example.com%2F%E5%AF%8C%E5%A3%AB%E5%B1%B1.jpg&w=800&exp=1772543600&sig=3bf7e7b200d9a65cb79f345a72b50b7516d58263030c33102529b989818ba499",
+      "expected_error": null
+    },
+    {
+      "id": "vec_10_unicode_emoji",
+      "description": "UTF-8 multibyte emoji characters",
+      "type": "positive",
+      "key": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "kid": null,
+      "params": {
+        "src": "https://images.example.com/vacation\ud83c\udfdd\ufe0f.png",
+        "w": "640"
+      },
+      "exp": 1772543600,
+      "now_secs": 1772540000,
+      "canonical_string": "GET\n/transform\n1772543600\nexp=1772543600\nsrc=https%3A%2F%2Fimages.example.com%2Fvacation%F0%9F%8F%9D%EF%B8%8F.png\nw=640",
+      "expected_sig": "0ab5cc1dae608a6591d8a07f3516db35e2954e1219c5cf9bd84016c3a24d258f",
+      "raw_query": "src=https%3A%2F%2Fimages.example.com%2Fvacation%F0%9F%8F%9D%EF%B8%8F.png&w=640&exp=1772543600&sig=0ab5cc1dae608a6591d8a07f3516db35e2954e1219c5cf9bd84016c3a24d258f",
+      "expected_error": null
+    },
+    {
+      "id": "vec_11_nested_query",
+      "description": "Source URL with its own query string",
+      "type": "positive",
+      "key": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "kid": null,
+      "params": {
+        "src": "https://images.example.com/api?user=123&filter=a+b&tag=hero",
+        "w": "1200"
+      },
+      "exp": 1772543600,
+      "now_secs": 1772540000,
+      "canonical_string": "GET\n/transform\n1772543600\nexp=1772543600\nsrc=https%3A%2F%2Fimages.example.com%2Fapi%3Fuser%3D123%26filter%3Da%2Bb%26tag%3Dhero\nw=1200",
+      "expected_sig": "b302545a183f01a9cd5e999e8702de14ebf06f1219ee5e01a65d9e71874f3323",
+      "raw_query": "src=https%3A%2F%2Fimages.example.com%2Fapi%3Fuser%3D123%26filter%3Da%2Bb%26tag%3Dhero&w=1200&exp=1772543600&sig=b302545a183f01a9cd5e999e8702de14ebf06f1219ee5e01a65d9e71874f3323",
+      "expected_error": null
+    },
+    {
+      "id": "vec_12_cache_version_v",
+      "description": "Cache version parameter v present",
+      "type": "positive",
+      "key": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "kid": null,
+      "params": {
+        "src": "https://images.example.com/logo.png",
+        "w": "250",
+        "v": "2.1.0"
+      },
+      "exp": 1772543600,
+      "now_secs": 1772540000,
+      "canonical_string": "GET\n/transform\n1772543600\nexp=1772543600\nsrc=https%3A%2F%2Fimages.example.com%2Flogo.png\nv=2.1.0\nw=250",
+      "expected_sig": "a9ddc06f3cbbadfd8375b9375035b946c86aa520a587ff5f430cf0ed4f4cff34",
+      "raw_query": "src=https%3A%2F%2Fimages.example.com%2Flogo.png&w=250&v=2.1.0&exp=1772543600&sig=a9ddc06f3cbbadfd8375b9375035b946c86aa520a587ff5f430cf0ed4f4cff34",
+      "expected_error": null
+    },
+    {
+      "id": "vec_13_key_rotation_kid",
+      "description": "Key rotation parameter kid present",
+      "type": "positive",
+      "key": "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210",
+      "kid": "v2",
+      "params": {
+        "src": "https://images.example.com/banner.jpg",
+        "w": "1024"
+      },
+      "exp": 1772543600,
+      "now_secs": 1772540000,
+      "canonical_string": "GET\n/transform\n1772543600\nexp=1772543600\nkid=v2\nsrc=https%3A%2F%2Fimages.example.com%2Fbanner.jpg\nw=1024",
+      "expected_sig": "cf0e8019b1625a48b25cce0b798ee0f4209b56a5946772849771feee8aef9f5c",
+      "raw_query": "src=https%3A%2F%2Fimages.example.com%2Fbanner.jpg&w=1024&exp=1772543600&kid=v2&sig=cf0e8019b1625a48b25cce0b798ee0f4209b56a5946772849771feee8aef9f5c",
+      "expected_error": null
+    },
+    {
+      "id": "vec_14_all_special_combined",
+      "description": "All special characters and options combined",
+      "type": "positive",
+      "key": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "kid": null,
+      "params": {
+        "src": "https://images.example.com/~test/file (1)*2!+3's.png",
+        "w": "500",
+        "h": "500",
+        "fit": "cover",
+        "format": "webp",
+        "quality_target": "high",
+        "v": "v1"
+      },
+      "exp": 1772543600,
+      "now_secs": 1772540000,
+      "canonical_string": "GET\n/transform\n1772543600\nexp=1772543600\nfit=cover\nformat=webp\nh=500\nquality_target=high\nsrc=https%3A%2F%2Fimages.example.com%2F~test%2Ffile%20%281%29%2A2%21%2B3%27s.png\nv=v1\nw=500",
+      "expected_sig": "03e279df45ecc75df68a6a3c8b808afc0d704bfc608d31892fb97288450f8d3f",
+      "raw_query": "src=https%3A%2F%2Fimages.example.com%2F~test%2Ffile%20%281%29%2A2%21%2B3%27s.png&w=500&h=500&fit=cover&format=webp&quality_target=high&v=v1&exp=1772543600&sig=03e279df45ecc75df68a6a3c8b808afc0d704bfc608d31892fb97288450f8d3f",
+      "expected_error": null
+    },
+    {
+      "id": "vec_15_neg_duplicate_key",
+      "description": "Duplicate parameter key in query string",
+      "type": "negative",
+      "key": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "kid": null,
+      "params": {
+        "src": "https://images.example.com/photo.jpg",
+        "w": "300"
+      },
+      "exp": 1772543600,
+      "now_secs": 1772540000,
+      "canonical_string": "GET\n/transform\n1772543600\nexp=1772543600\nsrc=https%3A%2F%2Fimages.example.com%2Fphoto.jpg\nw=300",
+      "expected_sig": "f51965a00bb988895939fe5083fb3ad3f2bd6199f6b269eb2c9aabb485403534",
+      "raw_query": "src=https%3A%2F%2Fimages.example.com%2Fphoto.jpg&w=300&w=400&exp=1772543600&sig=f51965a00bb988895939fe5083fb3ad3f2bd6199f6b269eb2c9aabb485403534",
+      "expected_error": "DuplicateParam",
+      "tampered_query": "src=https%3A%2F%2Fimages.example.com%2Fphoto.jpg&w=300&w=400&exp=1772543600&sig=f51965a00bb988895939fe5083fb3ad3f2bd6199f6b269eb2c9aabb485403534"
+    },
+    {
+      "id": "vec_16_neg_tampered_value",
+      "description": "Tampered parameter value",
+      "type": "negative",
+      "key": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "kid": null,
+      "params": {
+        "src": "https://images.example.com/photo.jpg",
+        "w": "300"
+      },
+      "exp": 1772543600,
+      "now_secs": 1772540000,
+      "canonical_string": "GET\n/transform\n1772543600\nexp=1772543600\nsrc=https%3A%2F%2Fimages.example.com%2Fphoto.jpg\nw=300",
+      "expected_sig": "f51965a00bb988895939fe5083fb3ad3f2bd6199f6b269eb2c9aabb485403534",
+      "raw_query": "src=https%3A%2F%2Fimages.example.com%2Fphoto.jpg&w=500&exp=1772543600&sig=f51965a00bb988895939fe5083fb3ad3f2bd6199f6b269eb2c9aabb485403534",
+      "expected_error": "Unauthorized",
+      "tampered_query": "src=https%3A%2F%2Fimages.example.com%2Fphoto.jpg&w=500&exp=1772543600&sig=f51965a00bb988895939fe5083fb3ad3f2bd6199f6b269eb2c9aabb485403534"
+    },
+    {
+      "id": "vec_17_neg_wrong_key",
+      "description": "Signed with wrong secret key",
+      "type": "negative",
+      "key": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "kid": null,
+      "params": {
+        "src": "https://images.example.com/photo.jpg",
+        "w": "300"
+      },
+      "exp": 1772543600,
+      "now_secs": 1772540000,
+      "canonical_string": "GET\n/transform\n1772543600\nexp=1772543600\nsrc=https%3A%2F%2Fimages.example.com%2Fphoto.jpg\nw=300",
+      "expected_sig": "2c059bf0cc17cea6b2edd9370a760fa6b9fee939f52017b46cd28b0c11c6b7fc",
+      "raw_query": "src=https%3A%2F%2Fimages.example.com%2Fphoto.jpg&w=300&exp=1772543600&sig=2c059bf0cc17cea6b2edd9370a760fa6b9fee939f52017b46cd28b0c11c6b7fc",
+      "expected_error": "Unauthorized"
+    },
+    {
+      "id": "vec_18_neg_expired",
+      "description": "Expired signature timestamp",
+      "type": "negative",
+      "key": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "kid": null,
+      "params": {
+        "src": "https://images.example.com/photo.jpg",
+        "w": "300"
+      },
+      "exp": 1772539900,
+      "now_secs": 1772540000,
+      "canonical_string": "GET\n/transform\n1772539900\nexp=1772539900\nsrc=https%3A%2F%2Fimages.example.com%2Fphoto.jpg\nw=300",
+      "expected_sig": "91e4aea8e7496ed49ddfcf2202591bbbacfae15a5b5aa6a3f27608ebf98355ae",
+      "raw_query": "src=https%3A%2F%2Fimages.example.com%2Fphoto.jpg&w=300&exp=1772539900&sig=91e4aea8e7496ed49ddfcf2202591bbbacfae15a5b5aa6a3f27608ebf98355ae",
+      "expected_error": "Expired"
+    },
+    {
+      "id": "vec_19_neg_missing_sig",
+      "description": "Missing required sig parameter",
+      "type": "negative",
+      "key": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "kid": null,
+      "params": {
+        "src": "https://images.example.com/photo.jpg",
+        "w": "300"
+      },
+      "exp": 1772543600,
+      "now_secs": 1772540000,
+      "canonical_string": "GET\n/transform\n1772543600\nexp=1772543600\nsrc=https%3A%2F%2Fimages.example.com%2Fphoto.jpg\nw=300",
+      "expected_sig": "f51965a00bb988895939fe5083fb3ad3f2bd6199f6b269eb2c9aabb485403534",
+      "raw_query": "src=https%3A%2F%2Fimages.example.com%2Fphoto.jpg&w=300&exp=1772543600",
+      "expected_error": "Unauthorized"
+    },
+    {
+      "id": "vec_20_neg_invalid_hex_sig",
+      "description": "Invalid non-hex sig parameter",
+      "type": "negative",
+      "key": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "kid": null,
+      "params": {
+        "src": "https://images.example.com/photo.jpg",
+        "w": "300"
+      },
+      "exp": 1772543600,
+      "now_secs": 1772540000,
+      "canonical_string": "GET\n/transform\n1772543600\nexp=1772543600\nsrc=https%3A%2F%2Fimages.example.com%2Fphoto.jpg\nw=300",
+      "expected_sig": "f51965a00bb988895939fe5083fb3ad3f2bd6199f6b269eb2c9aabb485403534",
+      "raw_query": "src=https%3A%2F%2Fimages.example.com%2Fphoto.jpg&w=300&exp=1772543600&sig=not_valid_hex_12345",
+      "expected_error": "Unauthorized"
+    }
+  ]
+}

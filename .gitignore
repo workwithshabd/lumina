@@ -1,0 +1,10 @@
+/target
+.env
+*.swp
+*.bak
+.DS_Store
+benchmarks/output/
+bench/certs/
+bench/corpus/
+__pycache__/
+*.pyc

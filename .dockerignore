@@ -1,0 +1,11 @@
+target/
+.git/
+.env
+fuzz/
+tests/
+docs/
+benchmarks/
+*.md
+LICENSE
+.system_generated/
+
