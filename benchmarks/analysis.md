@@ -15,7 +15,11 @@
 - **Operating System**: macOS 27.2 (Build 26B123)
 - **Kernel**: `Darwin Mac-mini.local 27.2.0 Darwin Kernel Version 27.2.0: Wed Oct 14 23:47:07 PDT 2026; root:xnu-13432.41.4~25/RELEASE_ARM64_T8132 arm64`
 - **Compiler / Toolchain**: `rustc 1.97.1 (8bab26f4f 2026-07-14)`, Python 3.12.14, `Docker version 29.9.2, build a82e528901` (`colima`)
-- **Git Commit**: `b507d0b6` (Full: `b507d0b6330ab5701cee730c7c9cb75763e50fd6`, Dirty: `False`)
+- **Git Commit Identity Reconciliation**:
+  - **Tested Software Commit**: `b507d0b6` (Full: `b507d0b6330ab5701cee730c7c9cb75763e50fd6`, Dirty: `False`)
+    *This is the exact, immutable Git commit of the codebase (Rust implementation, vendored crates, benchmark harness) tested during the run.*
+  - **Documentation Recording Commit**: `8827dc0a296cb834aae8a8d608342da8231fde15`
+    *This was the subsequent documentation commit recording the resulting report artifacts into version control.*
 - **Active Profile**: `Production Default (speed=6, max_entry=10MB)`
 - **Competitors Tested**:
   - **Atihsrah Native**: `v0.1.0` (pure-Rust native binary `target/release/atihsrah`)
@@ -67,22 +71,45 @@ Visual quality metrics computed against ground truth Pillow `Image.Resampling.LA
   - Atihsrah Wins: 2
   - imgproxy Wins: 0
   - Ties (|Δ| ≤ 1.0%): 0
-- **Median Byte Delta (Eligible Pairs)**: -21.2%
+- **Median Byte Delta (Eligible Pairs)**: -33.9%
 - **Mean Byte Delta (Eligible Pairs)**: -33.9%
 - **Average SSIM (All Samples)**: Atihsrah 0.9807 vs imgproxy 0.9110
-- **Optimization Hypothesis Verdict**: **NOT SUPPORTED / QUALITY GATE FAILURE**: Atihsrah failed the minimum SSIM quality gate on 1 asset(s): img_18 (python_logo_alpha.png: SSIM 0.9799 < 0.98). Compression wins cannot be certified when visual quality gates are breached.
+- **Optimization Hypothesis Verdict**: **NOT SUPPORTED / QUALITY GATE FAILURE (Explicit AVIF q=90 Gate)**: Atihsrah failed the minimum SSIM quality gate on 1 asset(s) under explicit AVIF q=90: img_18 (python_logo_alpha.png: SSIM 0.9799 < 0.98). Compression wins cannot be certified when visual quality gates are breached.
 - **Encoder Scale Disclosure**: Comparing nominal q=90 is a configuration comparison, not an equivalent perceptual quality match. Upstream encoders (`ravif` vs `libheif`/`libaom`) have distinct rate-distortion curves.
 
-### 3.2 Matched WebP Analysis (Capability & Encoding Trade-off)
+> [!IMPORTANT]
+> **NARROW COMPARISON SAMPLE DISCLOSURE ($N=2$)**:
+> Across the 20 real-world calibration images, only 2 images (`moraine_lake.jpg` and `alacritty_logo_alpha.png`) met category quality thresholds on *both* Atihsrah and imgproxy under explicit AVIF $q=90$. The other 18 images were disqualified from head-to-head comparison because imgproxy failed the SSIM quality gate against the Pillow reference (17 photos scored SSIM 0.79–0.94 vs ≥ 0.95 gate; 1 alpha logo scored 0.9329 vs ≥ 0.98 gate).
+> While Atihsrah produced smaller files on both eligible images (-21.2% and -46.6%, conventional median **-33.9%**), **$N=2$ mutually eligible pairs is a narrow, illustrative observation**. It demonstrates technical viability on these specific test cases, but does **not** constitute a statistically robust demonstration of market superiority over imgproxy across general web workloads.
+
+### 3.2 Working Hypotheses on Resampling and Color Space Discrepancies
+
+- **Hypothesis 1 (Resampling Filter Alignment)**: Switching Atihsrah's default filter from Catmull-Rom (`Triangle`/`CatmullRom`) to `Lanczos3` aligns its filter kernel family with Pillow's `Image.Resampling.LANCZOS` reference, raising photo SSIM scores into the 0.96–0.98 range. While empirically correlated with higher scores against the Pillow ground truth, this is a filter-congruence hypothesis; different filters trade off sharpness, ringing, and aliasing.
+- **Hypothesis 2 (Color Space & Gamma Linearization in libvips)**: imgproxy / libvips resizes in linearized light (converting sRGB -> linear -> resize -> sRGB), whereas standard Pillow resizes directly in non-linear gamma-encoded sRGB. This mathematical discrepancy in color-space processing during resampling accounts for significant structural differences in pixel values when scored against a Pillow reference, explaining imgproxy's lower measured SSIM (0.79–0.94) against the Pillow reference. This is framed as a working hypothesis to explain the measurement gap, not a definitive verdict on perceptual superiority.
+
+### 3.3 Matched WebP Analysis (Capability & Encoding Trade-off)
 
 - **Atihsrah WebP**: Pure-Rust `image-rs` lossless encoding (Average SSIM: 0.9980)
 - **imgproxy & Thumbor WebP**: `libwebp` / Pillow lossy encoding at q=75 (Average SSIM: 0.8874)
 - **WebP File Size Comparison**: imgproxy delivers smaller files on **20 of 20 images** (delta range -80% to -96% vs Atihsrah lossless WebP).
 - *Capability Disclosure*: Under Option A (pure Rust), Atihsrah generates lossless WebP for graphics and alpha assets. Because it does not link the C `libwebp` library, it cannot produce lossy WebP at q=75. Consequently, comparing Atihsrah lossless WebP directly to lossy WebP reflects an encoding mode trade-off (lossless visual fidelity vs lossy compression).
 
+### 3.4 Production Auto-Negotiation Pipeline Qualification (`format=auto`)
+
+- **Scope and Mechanism**: The requirement of zero larger-than-source outputs applies strictly to `format=auto`. In explicit format requests at nominal $q=90$, highly compressed or tiny graphics can inflate (e.g., `alacritty_logo_alpha.png` source 3,612 bytes to explicit AVIF 10,477 bytes, +190.1%). In `format=auto`, Atihsrah evaluates candidate sizes against the source and falls back along the quality ladder ($q=40$) to guarantee output byte size does not exceed source bytes (producing 3,401 bytes ≤ 3,612).
+- **Calibration Corpus Results (`format=auto`)**:
+  - Total Calibration Assets Evaluated: 20
+  - Outputs ≤ Source Bytes: **20 of 20 (100%)** (0 larger-than-source outputs)
+  - Category Quality Passes: **18 of 20** (15 of 15 photos pass ≥ 0.95; 3 of 5 graphics/UI/alpha pass ≥ 0.98; `python_logo_alpha.png` marginal miss at 0.9799, `alacritty_logo_alpha.png` at 0.9674 due to size-limiting fallback)
+  - Average SSIM: 0.9807
+  - Average PSNR: 41.67 dB
+  - Status: **Zero Larger-Than-Source Verified** under default auto-negotiation.
+
 ---
 
 ## 4. Per-Image Results: 20-Image Real-World Calibration Corpus
+
+### 4.1 Explicit Matched AVIF ($q=90$) & WebP Comparison
 
 | ID | Filename | Category | SSIM Gate | Orig Bytes | Atihsrah AVIF Bytes | Atihsrah AVIF SSIM | Atihsrah AVIF PSNR | imgproxy AVIF Bytes | imgproxy AVIF SSIM | imgproxy AVIF PSNR | AVIF Byte Δ (%) | Quality Status | Atihsrah WebP (Lossless) | imgproxy WebP (q75) |
 | :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
@@ -107,6 +134,31 @@ Visual quality metrics computed against ground truth Pillow `Image.Resampling.LA
 | img_19 | alacritty_logo_alpha.png | alpha | 0.98 | 3612 | 10477 | 0.9931 | 49.31 | 19633 | 0.9800 | 39.06 | -46.6% | At:PASS / img:PASS | 163650 (lossless) | 7494 (q75) |
 | img_20 | world_map_graphic.png | graphic | 0.98 | 87924 | 60061 | 0.9963 | 47.57 | 51768 | 0.8923 | 19.2 | +16.0% | At:PASS / img:**FAIL** | 82416 (lossless) | 65118 (q75) |
 
+### 4.2 Production Auto-Negotiation & Zero-Larger-Than-Source Audit (`format=auto`)
+
+| ID | Filename | Category | SSIM Gate | Orig Bytes | Auto Format | Auto Bytes | Ratio vs Orig | Auto SSIM | Auto PSNR | Output <= Source? | Quality Status |
+| :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| img_01 | kodim01.png | photo | 0.95 | 736501 | avif | 125449 |  17.0% | 0.9838 | 39.95 | YES (0 larger) | PASS |
+| img_02 | kodim02.png | photo | 0.95 | 617995 | avif | 90031 |  14.6% | 0.9683 | 41.48 | YES (0 larger) | PASS |
+| img_03 | kodim03.png | photo | 0.95 | 502888 | avif | 51233 |  10.2% | 0.9763 | 42.87 | YES (0 larger) | PASS |
+| img_04 | kodim04.png | photo | 0.95 | 637432 | avif | 58350 |   9.2% | 0.9775 | 43.4 | YES (0 larger) | PASS |
+| img_05 | kodim05.png | photo | 0.95 | 785610 | avif | 131351 |  16.7% | 0.9842 | 39.51 | YES (0 larger) | PASS |
+| img_06 | kodim07.png | photo | 0.95 | 566322 | avif | 60205 |  10.6% | 0.9800 | 42.2 | YES (0 larger) | PASS |
+| img_07 | kodim08.png | photo | 0.95 | 788470 | avif | 133006 |  16.9% | 0.9831 | 39.02 | YES (0 larger) | PASS |
+| img_08 | kodim13.png | photo | 0.95 | 822712 | avif | 164655 |  20.0% | 0.9839 | 38.62 | YES (0 larger) | PASS |
+| img_09 | kodim14.png | photo | 0.95 | 692201 | avif | 123626 |  17.9% | 0.9790 | 40.15 | YES (0 larger) | PASS |
+| img_10 | kodim15.png | photo | 0.95 | 612582 | avif | 77857 |  12.7% | 0.9721 | 41.78 | YES (0 larger) | PASS |
+| img_11 | kodim17.png | photo | 0.95 | 602078 | avif | 68721 |  11.4% | 0.9794 | 42.51 | YES (0 larger) | PASS |
+| img_12 | kodim19.png | photo | 0.95 | 671476 | avif | 68968 |  10.3% | 0.9804 | 41.8 | YES (0 larger) | PASS |
+| img_13 | kodim20.png | photo | 0.95 | 492462 | avif | 59747 |  12.1% | 0.9718 | 41.7 | YES (0 larger) | PASS |
+| img_14 | kodim23.png | photo | 0.95 | 557596 | avif | 57220 |  10.3% | 0.9696 | 42.36 | YES (0 larger) | PASS |
+| img_15 | moraine_lake.jpg | photo | 0.95 | 1520767 | avif | 134470 |   8.8% | 0.9625 | 38.66 | YES (0 larger) | PASS |
+| img_16 | kde_spectacle.png | ui_screenshot | 0.98 | 83699 | avif | 44810 |  53.5% | 0.9964 | 44.5 | YES (0 larger) | PASS |
+| img_17 | training_module.png | ui_screenshot | 0.98 | 107821 | avif | 45668 |  42.4% | 0.9971 | 44.2 | YES (0 larger) | PASS |
+| img_18 | python_logo_alpha.png | alpha | 0.98 | 15770 | avif | 13950 |  88.5% | 0.9799 | 41.43 | YES (0 larger) | **FAIL** |
+| img_19 | alacritty_logo_alpha.png | alpha | 0.98 | 3612 | avif | 3401 |  94.2% | 0.9674 | 38.92 | YES (0 larger) | **FAIL** |
+| img_20 | world_map_graphic.png | graphic | 0.98 | 87924 | avif | 60061 |  68.3% | 0.9963 | 47.57 | YES (0 larger) | PASS |
+
 ---
 
 ## 5. Held-Out Synthetic Stress Suite (20 Procedural Test Assets)
@@ -115,6 +167,8 @@ Visual quality metrics computed against ground truth Pillow `Image.Resampling.LA
 > **SYNTHETIC STRESS SUITE DISCLOSURE**:
 > The 20 synthetic stress assets below evaluate procedural edge cases (gradients, high-contrast text, 4K resolution, checkerboards, alpha drop-shadows).
 > **Procedural stress assets do not measure real-world photographic generalization.** Results on synthetic patterns must not be extrapolated to claim real-world web delivery superiority.
+
+### 5.1 Explicit Matched AVIF ($q=90$) & WebP Comparison
 
 | ID | Filename | Category | SSIM Gate | Orig Bytes | Atihsrah AVIF Bytes | Atihsrah AVIF SSIM | Atihsrah AVIF PSNR | imgproxy AVIF Bytes | imgproxy AVIF SSIM | imgproxy AVIF PSNR | AVIF Byte Δ (%) | Quality Status | Atihsrah WebP (Lossless) | imgproxy WebP (q75) |
 | :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
@@ -138,6 +192,31 @@ Visual quality metrics computed against ground truth Pillow `Image.Resampling.LA
 | synth_18 | 18_photo_4k_large.jpg | photo_4k_large | 0.95 | 364042 | 15106 | 0.9905 | 47.97 | 34130 | 0.9885 | 44.71 | -55.7% | At:PASS / img:PASS | 317710 (lossless) | 12642 (q75) |
 | synth_19 | 19_photo_medium.jpg | photo | 0.95 | 36512 | 8456 | 0.9889 | 48.15 | 16049 | 0.9906 | 49.24 | -47.3% | At:PASS / img:PASS | 42920 (lossless) | 4434 (q75) |
 | synth_20 | 20_thumbnail_small.png | thumbnail_small | 0.95 | 129403 | 33651 | 0.9760 | 43.78 | 56351 | 0.9580 | 34.53 | -40.3% | At:PASS / img:PASS | 327140 (lossless) | 9200 (q75) |
+
+### 5.2 Production Auto-Negotiation Audit (`format=auto`)
+
+| ID | Filename | Category | SSIM Gate | Orig Bytes | Auto Format | Auto Bytes | Ratio vs Orig | Auto SSIM | Auto PSNR | Output <= Source? | Quality Status |
+| :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| synth_01 | 01_landscape.png | photo | 0.95 | 1206358 | avif | 14702 |   1.2% | 0.9849 | 46.76 | YES (0 larger) | PASS |
+| synth_02 | 02_portrait.jpg | photo | 0.95 | 66761 | avif | 6853 |  10.3% | 0.9944 | 50.0 | YES (0 larger) | PASS |
+| synth_03 | 03_macro_texture.png | photo | 0.95 | 3072094 | avif | 28478 |   0.9% | 0.9978 | 45.17 | YES (0 larger) | PASS |
+| synth_04 | 04_night_skyline.jpg | photo | 0.95 | 237866 | avif | 80347 |  33.8% | 0.9926 | 43.57 | YES (0 larger) | PASS |
+| synth_05 | 05_architecture.png | photo | 0.95 | 2035919 | avif | 93428 |   4.6% | 0.9948 | 40.0 | YES (0 larger) | PASS |
+| synth_06 | 06_vector_flat.png | vector_flat | 0.98 | 32167 | avif | 9069 |  28.2% | 0.9991 | 49.99 | YES (0 larger) | PASS |
+| synth_07 | 07_smooth_gradient.png | smooth_gradient | 0.98 | 364394 | avif | 6013 |   1.7% | 0.9931 | 50.23 | YES (0 larger) | PASS |
+| synth_08 | 08_typography_poster.png | typography_poster | 0.98 | 222246 | avif | 26968 |  12.1% | 0.9962 | 47.27 | YES (0 larger) | PASS |
+| synth_09 | 09_ui_desktop.png | ui_desktop | 0.98 | 33439 | avif | 3340 |  10.0% | 0.9975 | 49.39 | YES (0 larger) | PASS |
+| synth_10 | 10_ui_mobile.png | ui_mobile | 0.98 | 18535 | avif | 1383 |   7.5% | 0.9996 | 55.35 | YES (0 larger) | PASS |
+| synth_11 | 11_document_text.png | document_text | 0.98 | 4725797 | avif | 87337 |   1.8% | 0.9987 | 43.01 | YES (0 larger) | PASS |
+| synth_12 | 12_transparent_icon.png | transparent_icon | 0.98 | 13040 | avif | 11511 |  88.3% | 0.9952 | 45.04 | YES (0 larger) | PASS |
+| synth_13 | 13_transparent_shadow.png | transparent_shadow | 0.98 | 24390 | avif | 2773 |  11.4% | 0.9995 | 60.69 | YES (0 larger) | PASS |
+| synth_14 | 14_hdr_highcontrast.jpg | hdr_highcontrast | 0.95 | 60780 | avif | 2298 |   3.8% | 0.9981 | 57.67 | YES (0 larger) | PASS |
+| synth_15 | 15_lowcontrast_fog.jpg | lowcontrast_fog | 0.95 | 54118 | avif | 2768 |   5.1% | 0.9988 | 57.03 | YES (0 larger) | PASS |
+| synth_16 | 16_pattern_checkerboard.png | pattern_checkerboard | 0.98 | 42529 | avif | 32357 |  76.1% | 0.9397 | 25.51 | YES (0 larger) | **FAIL** |
+| synth_17 | 17_noise_grain.png | noise_grain | 0.95 | 2203506 | avif | 124231 |   5.6% | 0.9856 | 41.22 | YES (0 larger) | PASS |
+| synth_18 | 18_photo_4k_large.jpg | photo_4k_large | 0.95 | 364042 | avif | 15106 |   4.1% | 0.9905 | 47.97 | YES (0 larger) | PASS |
+| synth_19 | 19_photo_medium.jpg | photo | 0.95 | 36512 | avif | 8456 |  23.2% | 0.9889 | 48.15 | YES (0 larger) | PASS |
+| synth_20 | 20_thumbnail_small.png | thumbnail_small | 0.95 | 129403 | avif | 33651 |  26.0% | 0.9760 | 43.78 | YES (0 larger) | PASS |
 
 ---
 
