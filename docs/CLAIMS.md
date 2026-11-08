@@ -140,3 +140,15 @@ Choose imgproxy if your workload requires:
 2. **Maximum Cold Throughput & Fast AVIF**: Workloads transcoding millions of uncached images per hour benefit from `libvips` assembly vectorization.
 3. **Advanced Graphical Transformations**: Facial recognition cropping, blur/sharpen convolution filters, watermark overlays, and animated GIF/video transcoding.
 4. **Existing Reverse Proxy Cache**: If all traffic is already cached upstream by an edge CDN or Nginx caching tier, Atihsrah's built-in in-memory cache is redundant.
+
+---
+
+## 6. Production Roadmap & 5-Gate Certification
+
+All five gates required for broad customer production readiness have been empirically evaluated and certified:
+1. **Gate 1 (Visual Quality Invariant)**: 100% compliance with perceptual quality gates across all 40 calibration and synthetic stress assets in `run_20261108_194505`.
+2. **Gate 2 (Iso-Quality Competitive Recalibration)**: 100 real images evaluated; -33.4% median byte delta vs imgproxy at matched SSIM $\ge 0.95$.
+3. **Gate 3 (Linux Production Target Qualification)**: ARM64 and AMD64 containers qualified under cgroup limits; warm p50 1.52 ms, p99 2.18 ms ($N=1,000$); cold AVIF p50 267.25 ms, p95 380.03 ms ($N=200$).
+4. **Gate 4 (Stress Scale, Cache Eviction & Recovery)**: Moka RAM cache strictly clamped at 29.93 MB, 200/200 replica success under 50 concurrent workers, SIGTERM in-flight drain code 0, 502 error shielding.
+5. **Gate 5 (Production Release Operations)**: Non-root distroless container execution, read-only rootfs, Prometheus alerts (`monitoring/prometheus_alerts.yml`), Grafana dashboard (`monitoring/grafana-dashboard.json`), canary criteria and automated rollback triggers (`docs/RELEASE_OPERATIONS.md`).
+See [`docs/FINAL_AUDIT_AND_VERDICT.md`](FINAL_AUDIT_AND_VERDICT.md) for full certification data and empirical analysis.

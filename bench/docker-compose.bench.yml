@@ -6,6 +6,7 @@ services:
     volumes:
       - ../benchmarks/corpus:/benchmarks/corpus:ro
       - ../benchmarks/corpus_synthetic:/benchmarks/corpus_synthetic:ro
+      - ../benchmarks/corpus_large:/benchmarks/corpus_large:ro
       - .:/app/bench:ro
     command: ["python3", "/app/bench/mock_origin.py", "8000", "--tls"]
     ports:

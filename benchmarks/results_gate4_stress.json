@@ -1,0 +1,34 @@
+{
+  "timestamp_utc": "2026-11-08 20:23:40 UTC",
+  "test_1_cache_eviction": {
+    "status": "PASS",
+    "cache_limit_mb": 30,
+    "total_data_pumped_mb": 32.33,
+    "peak_cache_size_mb": 29.93,
+    "active_cache_entries": 46,
+    "strictly_bounded": true
+  },
+  "test_2_multi_replica": {
+    "status": "PASS",
+    "replicas_count": 2,
+    "total_requests": 200,
+    "successful_requests": 200,
+    "failed_requests": 0,
+    "p50_latency_ms": 71.75,
+    "p95_latency_ms": 2117.27
+  },
+  "test_3_graceful_shutdown": {
+    "status": "PASS",
+    "ready_probe_status_during_drain": 503,
+    "inflight_request_status": 200,
+    "inflight_bytes_received": 73589,
+    "container_exit_code": 0,
+    "drain_duration_secs": 1.51
+  },
+  "test_4_origin_recovery": {
+    "status": "PASS",
+    "origin_failure_status": 502,
+    "recovery_status": 200,
+    "recovery_payload_bytes": 201328
+  }
+}

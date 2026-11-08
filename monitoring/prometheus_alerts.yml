@@ -1,0 +1,100 @@
+groups:
+  - name: atihsrah_production_alerts
+    rules:
+      - alert: AtihsrahHigh5xxErrorRate
+        expr: |
+          (
+            sum(rate(atihsrah_requests_total{status_class="5xx"}[5m]))
+            /
+            sum(rate(atihsrah_requests_total[5m]))
+          ) * 100 > 1.0
+        for: 3m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Atihsrah 5xx error rate is elevated (> 1%)"
+          description: "5xx error rate is {{ $value | printf \"%.2f\" }}% over the last 5 minutes on instance {{ $labels.instance }}."
+          runbook_url: "docs/RELEASE_OPERATIONS.md#rollback-runbook"
+
+      - alert: AtihsrahWarmCacheLatencySLOBreach
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum(rate(atihsrah_request_duration_seconds_bucket{cache_result="hit"}[5m])) by (le)
+          ) * 1000 > 10.0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Warm cache p95 latency exceeds 10ms SLO"
+          description: "Warm cache p95 request latency is {{ $value | printf \"%.2f\" }}ms (SLO: <= 10ms)."
+          runbook_url: "docs/RELEASE_OPERATIONS.md#latency-slo-investigation"
+
+      - alert: AtihsrahColdTransformLatencySLOBreach
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum(rate(atihsrah_request_duration_seconds_bucket{cache_result="miss"}[5m])) by (le)
+          ) * 1000 > 500.0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Cold transform p95 latency exceeds 500ms SLO"
+          description: "Cold transform p95 request latency is {{ $value | printf \"%.2f\" }}ms (SLO: <= 500ms)."
+          runbook_url: "docs/RELEASE_OPERATIONS.md#latency-slo-investigation"
+
+      - alert: AtihsrahTransformQueueSaturation
+        expr: atihsrah_transform_queue_depth > 30
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Atihsrah transform queue is saturated"
+          description: "Transform queue depth is {{ $value }} (threshold: > 30). Concurrency backpressure is engaged."
+          runbook_url: "docs/RELEASE_OPERATIONS.md#queue-saturation-remediation"
+
+      - alert: AtihsrahMemorySaturationRisk
+        expr: atihsrah_cache_size_bytes > 0.85 * (1024 * 1024 * 1024)
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Cache memory usage approaching threshold (> 85%)"
+          description: "Cache memory usage is {{ $value | humanizeBytes }}."
+          runbook_url: "docs/RELEASE_OPERATIONS.md#cache-memory-management"
+
+      - alert: AtihsrahOutputLargerThanSourceAnomaly
+        expr: |
+          (
+            sum(rate(atihsrah_output_larger_than_source_total[5m]))
+            /
+            (sum(rate(atihsrah_requests_total{status_class="2xx",cache_result="miss"}[5m])) > 0)
+          ) * 100 > 5.0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Spike in outputs larger than source (> 5% of cold transforms)"
+          description: "Outputs exceeding source size rate is {{ $value | printf \"%.2f\" }}%."
+          runbook_url: "docs/RELEASE_OPERATIONS.md#quality-and-size-guardrails"
+
+      - alert: AtihsrahOriginFailureSpike
+        expr: sum(rate(atihsrah_errors_total{type="origin_error"}[5m])) > 5
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Upstream origin outage detected"
+          description: "Origin errors rate is {{ $value | printf \"%.2f\" }} err/s."
+          runbook_url: "docs/RELEASE_OPERATIONS.md#origin-failure-shielding"
+
+      - alert: AtihsrahSSRFProbingAttack
+        expr: sum(rate(atihsrah_ssrf_blocked_total[5m])) > 1
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Active SSRF probing blocked by Atihsrah security guardrails"
+          description: "SSRF block rate is {{ $value | printf \"%.2f\" }} blocks/s."
+          runbook_url: "docs/RELEASE_OPERATIONS.md#security-incident-response"

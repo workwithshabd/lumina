@@ -1,0 +1,46 @@
+{
+  "timestamp_utc": "2026-11-08 20:18:38 UTC",
+  "cgroup_qualification": {
+    "user": "10001:10001",
+    "readonly_rootfs": true,
+    "cpus_limit": 2.0,
+    "memory_limit_mb": 2048.0,
+    "security_opt": [
+      "no-new-privileges:true"
+    ],
+    "cap_drop": [
+      "ALL"
+    ]
+  },
+  "multi_arch": {
+    "platform": "linux/amd64",
+    "supported": true,
+    "runtime_output": "x86_64"
+  },
+  "latency_percentiles": {
+    "warm_cache_distribution": {
+      "samples": 1000,
+      "p50_ms": 1.52,
+      "p90_ms": 1.82,
+      "p95_ms": 1.94,
+      "p99_ms": 2.18,
+      "p99_9_ms": 2.45,
+      "mean_ms": 1.57,
+      "stddev_ms": 0.18,
+      "min_ms": 1.31,
+      "max_ms": 3.63
+    },
+    "cold_transform_distribution": {
+      "samples": 200,
+      "p50_ms": 267.25,
+      "p90_ms": 343.93,
+      "p95_ms": 380.03,
+      "p99_ms": 441.31,
+      "p99_9_ms": 495.77,
+      "mean_ms": 258.23,
+      "stddev_ms": 87.05,
+      "min_ms": 10.85,
+      "max_ms": 503.41
+    }
+  }
+}

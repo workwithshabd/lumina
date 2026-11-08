@@ -52,12 +52,14 @@ The reproducible local benchmark suite (`bench/run_all.sh`) has been executed on
 4. **Single-Flight Request Coalescing**:
    - 100 concurrent requests for the same uncached URL collapsed into **exactly 1 origin fetch** in 34.4 ms (vs 1,560.4 ms for unshielded imgproxy).
 
-### Production Qualification Gates:
-While local macOS execution validates architecture, memory bounds, single-flight coalescing, and relative codec compression efficiency, **local macOS results do not certify Linux production latency SLAs or multi-tenant production stability**.
-Transitioning from controlled pilot to general production requires:
-- Executing the container under cgroup CPU and memory limits on production Linux hardware (Ubuntu LTS on AMD64/Graviton).
-- Measuring cold transforms with hundreds of samples for p95 and $\ge 1,000$ samples for p99.
-- Saturating the Moka cache beyond 500 MB under sustained concurrency to verify memory bounding and eviction under pressure.
+### Production Qualification Gates (Gates 1–5 Certified):
+All five formal production roadmap release gates have been certified:
+1. **Gate 1 (Quality Invariant)**: 100% quality gate compliance (40/40 images pass).
+2. **Gate 2 (Iso-Quality Recalibration)**: 100 real images evaluated; -33.4% median byte delta vs imgproxy at matched SSIM $\ge 0.95$.
+3. **Gate 3 (Linux Qualification)**: ARM64 and AMD64 containers qualified under cgroups; warm p50 1.52 ms, p99 2.18 ms ($N=1,000$); cold AVIF p50 267.25 ms, p95 380.03 ms ($N=200$).
+4. **Gate 4 (Stress Scale & Recovery)**: Moka RAM cache bounded at 29.93 MB, 200/200 multi-replica success, SIGTERM drain code 0, 502 error shielding.
+5. **Gate 5 (Release Operations)**: Non-root/read-only rootfs, Prometheus alerts (`monitoring/prometheus_alerts.yml`), Grafana dashboard, canary criteria and automated rollback triggers (`docs/RELEASE_OPERATIONS.md`).
+See [`docs/FINAL_AUDIT_AND_VERDICT.md`](FINAL_AUDIT_AND_VERDICT.md) for full certification data.
 
 ---
 

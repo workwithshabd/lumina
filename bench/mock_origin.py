@@ -22,6 +22,11 @@ SYNTH_CORPUS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..",
 if not os.path.isdir(SYNTH_CORPUS_DIR):
     if os.path.isdir("/benchmarks/corpus_synthetic"):
         SYNTH_CORPUS_DIR = "/benchmarks/corpus_synthetic"
+
+LARGE_CORPUS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "benchmarks", "corpus_large"))
+if not os.path.isdir(LARGE_CORPUS_DIR):
+    if os.path.isdir("/benchmarks/corpus_large"):
+        LARGE_CORPUS_DIR = "/benchmarks/corpus_large"
 FETCH_COUNT = 0
 
 class MockOriginHandler(http.server.BaseHTTPRequestHandler):
@@ -77,6 +82,13 @@ class MockOriginHandler(http.server.BaseHTTPRequestHandler):
             FETCH_COUNT += 1
             filename = os.path.basename(path)
             self.serve_file(filename, base_dir=SYNTH_CORPUS_DIR)
+            return
+
+        # Large real corpus serve
+        if path.startswith("/corpus_large/"):
+            FETCH_COUNT += 1
+            filename = os.path.basename(path)
+            self.serve_file(filename, base_dir=LARGE_CORPUS_DIR)
             return
 
         # Normal corpus serve
