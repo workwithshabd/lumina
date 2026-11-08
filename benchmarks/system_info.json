@@ -1,0 +1,50 @@
+{
+  "timestamp": "2026-11-08 06:10:25 UTC",
+  "hardware": {
+    "model": "Mac16,10",
+    "cpu": "Apple M4",
+    "logical_cores": 10,
+    "memory_gb": 16.0,
+    "architecture": "arm64"
+  },
+  "operating_system": {
+    "name": "macOS",
+    "version": "27.2",
+    "build": "26B123",
+    "kernel": "Darwin Mac-mini.local 27.2.0 Darwin Kernel Version 27.2.0: Wed Oct 14 23:47:07 PDT 2026; root:xnu-13432.41.4~25/RELEASE_ARM64_T8132 arm64"
+  },
+  "toolchain": {
+    "rustc": "rustc 1.97.1 (8bab26f4f 2026-07-14)",
+    "python": "3.12.14 (main, Sep 24 2026, 17:46:32) [Clang 22.1.3 ]",
+    "docker": "Docker version 29.9.2, build a82e528901",
+    "docker_context": "colima",
+    "git_commit": "f4d83f9"
+  },
+  "competitors": {
+    "atihsrah_native": {
+      "version": "0.1.0",
+      "execution_mode": "Native macOS arm64 binary",
+      "binary": "target/release/atihsrah"
+    },
+    "atihsrah_docker": {
+      "version": "0.1.0",
+      "execution_mode": "Containerized (Linux VM via Colima)",
+      "image": "atihsrah:latest"
+    },
+    "imgproxy": {
+      "version": "4.0.21",
+      "execution_mode": "Containerized (Linux VM via Colima)",
+      "image": "darthsim/imgproxy:latest"
+    },
+    "imgproxy_cached": {
+      "version": "4.0.21 + nginx/alpine",
+      "execution_mode": "Containerized (Linux VM via Colima)",
+      "image": "nginx:alpine -> darthsim/imgproxy:latest"
+    },
+    "thumbor": {
+      "version": "7.8.0",
+      "execution_mode": "Native macOS (Python 3.12 / uv)"
+    }
+  },
+  "virtualization_disclosure": "On macOS, Docker Desktop / Colima executes containers within an arm64 Linux virtual machine. Containerized services (imgproxy, imgproxy_cached, and containerized Atihsrah) incur hypervisor context-switching, virtual network interface NAT translation, and guest kernel scheduling. Native services (Native Atihsrah and Thumbor) execute directly on macOS host silicon. To fairly isolate this virtualization delta, Atihsrah is benchmarked in both native and containerized modes."
+}

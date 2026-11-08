@@ -24,6 +24,9 @@ class MockOriginHandler(http.server.BaseHTTPRequestHandler):
         # Suppress noisy standard request logs during high concurrency benchmarks
         pass
 
+    def do_HEAD(self):
+        self.do_GET()
+
     def do_GET(self):
         global FETCH_COUNT
         parsed = urllib.parse.urlparse(self.path)

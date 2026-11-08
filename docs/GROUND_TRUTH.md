@@ -431,11 +431,12 @@ The following contradictions exist between the verified ground truth facts above
   - The test asserts that WebP sizes are identical because WebP is lossless-only under Option A.
   - **Resolution**: Renamed to `test_finding_g_webp_lossless_option_a_invariant_under_quality_target` to accurately describe the asserted behavior.
 
-### 7. Unverified Benchmark Results in Repository (`BENCHMARKS.md`)
+### 7. Historical Intermediate Benchmark Results (`BENCHMARKS.md`)
 - **Documentation Claim**:
-  - `BENCHMARKS.md` publishes exact numbers, latencies, and SSIM scores across 20 corpus images.
-- **Ground Truth Fact**:
-  - These results were documented for an intermediate build testing C `libwebp`, not the current pure-Rust shipping build. As instructed, empirical benchmarks run on the user's Linux VPS via `bench/RUNME.md` into `benchmarks/analysis.md`, not fabricated or retained from non-shipping configurations.
+  - `BENCHMARKS.md` previously published numbers and latencies for an intermediate build testing C `libwebp`.
+- **Ground Truth Fact & Current State**:
+  - Those unverified intermediate numbers were quarantined. The benchmark suite was rebuilt from scratch (`bench/run_all.sh`) and executed directly on local Apple Silicon macOS hardware (Apple M4, 10 cores, macOS 27.2).
+  - All empirical ground truth is recorded in [`benchmarks/raw_results.json`](../benchmarks/raw_results.json), [`benchmarks/results.csv`](../benchmarks/results.csv), and [`benchmarks/analysis.md`](../benchmarks/analysis.md). Zero fabricated or estimated numbers are retained.
 
 ### 8. Absolute Links in Documentation (`docs/CLAIMS.md`)
 - **Documentation Defect**:

@@ -1,0 +1,812 @@
+{
+  "system_info": {
+    "timestamp": "2026-11-08 06:10:25 UTC",
+    "hardware": {
+      "model": "Mac16,10",
+      "cpu": "Apple M4",
+      "logical_cores": 10,
+      "memory_gb": 16.0,
+      "architecture": "arm64"
+    },
+    "operating_system": {
+      "name": "macOS",
+      "version": "27.2",
+      "build": "26B123",
+      "kernel": "Darwin Mac-mini.local 27.2.0 Darwin Kernel Version 27.2.0: Wed Oct 14 23:47:07 PDT 2026; root:xnu-13432.41.4~25/RELEASE_ARM64_T8132 arm64"
+    },
+    "toolchain": {
+      "rustc": "rustc 1.97.1 (8bab26f4f 2026-07-14)",
+      "python": "3.12.14 (main, Sep 24 2026, 17:46:32) [Clang 22.1.3 ]",
+      "docker": "Docker version 29.9.2, build a82e528901",
+      "docker_context": "colima",
+      "git_commit": "f4d83f9"
+    },
+    "competitors": {
+      "atihsrah_native": {
+        "version": "0.1.0",
+        "execution_mode": "Native macOS arm64 binary",
+        "binary": "target/release/atihsrah"
+      },
+      "atihsrah_docker": {
+        "version": "0.1.0",
+        "execution_mode": "Containerized (Linux VM via Colima)",
+        "image": "atihsrah:latest"
+      },
+      "imgproxy": {
+        "version": "4.0.21",
+        "execution_mode": "Containerized (Linux VM via Colima)",
+        "image": "darthsim/imgproxy:latest"
+      },
+      "imgproxy_cached": {
+        "version": "4.0.21 + nginx/alpine",
+        "execution_mode": "Containerized (Linux VM via Colima)",
+        "image": "nginx:alpine -> darthsim/imgproxy:latest"
+      },
+      "thumbor": {
+        "version": "7.8.0",
+        "execution_mode": "Native macOS (Python 3.12 / uv)"
+      }
+    },
+    "virtualization_disclosure": "On macOS, Docker Desktop / Colima executes containers within an arm64 Linux virtual machine. Containerized services (imgproxy, imgproxy_cached, and containerized Atihsrah) incur hypervisor context-switching, virtual network interface NAT translation, and guest kernel scheduling. Native services (Native Atihsrah and Thumbor) execute directly on macOS host silicon. To fairly isolate this virtualization delta, Atihsrah is benchmarked in both native and containerized modes."
+  },
+  "scenario_1_cold_requests": {
+    "atihsrah_native": {
+      "jpeg": {
+        "status": 200,
+        "bytes": 116257,
+        "duration_ms": 15.9
+      },
+      "png": {
+        "status": 200,
+        "bytes": 889703,
+        "duration_ms": 8.99
+      },
+      "webp": {
+        "status": 200,
+        "bytes": 603274,
+        "duration_ms": 9.53
+      },
+      "avif": {
+        "status": 200,
+        "bytes": 53493,
+        "duration_ms": 113.59
+      }
+    },
+    "atihsrah_docker": {
+      "jpeg": {
+        "status": 200,
+        "bytes": 116257,
+        "duration_ms": 11.1
+      },
+      "png": {
+        "status": 200,
+        "bytes": 889703,
+        "duration_ms": 10.12
+      },
+      "webp": {
+        "status": 200,
+        "bytes": 603274,
+        "duration_ms": 10.36
+      },
+      "avif": {
+        "status": 200,
+        "bytes": 52579,
+        "duration_ms": 278.29
+      }
+    },
+    "imgproxy": {
+      "jpeg": {
+        "status": 200,
+        "bytes": 112293,
+        "duration_ms": 24.25
+      },
+      "png": {
+        "status": 200,
+        "bytes": 856670,
+        "duration_ms": 32.46
+      },
+      "webp": {
+        "status": 200,
+        "bytes": 90566,
+        "duration_ms": 55.15
+      },
+      "avif": {
+        "status": 200,
+        "bytes": 114632,
+        "duration_ms": 88.69
+      }
+    },
+    "thumbor": {
+      "jpeg": {
+        "status": 200,
+        "bytes": 112336,
+        "duration_ms": 22.72
+      },
+      "png": {
+        "status": 200,
+        "bytes": 899032,
+        "duration_ms": 29.53
+      },
+      "webp": {
+        "status": 200,
+        "bytes": 96064,
+        "duration_ms": 60.78
+      },
+      "avif": {
+        "status": 200,
+        "bytes": 118218,
+        "duration_ms": 85.59
+      }
+    }
+  },
+  "scenario_2_warm_cache": {
+    "atihsrah_native": {
+      "min_ms": 0.55,
+      "p50_ms": 0.82,
+      "p90_ms": 0.93,
+      "p95_ms": 1.03,
+      "p99_ms": 1.43,
+      "mean_ms": 0.83
+    },
+    "atihsrah_docker": {
+      "min_ms": 1.65,
+      "p50_ms": 1.85,
+      "p90_ms": 2.28,
+      "p95_ms": 2.49,
+      "p99_ms": 2.99,
+      "mean_ms": 1.92
+    },
+    "imgproxy_direct": {
+      "min_ms": 49.15,
+      "p50_ms": 53.72,
+      "p90_ms": 55.47,
+      "p95_ms": 55.81,
+      "p99_ms": 65.11,
+      "mean_ms": 53.51
+    },
+    "imgproxy_cached": {
+      "min_ms": 0.8,
+      "p50_ms": 0.91,
+      "p90_ms": 1.02,
+      "p95_ms": 1.08,
+      "p99_ms": 1.37,
+      "mean_ms": 0.93
+    },
+    "thumbor": {
+      "min_ms": 37.8,
+      "p50_ms": 38.58,
+      "p90_ms": 38.98,
+      "p95_ms": 38.99,
+      "p99_ms": 50.16,
+      "mean_ms": 38.78
+    }
+  },
+  "scenario_3_concurrent_same_url": {
+    "atihsrah_native": {
+      "duration_ms": 38.17,
+      "origin_fetches": 1,
+      "success_count": 100,
+      "single_flight_coalesced": true
+    },
+    "imgproxy": {
+      "duration_ms": 2689.06,
+      "origin_fetches": 100,
+      "success_count": 100
+    }
+  },
+  "scenario_4_concurrent_different_urls": {
+    "atihsrah_native": {
+      "total_duration_s": 5.04,
+      "throughput_rps": 19.84,
+      "p50_ms": 43.06,
+      "p95_ms": 4415.21,
+      "p99_ms": 5011.22,
+      "success_count": 96
+    },
+    "atihsrah_docker": {
+      "total_duration_s": 2.54,
+      "throughput_rps": 39.4,
+      "p50_ms": 93.37,
+      "p95_ms": 2342.34,
+      "p99_ms": 2514.48,
+      "success_count": 100
+    },
+    "imgproxy": {
+      "total_duration_s": 1.01,
+      "throughput_rps": 99.5,
+      "p50_ms": 475.47,
+      "p95_ms": 516.65,
+      "p99_ms": 541.04,
+      "success_count": 100
+    },
+    "thumbor": {
+      "total_duration_s": 1.41,
+      "throughput_rps": 70.77,
+      "p50_ms": 681.41,
+      "p95_ms": 713.6,
+      "p99_ms": 729.57,
+      "success_count": 100
+    }
+  },
+  "scenario_5_slow_origin": {
+    "atihsrah_native": {
+      "status": 200,
+      "duration_s": 2.02
+    },
+    "imgproxy": {
+      "status": 200,
+      "duration_s": 2.03
+    }
+  },
+  "scenario_6_failing_origin": {
+    "atihsrah_native": {
+      "status": 502,
+      "is_502": true
+    },
+    "imgproxy": {
+      "status": 502
+    }
+  },
+  "scenario_7_sustained_load": {
+    "duration_s": 60,
+    "label": "60s",
+    "sample_interval_s": 10,
+    "samples": [
+      {
+        "elapsed_s": 0,
+        "atihsrah_native_rss_mb": 101.17,
+        "atihsrah_docker_rss_mb": 147.2,
+        "imgproxy_rss_mb": 42.47,
+        "thumbor_rss_mb": 80.38
+      },
+      {
+        "elapsed_s": 10,
+        "atihsrah_native_rss_mb": 186.81,
+        "atihsrah_docker_rss_mb": 146.8,
+        "imgproxy_rss_mb": 37.07,
+        "thumbor_rss_mb": 80.38
+      },
+      {
+        "elapsed_s": 20,
+        "atihsrah_native_rss_mb": 257.56,
+        "atihsrah_docker_rss_mb": 146.8,
+        "imgproxy_rss_mb": 35.42,
+        "thumbor_rss_mb": 80.38
+      },
+      {
+        "elapsed_s": 30,
+        "atihsrah_native_rss_mb": 316.86,
+        "atihsrah_docker_rss_mb": 146.8,
+        "imgproxy_rss_mb": 35.42,
+        "thumbor_rss_mb": 80.38
+      },
+      {
+        "elapsed_s": 40,
+        "atihsrah_native_rss_mb": 391.31,
+        "atihsrah_docker_rss_mb": 146.8,
+        "imgproxy_rss_mb": 35.42,
+        "thumbor_rss_mb": 80.38
+      },
+      {
+        "elapsed_s": 50,
+        "atihsrah_native_rss_mb": 478.44,
+        "atihsrah_docker_rss_mb": 146.8,
+        "imgproxy_rss_mb": 35.42,
+        "thumbor_rss_mb": 63.03
+      },
+      {
+        "elapsed_s": 60,
+        "atihsrah_native_rss_mb": 580.64,
+        "atihsrah_docker_rss_mb": 146.8,
+        "imgproxy_rss_mb": 35.42,
+        "thumbor_rss_mb": 62.56
+      }
+    ],
+    "initial_rss": {
+      "elapsed_s": 0,
+      "atihsrah_native_rss_mb": 101.17,
+      "atihsrah_docker_rss_mb": 147.2,
+      "imgproxy_rss_mb": 42.47,
+      "thumbor_rss_mb": 80.38
+    },
+    "final_rss": {
+      "elapsed_s": 60,
+      "atihsrah_native_rss_mb": 580.64,
+      "atihsrah_docker_rss_mb": 146.8,
+      "imgproxy_rss_mb": 35.42,
+      "thumbor_rss_mb": 62.56
+    }
+  },
+  "scenario_8_avif_vs_webp": [
+    {
+      "image": "kodim01.png",
+      "webp_ms": 21.9,
+      "webp_bytes": 603274,
+      "avif_ms": 123.2,
+      "avif_bytes": 53493,
+      "byte_delta_percent": -91.1,
+      "cpu_time_ratio": 5.64
+    },
+    {
+      "image": "kodim05.png",
+      "webp_ms": 9.9,
+      "webp_bytes": 656566,
+      "avif_ms": 140.9,
+      "avif_bytes": 57221,
+      "byte_delta_percent": -91.3,
+      "cpu_time_ratio": 14.21
+    },
+    {
+      "image": "moraine_lake.jpg",
+      "webp_ms": 51.3,
+      "webp_bytes": 845412,
+      "avif_ms": 199.3,
+      "avif_bytes": 49814,
+      "byte_delta_percent": -94.1,
+      "cpu_time_ratio": 3.88
+    },
+    {
+      "image": "kde_spectacle.png",
+      "webp_ms": 5.6,
+      "webp_bytes": 91536,
+      "avif_ms": 103.6,
+      "avif_bytes": 24426,
+      "byte_delta_percent": -73.3,
+      "cpu_time_ratio": 18.43
+    },
+    {
+      "image": "python_logo_alpha.png",
+      "webp_ms": 3.3,
+      "webp_bytes": 15958,
+      "avif_ms": 87.1,
+      "avif_bytes": 5698,
+      "byte_delta_percent": -64.3,
+      "cpu_time_ratio": 26.13
+    }
+  ],
+  "scenario_9_corpus_summary": {
+    "total_images": 20,
+    "rows": [
+      {
+        "id": "img_01",
+        "filename": "kodim01.png",
+        "category": "photo",
+        "original_bytes": 736501,
+        "atihsrah_bytes": 64961,
+        "atihsrah_format": "avif",
+        "atihsrah_ssim": 0.9924,
+        "atihsrah_vmaf": 89.08,
+        "atihsrah_larger_than_orig": false,
+        "atihsrah_time_ms": 172.2,
+        "imgproxy_bytes": 856670,
+        "imgproxy_format": "png",
+        "imgproxy_ssim": 0.9492,
+        "imgproxy_vmaf": 64.99,
+        "imgproxy_larger_than_orig": true,
+        "imgproxy_time_ms": 33.8,
+        "thumbor_bytes": 80528,
+        "thumbor_ssim": 0.9663,
+        "thumbor_time_ms": 38.0,
+        "byte_delta_percent": -92.4
+      },
+      {
+        "id": "img_02",
+        "filename": "kodim02.png",
+        "category": "photo",
+        "original_bytes": 617995,
+        "atihsrah_bytes": 37094,
+        "atihsrah_format": "avif",
+        "atihsrah_ssim": 0.9882,
+        "atihsrah_vmaf": 89.31,
+        "atihsrah_larger_than_orig": false,
+        "atihsrah_time_ms": 171.9,
+        "imgproxy_bytes": 714368,
+        "imgproxy_format": "png",
+        "imgproxy_ssim": 0.9699,
+        "imgproxy_vmaf": 77.61,
+        "imgproxy_larger_than_orig": true,
+        "imgproxy_time_ms": 36.9,
+        "thumbor_bytes": 36566,
+        "thumbor_ssim": 0.968,
+        "thumbor_time_ms": 33.3,
+        "byte_delta_percent": -94.8
+      },
+      {
+        "id": "img_03",
+        "filename": "kodim03.png",
+        "category": "photo",
+        "original_bytes": 502888,
+        "atihsrah_bytes": 23268,
+        "atihsrah_format": "avif",
+        "atihsrah_ssim": 0.9979,
+        "atihsrah_vmaf": 89.87,
+        "atihsrah_larger_than_orig": false,
+        "atihsrah_time_ms": 158.4,
+        "imgproxy_bytes": 606875,
+        "imgproxy_format": "png",
+        "imgproxy_ssim": 0.9943,
+        "imgproxy_vmaf": 79.86,
+        "imgproxy_larger_than_orig": true,
+        "imgproxy_time_ms": 38.5,
+        "thumbor_bytes": 25280,
+        "thumbor_ssim": 0.9932,
+        "thumbor_time_ms": 29.9,
+        "byte_delta_percent": -96.2
+      },
+      {
+        "id": "img_04",
+        "filename": "kodim04.png",
+        "category": "photo",
+        "original_bytes": 637432,
+        "atihsrah_bytes": 25129,
+        "atihsrah_format": "avif",
+        "atihsrah_ssim": 0.9968,
+        "atihsrah_vmaf": 87.59,
+        "atihsrah_larger_than_orig": false,
+        "atihsrah_time_ms": 154.7,
+        "imgproxy_bytes": 617196,
+        "imgproxy_format": "png",
+        "imgproxy_ssim": 0.9938,
+        "imgproxy_vmaf": 77.84,
+        "imgproxy_larger_than_orig": false,
+        "imgproxy_time_ms": 38.9,
+        "thumbor_bytes": 26848,
+        "thumbor_ssim": 0.9955,
+        "thumbor_time_ms": 32.2,
+        "byte_delta_percent": -95.9
+      },
+      {
+        "id": "img_05",
+        "filename": "kodim05.png",
+        "category": "photo",
+        "original_bytes": 785610,
+        "atihsrah_bytes": 70303,
+        "atihsrah_format": "avif",
+        "atihsrah_ssim": 0.995,
+        "atihsrah_vmaf": 91.33,
+        "atihsrah_larger_than_orig": false,
+        "atihsrah_time_ms": 195.8,
+        "imgproxy_bytes": 911877,
+        "imgproxy_format": "png",
+        "imgproxy_ssim": 0.9659,
+        "imgproxy_vmaf": 64.59,
+        "imgproxy_larger_than_orig": true,
+        "imgproxy_time_ms": 33.1,
+        "thumbor_bytes": 86286,
+        "thumbor_ssim": 0.9681,
+        "thumbor_time_ms": 39.7,
+        "byte_delta_percent": -92.3
+      },
+      {
+        "id": "img_06",
+        "filename": "kodim07.png",
+        "category": "photo",
+        "original_bytes": 566322,
+        "atihsrah_bytes": 29990,
+        "atihsrah_format": "avif",
+        "atihsrah_ssim": 0.9967,
+        "atihsrah_vmaf": 90.05,
+        "atihsrah_larger_than_orig": false,
+        "atihsrah_time_ms": 165.2,
+        "imgproxy_bytes": 663711,
+        "imgproxy_format": "png",
+        "imgproxy_ssim": 0.984,
+        "imgproxy_vmaf": 67.19,
+        "imgproxy_larger_than_orig": true,
+        "imgproxy_time_ms": 37.9,
+        "thumbor_bytes": 33782,
+        "thumbor_ssim": 0.9895,
+        "thumbor_time_ms": 33.3,
+        "byte_delta_percent": -95.5
+      },
+      {
+        "id": "img_07",
+        "filename": "kodim08.png",
+        "category": "photo",
+        "original_bytes": 788470,
+        "atihsrah_bytes": 68152,
+        "atihsrah_format": "avif",
+        "atihsrah_ssim": 0.9965,
+        "atihsrah_vmaf": 91.74,
+        "atihsrah_larger_than_orig": false,
+        "atihsrah_time_ms": 195.0,
+        "imgproxy_bytes": 889966,
+        "imgproxy_format": "png",
+        "imgproxy_ssim": 0.9564,
+        "imgproxy_vmaf": 57.29,
+        "imgproxy_larger_than_orig": true,
+        "imgproxy_time_ms": 32.1,
+        "thumbor_bytes": 90162,
+        "thumbor_ssim": 0.9607,
+        "thumbor_time_ms": 41.0,
+        "byte_delta_percent": -92.3
+      },
+      {
+        "id": "img_08",
+        "filename": "kodim13.png",
+        "category": "photo",
+        "original_bytes": 822712,
+        "atihsrah_bytes": 88759,
+        "atihsrah_format": "avif",
+        "atihsrah_ssim": 0.9946,
+        "atihsrah_vmaf": 88.64,
+        "atihsrah_larger_than_orig": false,
+        "atihsrah_time_ms": 163.6,
+        "imgproxy_bytes": 982112,
+        "imgproxy_format": "png",
+        "imgproxy_ssim": 0.9555,
+        "imgproxy_vmaf": 57.22,
+        "imgproxy_larger_than_orig": true,
+        "imgproxy_time_ms": 33.1,
+        "thumbor_bytes": 114410,
+        "thumbor_ssim": 0.9701,
+        "thumbor_time_ms": 42.0,
+        "byte_delta_percent": -91.0
+      },
+      {
+        "id": "img_09",
+        "filename": "kodim14.png",
+        "category": "photo",
+        "original_bytes": 692201,
+        "atihsrah_bytes": 62106,
+        "atihsrah_format": "avif",
+        "atihsrah_ssim": 0.9954,
+        "atihsrah_vmaf": 90.07,
+        "atihsrah_larger_than_orig": false,
+        "atihsrah_time_ms": 169.4,
+        "imgproxy_bytes": 835660,
+        "imgproxy_format": "png",
+        "imgproxy_ssim": 0.9791,
+        "imgproxy_vmaf": 64.1,
+        "imgproxy_larger_than_orig": true,
+        "imgproxy_time_ms": 32.6,
+        "thumbor_bytes": 72466,
+        "thumbor_ssim": 0.9832,
+        "thumbor_time_ms": 38.0,
+        "byte_delta_percent": -92.6
+      },
+      {
+        "id": "img_10",
+        "filename": "kodim15.png",
+        "category": "photo",
+        "original_bytes": 612582,
+        "atihsrah_bytes": 34573,
+        "atihsrah_format": "avif",
+        "atihsrah_ssim": 0.9989,
+        "atihsrah_vmaf": 90.76,
+        "atihsrah_larger_than_orig": false,
+        "atihsrah_time_ms": 165.7,
+        "imgproxy_bytes": 711423,
+        "imgproxy_format": "png",
+        "imgproxy_ssim": 0.996,
+        "imgproxy_vmaf": 73.72,
+        "imgproxy_larger_than_orig": true,
+        "imgproxy_time_ms": 35.7,
+        "thumbor_bytes": 36240,
+        "thumbor_ssim": 0.9959,
+        "thumbor_time_ms": 33.1,
+        "byte_delta_percent": -95.1
+      },
+      {
+        "id": "img_11",
+        "filename": "kodim17.png",
+        "category": "photo",
+        "original_bytes": 602078,
+        "atihsrah_bytes": 31893,
+        "atihsrah_format": "avif",
+        "atihsrah_ssim": 0.9975,
+        "atihsrah_vmaf": 89.04,
+        "atihsrah_larger_than_orig": false,
+        "atihsrah_time_ms": 162.7,
+        "imgproxy_bytes": 676412,
+        "imgproxy_format": "png",
+        "imgproxy_ssim": 0.9922,
+        "imgproxy_vmaf": 70.53,
+        "imgproxy_larger_than_orig": true,
+        "imgproxy_time_ms": 37.7,
+        "thumbor_bytes": 36458,
+        "thumbor_ssim": 0.997,
+        "thumbor_time_ms": 33.7,
+        "byte_delta_percent": -95.3
+      },
+      {
+        "id": "img_12",
+        "filename": "kodim19.png",
+        "category": "photo",
+        "original_bytes": 671476,
+        "atihsrah_bytes": 31306,
+        "atihsrah_format": "avif",
+        "atihsrah_ssim": 0.9972,
+        "atihsrah_vmaf": 91.52,
+        "atihsrah_larger_than_orig": false,
+        "atihsrah_time_ms": 174.9,
+        "imgproxy_bytes": 680579,
+        "imgproxy_format": "png",
+        "imgproxy_ssim": 0.9784,
+        "imgproxy_vmaf": 68.37,
+        "imgproxy_larger_than_orig": true,
+        "imgproxy_time_ms": 36.8,
+        "thumbor_bytes": 40546,
+        "thumbor_ssim": 0.9968,
+        "thumbor_time_ms": 34.2,
+        "byte_delta_percent": -95.4
+      },
+      {
+        "id": "img_13",
+        "filename": "kodim20.png",
+        "category": "photo",
+        "original_bytes": 492462,
+        "atihsrah_bytes": 28025,
+        "atihsrah_format": "avif",
+        "atihsrah_ssim": 0.9993,
+        "atihsrah_vmaf": 92.39,
+        "atihsrah_larger_than_orig": false,
+        "atihsrah_time_ms": 156.7,
+        "imgproxy_bytes": 564999,
+        "imgproxy_format": "png",
+        "imgproxy_ssim": 0.9959,
+        "imgproxy_vmaf": 70.79,
+        "imgproxy_larger_than_orig": true,
+        "imgproxy_time_ms": 31.1,
+        "thumbor_bytes": 30802,
+        "thumbor_ssim": 0.9963,
+        "thumbor_time_ms": 29.2,
+        "byte_delta_percent": -95.0
+      },
+      {
+        "id": "img_14",
+        "filename": "kodim23.png",
+        "category": "photo",
+        "original_bytes": 557596,
+        "atihsrah_bytes": 23909,
+        "atihsrah_format": "avif",
+        "atihsrah_ssim": 0.9986,
+        "atihsrah_vmaf": 90.95,
+        "atihsrah_larger_than_orig": false,
+        "atihsrah_time_ms": 157.2,
+        "imgproxy_bytes": 657733,
+        "imgproxy_format": "png",
+        "imgproxy_ssim": 0.9945,
+        "imgproxy_vmaf": 72.62,
+        "imgproxy_larger_than_orig": true,
+        "imgproxy_time_ms": 37.8,
+        "thumbor_bytes": 26202,
+        "thumbor_ssim": 0.9945,
+        "thumbor_time_ms": 30.8,
+        "byte_delta_percent": -96.4
+      },
+      {
+        "id": "img_15",
+        "filename": "moraine_lake.jpg",
+        "category": "photo",
+        "original_bytes": 1520767,
+        "atihsrah_bytes": 49814,
+        "atihsrah_format": "avif",
+        "atihsrah_ssim": 0.9968,
+        "atihsrah_vmaf": 87.36,
+        "atihsrah_larger_than_orig": false,
+        "atihsrah_time_ms": 203.3,
+        "imgproxy_bytes": 82300,
+        "imgproxy_format": "png",
+        "imgproxy_ssim": 0.9964,
+        "imgproxy_vmaf": 92.42,
+        "imgproxy_larger_than_orig": false,
+        "imgproxy_time_ms": 22.0,
+        "thumbor_bytes": 65766,
+        "thumbor_ssim": 0.9969,
+        "thumbor_time_ms": 43.4,
+        "byte_delta_percent": -39.5
+      },
+      {
+        "id": "img_16",
+        "filename": "kde_spectacle.png",
+        "category": "ui_screenshot",
+        "original_bytes": 83699,
+        "atihsrah_bytes": 24801,
+        "atihsrah_format": "avif",
+        "atihsrah_ssim": 0.9937,
+        "atihsrah_vmaf": 92.31,
+        "atihsrah_larger_than_orig": false,
+        "atihsrah_time_ms": 136.7,
+        "imgproxy_bytes": 158513,
+        "imgproxy_format": "png",
+        "imgproxy_ssim": 0.9093,
+        "imgproxy_vmaf": 61.19,
+        "imgproxy_larger_than_orig": true,
+        "imgproxy_time_ms": 14.3,
+        "thumbor_bytes": 23596,
+        "thumbor_ssim": 0.9871,
+        "thumbor_time_ms": 22.0,
+        "byte_delta_percent": -84.4
+      },
+      {
+        "id": "img_17",
+        "filename": "training_module.png",
+        "category": "ui_screenshot",
+        "original_bytes": 107821,
+        "atihsrah_bytes": 134476,
+        "atihsrah_format": "webp",
+        "atihsrah_ssim": 1.0,
+        "atihsrah_vmaf": 97.35,
+        "atihsrah_larger_than_orig": true,
+        "atihsrah_time_ms": 13.2,
+        "imgproxy_bytes": 153672,
+        "imgproxy_format": "png",
+        "imgproxy_ssim": 0.9702,
+        "imgproxy_vmaf": 70.29,
+        "imgproxy_larger_than_orig": true,
+        "imgproxy_time_ms": 16.3,
+        "thumbor_bytes": 20340,
+        "thumbor_ssim": 0.9925,
+        "thumbor_time_ms": 22.2,
+        "byte_delta_percent": -12.5
+      },
+      {
+        "id": "img_18",
+        "filename": "python_logo_alpha.png",
+        "category": "alpha",
+        "original_bytes": 15770,
+        "atihsrah_bytes": 54606,
+        "atihsrah_format": "webp",
+        "atihsrah_ssim": 0.9835,
+        "atihsrah_vmaf": null,
+        "atihsrah_larger_than_orig": true,
+        "atihsrah_time_ms": 16.9,
+        "imgproxy_bytes": 61817,
+        "imgproxy_format": "png",
+        "imgproxy_ssim": 0.9931,
+        "imgproxy_vmaf": 3.05,
+        "imgproxy_larger_than_orig": true,
+        "imgproxy_time_ms": 14.9,
+        "thumbor_bytes": 33482,
+        "thumbor_ssim": 0.9728,
+        "thumbor_time_ms": 79.0,
+        "byte_delta_percent": -11.7
+      },
+      {
+        "id": "img_19",
+        "filename": "alacritty_logo_alpha.png",
+        "category": "alpha",
+        "original_bytes": 3612,
+        "atihsrah_bytes": 163650,
+        "atihsrah_format": "webp",
+        "atihsrah_ssim": 1.0,
+        "atihsrah_vmaf": 96.44,
+        "atihsrah_larger_than_orig": true,
+        "atihsrah_time_ms": 12.5,
+        "imgproxy_bytes": 115447,
+        "imgproxy_format": "png",
+        "imgproxy_ssim": 0.999,
+        "imgproxy_vmaf": 73.74,
+        "imgproxy_larger_than_orig": true,
+        "imgproxy_time_ms": 18.9,
+        "thumbor_bytes": 7598,
+        "thumbor_ssim": 0.9984,
+        "thumbor_time_ms": 22.5,
+        "byte_delta_percent": 41.8
+      },
+      {
+        "id": "img_20",
+        "filename": "world_map_graphic.png",
+        "category": "graphic",
+        "original_bytes": 87924,
+        "atihsrah_bytes": 82416,
+        "atihsrah_format": "webp",
+        "atihsrah_ssim": 1.0,
+        "atihsrah_vmaf": 65.03,
+        "atihsrah_larger_than_orig": false,
+        "atihsrah_time_ms": 18.5,
+        "imgproxy_bytes": 91122,
+        "imgproxy_format": "png",
+        "imgproxy_ssim": 0.9711,
+        "imgproxy_vmaf": 64.64,
+        "imgproxy_larger_than_orig": true,
+        "imgproxy_time_ms": 13.6,
+        "thumbor_bytes": 64472,
+        "thumbor_ssim": 0.9984,
+        "thumbor_time_ms": 39.5,
+        "byte_delta_percent": -9.6
+      }
+    ]
+  }
+}

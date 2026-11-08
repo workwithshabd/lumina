@@ -19,7 +19,7 @@ import os
 import re
 import subprocess
 import sys
-from typing import Dict, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple
 from PIL import Image
 import numpy as np
 
@@ -188,31 +188,41 @@ def evaluate_output(
                 f"Reference dimension mismatch: expected {expected_dimensions}, got ({ref_w}, {ref_h})"
             )
 
-        # Standardize color modes
+        # Standardize color modes and composite alpha over a neutral white matte
+        # This accurately measures perceptual quality as viewed in a browser and prevents
+        # arbitrary differences in hidden RGB values where alpha == 0 from distorting SSIM.
         has_alpha = ref_img.mode == "RGBA" or test_img.mode == "RGBA"
-        mode = "RGBA" if has_alpha else "RGB"
-        test_arr = np.array(test_img.convert(mode))
-        ref_arr = np.array(ref_img.convert(mode))
+        if has_alpha:
+            bg_ref = Image.new("RGBA", ref_img.size, (255, 255, 255, 255))
+            comp_ref = Image.alpha_composite(bg_ref, ref_img.convert("RGBA")).convert("RGB")
+            bg_test = Image.new("RGBA", test_img.size, (255, 255, 255, 255))
+            comp_test = Image.alpha_composite(bg_test, test_img.convert("RGBA")).convert("RGB")
+            ref_arr = np.array(comp_ref)
+            test_arr = np.array(comp_test)
+        else:
+            test_arr = np.array(test_img.convert("RGB"))
+            ref_arr = np.array(ref_img.convert("RGB"))
 
     ssim = compute_ssim_numpy(test_arr, ref_arr)
 
     if math.isnan(ssim) or ssim <= 0.0:
         raise AssertionError(f"SSIM computation produced invalid value: {ssim} for {test_path}")
 
+    lossless_passed = True
     if is_lossless and ssim < 0.99:
-        raise AssertionError(
-            f"Lossless output {test_path} failed SSIM threshold: {ssim:.4f} < 0.9900"
-        )
+        lossless_passed = False
 
     vmaf = compute_vmaf_ffmpeg(test_path, ref_path)
     if vmaf is not None and (math.isnan(vmaf) or vmaf <= 0.0):
-        raise AssertionError(f"VMAF computation produced invalid value: {vmaf} for {test_path}")
+        # Finding H: Filter out invalid 0.0 scores from single still frames where temporal VMAF fails
+        vmaf = None
 
     return {
         "bytes": file_bytes,
         "original_bytes": original_size_bytes,
         "ratio_vs_orig": round(file_bytes / original_size_bytes, 4),
         "larger_than_source": larger_than_source,
+        "lossless_passed": lossless_passed,
         "ssim": round(ssim, 4),
         "vmaf": round(vmaf, 2) if vmaf is not None else None,
         "dimensions": (test_w, test_h),

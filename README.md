@@ -41,7 +41,7 @@ Atihsrah and imgproxy represent different architectural design choices in self-h
 | **Implementation Language** | Rust (Axum, Tokio) | Go + C (`cgo`) | Atihsrah contains **no `unsafe` in our own code**; imgproxy links C libraries (`libvips`). |
 | **Image Processing Engine** | Pure-Rust `image-rs` & `ravif` | `libvips` (C library) | Atihsrah uses pure-Rust codecs without C image library linking. imgproxy achieves higher cold transformation throughput via C assembly SIMD vectorization. |
 | **Container Footprint** | **~13.9 MB compressed transfer** (~44.8 MB unpacked file contents) | ~40–85 MB uncompressed (requires glibc, libvips, and shared C libraries) | Atihsrah has 0 HIGH/CRITICAL findings in Trivy container scan (v0.76.1 on 2026-11-08; scope: 10 Debian base packages, 0 language files). |
-| **In-Memory Caching** | **Built-in byte-bounded LRU cache** (`moka`) with single-flight coalescing | None built-in (relies on external CDN or proxy) | Atihsrah delivers sub-millisecond warm cache hits standalone (see `bench/RUNME.md` for reproducible VPS measurements). When imgproxy is paired with Nginx `proxy_cache`, warm cache latency is comparable. |
+| **In-Memory Caching** | **Built-in byte-bounded LRU cache** (`moka`) with single-flight coalescing | None built-in (relies on external CDN or proxy) | Atihsrah delivers sub-millisecond warm cache hits standalone (see `bench/run_all.sh` and `benchmarks/analysis.md` for reproducible measurements). When imgproxy is paired with Nginx `proxy_cache`, warm cache latency is comparable. |
 | **Cold Concurrency & Throughput** | Lower cold throughput | **Higher cold throughput (imgproxy wins)** | `libvips` multi-threaded C pipeline decodes and resizes cold images faster than pure-Rust `image-rs`. |
 | **AVIF Encoding Speed** | Slower (CPU-intensive pure Rust) | **Faster (imgproxy wins)** | imgproxy links C `libheif`/`libaom` with assembly vectorization. Atihsrah requires tuning `ATIHSRAH_AVIF_SPEED=6..8` for high volume. |
 | **WebP Encoding Mode** | **Lossless-only WebP** (in this Pure Rust Option A build) | **Lossy & Lossless WebP (imgproxy wins on lossy WebP)** | Atihsrah restricts WebP to graphics and alpha to prevent photo size inflation; imgproxy supports lossy WebP for photos. |
@@ -306,7 +306,7 @@ Atihsrah is built with automated CI security verification covering 22 threat vec
 Detailed threat mitigation mappings are documented in [THREAT_MODEL.md](THREAT_MODEL.md).
 
 ```bash
-# Run the automated security test suite (117+ tests)
+# Run the automated test suite (144 tests passing)
 cargo test
 
 # Run static analysis and style checks

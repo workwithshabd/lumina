@@ -5,8 +5,6 @@ pub mod validator;
 use std::sync::Arc;
 use std::time::Duration;
 
-use sha2::{Digest, Sha256};
-
 use crate::config::Config;
 use crate::error::AppError;
 use crate::fetch::resolver::{HostLookup, SafeDnsResolver, SystemHostLookup};
@@ -179,7 +177,5 @@ fn sanitize_reqwest_error(err: &reqwest::Error) -> String {
 
 /// Hashes a URL with SHA-256 for safe, non-sensitive audit logging.
 pub fn hash_url_for_log(url: &str) -> String {
-    let mut hasher = Sha256::new();
-    hasher.update(url.as_bytes());
-    hex::encode(hasher.finalize())
+    crate::observability::sha256_prefix(url)
 }

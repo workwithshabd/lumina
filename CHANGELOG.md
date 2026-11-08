@@ -7,6 +7,21 @@ The project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 
 ## [Unreleased]
 
+### Audit Remediation, Async DNS Offload & Local macOS Benchmark Suite (2026-11-08)
+- **Non-Blocking Async DNS Resolution**:
+  - Wrapped synchronous DNS lookups in `src/fetch/resolver.rs` in `tokio::task::spawn_blocking`, eliminating async worker stalling on Tokio worker threads while retaining 100% of IPv4/IPv6 private IP filtering, link-local metadata protection, and DNS-rebinding prevention.
+  - Added regression test `test_dns_resolver_runs_on_blocking_pool_without_stalling_runtime` in `tests/fetch_security.rs`.
+- **Connected Graceful Shutdown Timeout**:
+  - Wired `config.shutdown_timeout_secs` in `src/main.rs` to server drain via `tokio::select!` timeout, ensuring clean process termination within configured bounds.
+- **Cleaned Redundant Configuration & Code**:
+  - Removed redundant `signing_key` and `log_level` fields from `Config`, keeping `signing_keys` as single source of truth.
+  - Delegated URL hashing in `src/fetch/mod.rs` directly to `crate::observability::sha256_prefix(url)`.
+- **Rebuilt Reproducible Benchmark Suite on Local macOS**:
+  - Rebuilt `bench/run_all.sh` and `bench/benchmark_suite.py` from scratch for local execution on Apple Silicon macOS hardware without remote VPS runners.
+  - Added support for Native Atihsrah (arm64 release binary), Containerized Atihsrah (Colima Linux VM), imgproxy OSS (v4.0.21), imgproxy Cached (Nginx reverse proxy), and Native Thumbor (v7.8.0).
+  - Evaluated the 20-image corpus across delivered bytes, visual fidelity (SSIM via Pillow Lanczos reference), cold latency, warm cache distributions, single-flight coalescing, and memory RSS.
+  - Quantified Docker virtualization overhead on macOS and emitted machine-readable results (`benchmarks/raw_results.json`, `benchmarks/results.csv`, `benchmarks/system_info.json`, `benchmarks/methodology.md`, `benchmarks/analysis.md`).
+
 ### Pure-Rust Format Policy & Stage 1 Remediation (2026-11-08)
 - **Pure-Rust Codec Architecture (Option A)**:
   - Finalized on pure-Rust image codecs (`image-rs` v0.25 and `ravif` v0.11), completely removing the `webp` / `libwebp-sys` crate.

@@ -30,13 +30,11 @@ async fn test_rate_limit_bypass_spoofed_x_forwarded_for_ignored() {
         cache_ttl_secs: 3600,
         auth_mode: AuthMode::Public,
         signing_keys: HashMap::new(),
-        signing_key: None,
         clock_skew_secs: 30,
         max_signature_ttl_secs: 86400,
         rate_limit_per_minute: 3,
         rate_limit_miss_per_minute: 3,
         trusted_proxy_cidrs: Vec::new(), // Untrusted!
-        log_level: "info".to_string(),
         debug_headers: true,
         metrics_bind: "127.0.0.1:0".parse().unwrap(),
         request_timeout_secs: 10,

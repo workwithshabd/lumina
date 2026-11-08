@@ -33,13 +33,11 @@ fn make_test_config(allowed: &[&str], timeout_secs: u64, max_mb: usize) -> Arc<C
         cache_ttl_secs: 86400,
         auth_mode: AuthMode::Public,
         signing_keys: std::collections::HashMap::new(),
-        signing_key: None,
         clock_skew_secs: 30,
         max_signature_ttl_secs: 86400,
         rate_limit_per_minute: 1000,
         rate_limit_miss_per_minute: 100,
         trusted_proxy_cidrs: Vec::new(),
-        log_level: "info".to_string(),
         debug_headers: false,
         metrics_bind: "127.0.0.1:9090".parse().unwrap(),
         request_timeout_secs: 30,
@@ -325,4 +323,44 @@ async fn test_slow_loris_origin_times_out() {
     let res = read_limited_body(resp, 10).await;
     let err = res.unwrap_err();
     assert_eq!(err.code(), "FETCH_TIMEOUT");
+}
+
+#[tokio::test]
+async fn test_dns_resolver_runs_on_blocking_pool_without_stalling_runtime() {
+    use atihsrah::fetch::resolver::SafeDnsResolver;
+    use reqwest::dns::Resolve;
+
+    struct SlowLookup;
+    impl HostLookup for SlowLookup {
+        fn lookup(&self, _host: &str, _port: u16) -> Result<Vec<SocketAddr>, std::io::Error> {
+            // Simulate synchronous blocking getaddrinfo latency
+            std::thread::sleep(Duration::from_millis(60));
+            Ok(vec!["93.184.216.34:443".parse().unwrap()])
+        }
+    }
+
+    let resolver = SafeDnsResolver::new(SlowLookup);
+
+    // Concurrently run resolve and an async timer task on Tokio
+    let resolve_task = tokio::spawn(async move {
+        let addrs = resolver
+            .resolve("example.com".parse().unwrap())
+            .await
+            .expect("resolution succeeds");
+        addrs.collect::<Vec<SocketAddr>>()
+    });
+
+    let mut ticks = 0;
+    for _ in 0..5 {
+        tokio::time::sleep(Duration::from_millis(10)).await;
+        ticks += 1;
+    }
+
+    let result = resolve_task.await.unwrap();
+    assert_eq!(result.len(), 1);
+    assert_eq!(result[0].ip(), "93.184.216.34".parse::<IpAddr>().unwrap());
+    assert!(
+        ticks >= 4,
+        "Async tasks continued progressing while DNS resolved in blocking pool"
+    );
 }

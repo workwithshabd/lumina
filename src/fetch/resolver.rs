@@ -289,8 +289,12 @@ impl<L: HostLookup> Resolve for SafeDnsResolver<L> {
         let is_private_host = self.allowed_private_hosts.contains(&host);
 
         Box::pin(async move {
-            let addrs = lookup
-                .lookup(&host, 443)
+            let host_for_lookup = host.clone();
+            let addrs = tokio::task::spawn_blocking(move || lookup.lookup(&host_for_lookup, 443))
+                .await
+                .map_err(|e| {
+                    Box::new(std::io::Error::other(e)) as Box<dyn std::error::Error + Send + Sync>
+                })?
                 .map_err(|e| Box::new(e) as Box<dyn std::error::Error + Send + Sync>)?;
 
             let safe_addrs: Vec<SocketAddr> = if is_private_host {

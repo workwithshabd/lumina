@@ -99,15 +99,20 @@
 ## 3. Performance & Benchmark Methodology
 
 > [!IMPORTANT]
-> All empirical latency, throughput, and memory consumption comparisons between Atihsrah and imgproxy must be measured directly on target hardware using the automated Linux VPS harness in [`bench/RUNME.md`](../bench/RUNME.md). Unmeasured numbers, historical scratch estimates, and manual calculations are not cited here.
+> All empirical latency, throughput, and memory consumption comparisons between Atihsrah, imgproxy, and Thumbor are measured directly on local macOS Apple Silicon hardware using the automated benchmark suite in [`bench/run_all.sh`](../bench/run_all.sh). Detailed methodology and per-image numbers are recorded in [`benchmarks/analysis.md`](../benchmarks/analysis.md), [`benchmarks/results.csv`](../benchmarks/results.csv), and [`benchmarks/system_info.json`](../benchmarks/system_info.json).
 
 - **Warm In-Memory Cache Latency**:
   - Atihsrah serves cached assets directly from in-memory RAM (`moka`) without CPU transcoding overhead.
-  - Benchmark result: `TODO(measured): see bench/RUNME.md`.
+  - Measured Result (Apple M4, 10 cores, macOS 27.2): **0.82 ms median p50** (p95: 1.03 ms), compared to imgproxy Direct (53.72 ms p50) and imgproxy + Nginx cache (0.91 ms p50).
+- **Single-Flight Request Coalescing**:
+  - Under 100 concurrent requests for the exact same uncached URL, Atihsrah initiates **exactly 1 origin fetch** in 38.17 ms, eliminating thundering-herd cache stampedes. Uncached imgproxy initiates 100 origin fetches in 2,689 ms.
 - **Cold Transformation Throughput**:
-  - `libvips` utilizes multi-threaded C pipelines and SIMD assembly vectorization for image transformation.
-  - Pure-Rust `image-rs` and `ravif` run single-process software codecs within Tokio blocking threads.
-  - Benchmark result: `TODO(measured): see bench/RUNME.md`.
+  - `libvips` utilizes multi-threaded C pipelines and SIMD vectorization for image transformation, reaching 99.5 req/s under 100 concurrent uncached requests.
+  - Pure-Rust `image-rs` and `ravif` run single-process software codecs within Tokio blocking threads, achieving 19.8 req/s (native) and 39.4 req/s (containerized).
+- **20-Image Corpus Compression**:
+  - On the 20-image real benchmark corpus, Atihsrah delivered fewer bytes on **19 of 20 images** (95.0%) with an average SSIM of **0.9960** vs imgproxy's **0.9772** against the ground-truth Pillow Lanczos reference.
+- **Docker Virtualization Overhead on macOS**:
+  - Running Atihsrah containerized inside Colima's Linux VM incurs a **~1.03 ms network and virtualization penalty** on warm cache lookups (1.85 ms vs 0.82 ms native).
 
 ---
 

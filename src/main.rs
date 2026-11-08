@@ -196,6 +196,7 @@ async fn main() {
 
     // 8. Prepare graceful shutdown signal handler (SIGTERM / SIGINT)
     let shutdown_state = state.clone();
+    let (drain_tx, drain_rx) = tokio::sync::oneshot::channel::<()>();
     let shutdown_signal = async move {
         let ctrl_c = async {
             tokio::signal::ctrl_c()
@@ -228,16 +229,33 @@ async fn main() {
             "Shutdown signal received. Flipping /ready to 503 and draining in-flight requests..."
         );
         shutdown_state.start_draining();
+        let _ = drain_tx.send(());
     };
 
-    // 9. Serve incoming requests with graceful drain
+    // 9. Serve incoming requests with graceful drain bounded by config.shutdown_timeout_secs
+    let shutdown_timeout = std::time::Duration::from_secs(config.shutdown_timeout_secs);
     let make_service = app.into_make_service_with_connect_info::<std::net::SocketAddr>();
     let server = axum::serve(listener, make_service).with_graceful_shutdown(shutdown_signal);
 
-    if let Err(err) = server.await {
-        tracing::error!(error = %err, "Server terminated unexpectedly");
-        std::process::exit(1);
+    tokio::select! {
+        res = server => {
+            if let Err(err) = res {
+                tracing::error!(error = %err, "Server terminated unexpectedly");
+                std::process::exit(1);
+            }
+            tracing::info!("Graceful shutdown complete.");
+        }
+        _ = async {
+            if drain_rx.await.is_ok() {
+                tokio::time::sleep(shutdown_timeout).await;
+            } else {
+                std::future::pending::<()>().await;
+            }
+        } => {
+            tracing::warn!(
+                timeout_secs = config.shutdown_timeout_secs,
+                "Graceful shutdown timed out; forcing exit"
+            );
+        }
     }
-
-    tracing::info!("Graceful shutdown complete.");
 }

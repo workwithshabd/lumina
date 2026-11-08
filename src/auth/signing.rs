@@ -230,7 +230,6 @@ mod tests {
         let mut cfg = Config::test_default(&["https://images.example.com"]);
         cfg.auth_mode = crate::config::AuthMode::Signed;
         cfg.signing_keys = signing_keys;
-        cfg.signing_key = Some(key_bytes);
         cfg
     }
 

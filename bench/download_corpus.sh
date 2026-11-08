@@ -21,48 +21,60 @@ echo "========================================================================"
 echo "          Atihsrah Benchmark: Downloading 20 Real Images                "
 echo "========================================================================"
 
-# Skip header row and parse CSV
-tail -n +2 "${MANIFEST}" | while IFS=',' read -r id filename cat dims url lic notes sha; do
-    # Remove quotes around notes and sha
-    notes=$(echo "${notes}" | tr -d '"')
-    sha=$(echo "${sha}" | tr -d '"')
-    dest="${CORPUS_DIR}/${filename}"
+python3 - <<EOF
+import csv
+import hashlib
+import os
+import sys
+import urllib.request
 
-    need_download=1
-    if [ -f "${dest}" ]; then
-        if command -v sha256sum >/dev/null 2>&1; then
-            current_sha=$(sha256sum "${dest}" | awk '{print $1}')
-        else
-            current_sha=$(shasum -a 256 "${dest}" | awk '{print $1}')
-        fi
-        if [ "${current_sha}" = "${sha}" ]; then
-            echo "[OK] ${filename} exists and SHA256 matches (${sha:0:12}...)"
-            need_download=0
-        fi
-    fi
+manifest_path = "${MANIFEST}"
+corpus_dir = "${CORPUS_DIR}"
+bench_dir = "${BENCH_CORPUS_DIR}"
 
-    if [ "${need_download}" -eq 1 ]; then
-        echo "[*] Downloading ${filename} from ${url}..."
-        curl -sSL -H "User-Agent: Mozilla/5.0" -o "${dest}" "${url}"
+os.makedirs(corpus_dir, exist_ok=True)
+os.makedirs(bench_dir, exist_ok=True)
 
-        if command -v sha256sum >/dev/null 2>&1; then
-            downloaded_sha=$(sha256sum "${dest}" | awk '{print $1}')
-        else
-            downloaded_sha=$(shasum -a 256 "${dest}" | awk '{print $1}')
-        fi
+with open(manifest_path, 'r', encoding='utf-8') as f:
+    reader = csv.DictReader(f)
+    for row in reader:
+        filename = row['filename'].strip()
+        url = row['source_url'].strip()
+        expected_sha = row['sha256'].strip()
+        dest = os.path.join(corpus_dir, filename)
+        bench_dest = os.path.join(bench_dir, filename)
 
-        if [ "${downloaded_sha}" != "${sha}" ]; then
-            echo "[-] ERROR: Checksum mismatch for ${filename}!" >&2
-            echo "    Expected: ${sha}" >&2
-            echo "    Actual:   ${downloaded_sha}" >&2
-            exit 1
-        fi
-        echo "[+] Verified ${filename} (${sha:0:12}...)"
-    fi
+        need_download = True
+        if os.path.exists(dest):
+            with open(dest, 'rb') as img_f:
+                current_sha = hashlib.sha256(img_f.read()).hexdigest()
+            if current_sha.lower() == expected_sha.lower():
+                print(f"[OK] {filename} exists and SHA256 matches ({expected_sha[:12]}...)")
+                need_download = False
 
-    # Mirror into bench/corpus
-    cp "${dest}" "${BENCH_CORPUS_DIR}/${filename}"
-done
+        if need_download:
+            print(f"[*] Downloading {filename} from {url}...")
+            req = urllib.request.Request(
+                url,
+                headers={"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AtihsrahBench/1.0"}
+            )
+            with urllib.request.urlopen(req) as resp, open(dest, 'wb') as out_f:
+                out_f.write(resp.read())
+
+            with open(dest, 'rb') as img_f:
+                downloaded_sha = hashlib.sha256(img_f.read()).hexdigest()
+
+            if downloaded_sha.lower() != expected_sha.lower():
+                print(f"[-] ERROR: Checksum mismatch for {filename}!", file=sys.stderr)
+                print(f"    Expected: {expected_sha}", file=sys.stderr)
+                print(f"    Actual:   {downloaded_sha}", file=sys.stderr)
+                sys.exit(1)
+            print(f"[+] Verified {filename} ({expected_sha[:12]}...)")
+
+        # Mirror to bench/corpus
+        with open(dest, 'rb') as src_f, open(bench_dest, 'wb') as dst_f:
+            dst_f.write(src_f.read())
+EOF
 
 echo "========================================================================"
 echo "[+] All 20 real benchmark images verified successfully."

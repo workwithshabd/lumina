@@ -46,7 +46,6 @@ fn build_test_config(key_hex: &str, kid: Option<&str>) -> Config {
     config
         .signing_keys
         .insert(key_name.to_string(), key_bytes.clone());
-    config.signing_key = Some(key_bytes);
     config
 }
 

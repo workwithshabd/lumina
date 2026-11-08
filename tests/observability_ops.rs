@@ -43,8 +43,6 @@ fn test_setup(
     let mut origins = HashSet::new();
     origins.insert("https://images.example.com".to_string());
 
-    let default_key = signing_keys.get("default").cloned();
-
     let config = Arc::new(Config {
         bind_addr: "127.0.0.1:8080".parse().unwrap(),
         allowed_origins: origins,
@@ -60,13 +58,11 @@ fn test_setup(
         cache_ttl_secs: 86400,
         auth_mode,
         signing_keys,
-        signing_key: default_key,
         clock_skew_secs: 30,
         max_signature_ttl_secs: 86400,
         rate_limit_per_minute,
         rate_limit_miss_per_minute,
         trusted_proxy_cidrs: Vec::new(),
-        log_level: "info".to_string(),
         debug_headers: true,
         metrics_bind: "127.0.0.1:9090".parse().unwrap(),
         request_timeout_secs: 30,

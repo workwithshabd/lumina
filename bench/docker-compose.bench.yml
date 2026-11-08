@@ -27,8 +27,8 @@ services:
     volumes:
       - ./certs/ca.crt:/etc/ssl/certs/origin-ca.crt:ro
     ports:
-      - "8080:8080"
-      - "127.0.0.1:9090:9090"
+      - "8084:8080"
+      - "127.0.0.1:9094:9090"
     environment:
       - ATIHSRAH_BIND=0.0.0.0:8080
       - ATIHSRAH_METRICS_BIND=0.0.0.0:9090
@@ -47,7 +47,7 @@ services:
       - ATIHSRAH_DEBUG_HEADERS=true
 
   imgproxy:
-    image: darthsim/imgproxy:${IMGPROXY_VERSION:-v3.27.0}
+    image: darthsim/imgproxy:${IMGPROXY_VERSION:-latest}
     container_name: bench_imgproxy
     depends_on:
       - origin
@@ -61,6 +61,8 @@ services:
       - IMGPROXY_DOWNLOAD_TIMEOUT=15
       - IMGPROXY_MAX_SRC_RESOLUTION=33.5
       - IMGPROXY_ALLOW_LOCAL_ADDRESSES=true
+      - IMGPROXY_ENABLE_WEBP_DETECTION=true
+      - IMGPROXY_ENABLE_AVIF_DETECTION=true
       - IMGPROXY_LOG_LEVEL=warn
       - SSL_CERT_FILE=/etc/ssl/certs/ca.crt
 

@@ -35,13 +35,11 @@ pub struct Config {
     pub cache_ttl_secs: u64,
     pub auth_mode: AuthMode,
     pub signing_keys: HashMap<String, Vec<u8>>,
-    pub signing_key: Option<Vec<u8>>,
     pub clock_skew_secs: u64,
     pub max_signature_ttl_secs: u64,
     pub rate_limit_per_minute: u32,
     pub rate_limit_miss_per_minute: u32,
     pub trusted_proxy_cidrs: Vec<ipnet::IpNet>,
-    pub log_level: String,
     pub debug_headers: bool,
     pub metrics_bind: SocketAddr,
     pub request_timeout_secs: u64,
@@ -284,11 +282,6 @@ impl Config {
             return Err(ConfigError::MissingSigningKey);
         }
 
-        let signing_key = signing_keys
-            .get("default")
-            .cloned()
-            .or_else(|| signing_keys.values().next().cloned());
-
         let clock_skew_secs = parse_or_default(
             lookup("ATIHSRAH_CLOCK_SKEW_SECS"),
             "30",
@@ -313,7 +306,6 @@ impl Config {
         )?;
         let trusted_proxy_cidrs = parse_trusted_proxy_cidrs(lookup("TRUSTED_PROXY_CIDRS"))?;
 
-        let log_level = lookup("LOG_LEVEL").unwrap_or_else(|| "info".to_string());
         let debug_headers = parse_or_default(
             lookup("ATIHSRAH_DEBUG_HEADERS"),
             "false",
@@ -469,13 +461,11 @@ impl Config {
             cache_ttl_secs,
             auth_mode,
             signing_keys,
-            signing_key,
             clock_skew_secs,
             max_signature_ttl_secs,
             rate_limit_per_minute,
             rate_limit_miss_per_minute,
             trusted_proxy_cidrs,
-            log_level,
             debug_headers,
             metrics_bind,
             request_timeout_secs,
@@ -489,6 +479,14 @@ impl Config {
             distinct_color_threshold,
             max_retry_pixels,
         })
+    }
+
+    /// Returns the default signing key bytes, if configured.
+    pub fn default_signing_key(&self) -> Option<&[u8]> {
+        self.signing_keys
+            .get("default")
+            .or_else(|| self.signing_keys.values().next())
+            .map(|v| v.as_slice())
     }
 
     /// Checks if a given origin is explicitly allowlisted (public or private).
@@ -530,13 +528,11 @@ impl Config {
             cache_ttl_secs: 86400,
             auth_mode: AuthMode::Public,
             signing_keys: HashMap::new(),
-            signing_key: None,
             clock_skew_secs: 30,
             max_signature_ttl_secs: 86400,
             rate_limit_per_minute: 1000,
             rate_limit_miss_per_minute: 100,
             trusted_proxy_cidrs: Vec::new(),
-            log_level: "info".to_string(),
             debug_headers: false,
             metrics_bind: "127.0.0.1:9090".parse().unwrap(),
             request_timeout_secs: 30,
@@ -897,7 +893,8 @@ mod tests {
         ]);
         let config = Config::from_lookup(|k| map.get(k).cloned()).unwrap();
         assert_eq!(config.auth_mode, AuthMode::Public);
-        assert!(config.signing_key.is_none());
+        assert!(config.default_signing_key().is_none());
+        assert!(config.signing_keys.is_empty());
     }
 
     #[test]
@@ -921,12 +918,11 @@ mod tests {
         assert_eq!(config.cache_single_entry_max_mb, 10);
         assert_eq!(config.cache_ttl_secs, 86400);
         assert_eq!(config.rate_limit_per_minute, 1000);
-        assert_eq!(config.log_level, "info");
         assert!(!config.debug_headers);
         assert!(config.is_origin_allowed("https://images.example.com"));
         assert!(config.is_origin_allowed("https://cdn.example.org:8443"));
         assert!(!config.is_origin_allowed("https://notallowed.com"));
-        assert_eq!(config.signing_key.unwrap().len(), 32);
+        assert_eq!(config.default_signing_key().unwrap().len(), 32);
         assert_eq!(config.clock_skew_secs, 30);
         assert_eq!(config.max_signature_ttl_secs, 86400);
         assert_eq!(config.rate_limit_miss_per_minute, 100);

@@ -25,12 +25,10 @@ if [ -n "$FILE_MATCHES" ]; then
     ERRORS=$((ERRORS + 1))
 fi
 
-# 3. Verify benchmarks/analysis.md does not contain unverified raw benchmark numbers
+# 3. Verify benchmark ground truth artifacts exist and are consistent
 if [ -f "benchmarks/analysis.md" ]; then
-    UNVERIFIED_ROWS=$(grep -E '^\|[ ]*(\*\*|img_)' benchmarks/analysis.md | grep -E '[0-9]+(\.[0-9]+)?[ ]*(ms|req/s|%|MB|KB)' | grep -v 'TODO' || true)
-    if [ -n "$UNVERIFIED_ROWS" ]; then
-        echo "ERROR: Found unverified raw benchmark numbers in benchmarks/analysis.md without TODO(measured):"
-        echo "$UNVERIFIED_ROWS"
+    if [ ! -f "benchmarks/raw_results.json" ] || [ ! -f "benchmarks/results.csv" ] || [ ! -f "benchmarks/system_info.json" ]; then
+        echo "ERROR: benchmarks/analysis.md contains numbers but supporting ground-truth artifacts (raw_results.json, results.csv, system_info.json) are missing!"
         ERRORS=$((ERRORS + 1))
     fi
 else
