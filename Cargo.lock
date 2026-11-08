@@ -101,6 +101,7 @@ dependencies = [
  "metrics-exporter-prometheus",
  "moka",
  "percent-encoding",
+ "rayon",
  "reqwest",
  "serde",
  "serde_json",

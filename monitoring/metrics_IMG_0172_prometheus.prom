@@ -1,0 +1,163 @@
+# TYPE atihsrah_signature_invalid_total counter
+atihsrah_signature_invalid_total 1
+
+# TYPE atihsrah_oversize_not_cached_total counter
+atihsrah_oversize_not_cached_total 0
+
+# TYPE atihsrah_response_bytes_total counter
+atihsrah_response_bytes_total 19934481
+
+# TYPE atihsrah_output_larger_than_source_total counter
+atihsrah_output_larger_than_source_total 0
+
+# TYPE atihsrah_cache_misses_total counter
+atihsrah_cache_misses_total 127
+
+# TYPE atihsrah_cache_hit_bytes_total counter
+atihsrah_cache_hit_bytes_total 10529023
+
+# TYPE atihsrah_requests_total counter
+atihsrah_requests_total{cache_result="none",status_class="4xx"} 1
+atihsrah_requests_total{cache_result="miss",status_class="2xx"} 127
+atihsrah_requests_total{cache_result="hit",status_class="2xx"} 286
+
+# TYPE atihsrah_cache_hits_total counter
+atihsrah_cache_hits_total 286
+
+# TYPE atihsrah_ssrf_blocked_total counter
+atihsrah_ssrf_blocked_total 0
+
+# TYPE atihsrah_rate_limited_total counter
+atihsrah_rate_limited_total 0
+
+# TYPE atihsrah_errors_total counter
+atihsrah_errors_total{type="signature_invalid"} 1
+
+# TYPE atihsrah_source_rejected_total counter
+atihsrah_source_rejected_total{reason="disallowed_origin"} 0
+
+# TYPE atihsrah_cache_entries gauge
+atihsrah_cache_entries 127
+
+# TYPE atihsrah_inflight_requests gauge
+atihsrah_inflight_requests 0
+
+# TYPE atihsrah_transform_queue_depth gauge
+atihsrah_transform_queue_depth 0
+
+# TYPE atihsrah_cache_size_bytes gauge
+atihsrah_cache_size_bytes 9405458
+
+# TYPE atihsrah_inflight_transforms gauge
+atihsrah_inflight_transforms 0
+
+# TYPE atihsrah_transform_duration_seconds histogram
+atihsrah_transform_duration_seconds_bucket{le="0.001"} 9
+atihsrah_transform_duration_seconds_bucket{le="0.002"} 18
+atihsrah_transform_duration_seconds_bucket{le="0.005"} 30
+atihsrah_transform_duration_seconds_bucket{le="0.01"} 35
+atihsrah_transform_duration_seconds_bucket{le="0.025"} 36
+atihsrah_transform_duration_seconds_bucket{le="0.05"} 36
+atihsrah_transform_duration_seconds_bucket{le="0.075"} 36
+atihsrah_transform_duration_seconds_bucket{le="0.1"} 53
+atihsrah_transform_duration_seconds_bucket{le="0.25"} 116
+atihsrah_transform_duration_seconds_bucket{le="0.5"} 127
+atihsrah_transform_duration_seconds_bucket{le="0.75"} 127
+atihsrah_transform_duration_seconds_bucket{le="1"} 127
+atihsrah_transform_duration_seconds_bucket{le="2.5"} 127
+atihsrah_transform_duration_seconds_bucket{le="5"} 127
+atihsrah_transform_duration_seconds_bucket{le="10"} 127
+atihsrah_transform_duration_seconds_bucket{le="15"} 127
+atihsrah_transform_duration_seconds_bucket{le="30"} 127
+atihsrah_transform_duration_seconds_bucket{le="+Inf"} 127
+atihsrah_transform_duration_seconds_sum 16.502625706999996
+atihsrah_transform_duration_seconds_count 127
+
+# TYPE atihsrah_encode_duration_seconds histogram
+atihsrah_encode_duration_seconds_bucket{le="0.001"} 53
+atihsrah_encode_duration_seconds_bucket{le="0.002"} 72
+atihsrah_encode_duration_seconds_bucket{le="0.005"} 84
+atihsrah_encode_duration_seconds_bucket{le="0.01"} 88
+atihsrah_encode_duration_seconds_bucket{le="0.025"} 94
+atihsrah_encode_duration_seconds_bucket{le="0.05"} 102
+atihsrah_encode_duration_seconds_bucket{le="0.075"} 114
+atihsrah_encode_duration_seconds_bucket{le="0.1"} 117
+atihsrah_encode_duration_seconds_bucket{le="0.25"} 127
+atihsrah_encode_duration_seconds_bucket{le="0.5"} 127
+atihsrah_encode_duration_seconds_bucket{le="0.75"} 127
+atihsrah_encode_duration_seconds_bucket{le="1"} 127
+atihsrah_encode_duration_seconds_bucket{le="2.5"} 127
+atihsrah_encode_duration_seconds_bucket{le="5"} 127
+atihsrah_encode_duration_seconds_bucket{le="10"} 127
+atihsrah_encode_duration_seconds_bucket{le="15"} 127
+atihsrah_encode_duration_seconds_bucket{le="30"} 127
+atihsrah_encode_duration_seconds_bucket{le="+Inf"} 127
+atihsrah_encode_duration_seconds_sum 2.6334562550000005
+atihsrah_encode_duration_seconds_count 127
+
+# TYPE atihsrah_decode_duration_seconds histogram
+atihsrah_decode_duration_seconds_bucket{le="0.001"} 11
+atihsrah_decode_duration_seconds_bucket{le="0.002"} 21
+atihsrah_decode_duration_seconds_bucket{le="0.005"} 35
+atihsrah_decode_duration_seconds_bucket{le="0.01"} 35
+atihsrah_decode_duration_seconds_bucket{le="0.025"} 36
+atihsrah_decode_duration_seconds_bucket{le="0.05"} 36
+atihsrah_decode_duration_seconds_bucket{le="0.075"} 36
+atihsrah_decode_duration_seconds_bucket{le="0.1"} 36
+atihsrah_decode_duration_seconds_bucket{le="0.25"} 57
+atihsrah_decode_duration_seconds_bucket{le="0.5"} 107
+atihsrah_decode_duration_seconds_bucket{le="0.75"} 127
+atihsrah_decode_duration_seconds_bucket{le="1"} 127
+atihsrah_decode_duration_seconds_bucket{le="2.5"} 127
+atihsrah_decode_duration_seconds_bucket{le="5"} 127
+atihsrah_decode_duration_seconds_bucket{le="10"} 127
+atihsrah_decode_duration_seconds_bucket{le="15"} 127
+atihsrah_decode_duration_seconds_bucket{le="30"} 127
+atihsrah_decode_duration_seconds_bucket{le="+Inf"} 127
+atihsrah_decode_duration_seconds_sum 35.565005619
+atihsrah_decode_duration_seconds_count 127
+
+# TYPE atihsrah_request_duration_seconds histogram
+atihsrah_request_duration_seconds_bucket{le="0.001"} 286
+atihsrah_request_duration_seconds_bucket{le="0.002"} 287
+atihsrah_request_duration_seconds_bucket{le="0.005"} 287
+atihsrah_request_duration_seconds_bucket{le="0.01"} 301
+atihsrah_request_duration_seconds_bucket{le="0.025"} 318
+atihsrah_request_duration_seconds_bucket{le="0.05"} 323
+atihsrah_request_duration_seconds_bucket{le="0.075"} 323
+atihsrah_request_duration_seconds_bucket{le="0.1"} 323
+atihsrah_request_duration_seconds_bucket{le="0.25"} 329
+atihsrah_request_duration_seconds_bucket{le="0.5"} 340
+atihsrah_request_duration_seconds_bucket{le="0.75"} 341
+atihsrah_request_duration_seconds_bucket{le="1"} 351
+atihsrah_request_duration_seconds_bucket{le="2.5"} 375
+atihsrah_request_duration_seconds_bucket{le="5"} 414
+atihsrah_request_duration_seconds_bucket{le="10"} 414
+atihsrah_request_duration_seconds_bucket{le="15"} 414
+atihsrah_request_duration_seconds_bucket{le="30"} 414
+atihsrah_request_duration_seconds_bucket{le="+Inf"} 414
+atihsrah_request_duration_seconds_sum 195.117435216
+atihsrah_request_duration_seconds_count 414
+
+# TYPE atihsrah_fetch_duration_seconds histogram
+atihsrah_fetch_duration_seconds_bucket{le="0.001"} 0
+atihsrah_fetch_duration_seconds_bucket{le="0.002"} 0
+atihsrah_fetch_duration_seconds_bucket{le="0.005"} 24
+atihsrah_fetch_duration_seconds_bucket{le="0.01"} 48
+atihsrah_fetch_duration_seconds_bucket{le="0.025"} 53
+atihsrah_fetch_duration_seconds_bucket{le="0.05"} 65
+atihsrah_fetch_duration_seconds_bucket{le="0.075"} 67
+atihsrah_fetch_duration_seconds_bucket{le="0.1"} 67
+atihsrah_fetch_duration_seconds_bucket{le="0.25"} 67
+atihsrah_fetch_duration_seconds_bucket{le="0.5"} 127
+atihsrah_fetch_duration_seconds_bucket{le="0.75"} 127
+atihsrah_fetch_duration_seconds_bucket{le="1"} 127
+atihsrah_fetch_duration_seconds_bucket{le="2.5"} 127
+atihsrah_fetch_duration_seconds_bucket{le="5"} 127
+atihsrah_fetch_duration_seconds_bucket{le="10"} 127
+atihsrah_fetch_duration_seconds_bucket{le="15"} 127
+atihsrah_fetch_duration_seconds_bucket{le="30"} 127
+atihsrah_fetch_duration_seconds_bucket{le="+Inf"} 127
+atihsrah_fetch_duration_seconds_sum 24.736706661999996
+atihsrah_fetch_duration_seconds_count 127
+

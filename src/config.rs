@@ -52,6 +52,7 @@ pub struct Config {
     pub avif_speed: u8,
     pub distinct_color_threshold: u32,
     pub max_retry_pixels: u64,
+    pub resize_filter: String,
 }
 
 #[derive(Debug, Error, PartialEq, Eq)]
@@ -373,6 +374,9 @@ impl Config {
             "16777216",
             "ATIHSRAH_MAX_RETRY_PIXELS",
         )?;
+        let resize_filter = lookup("ATIHSRAH_RESIZE_FILTER")
+            .unwrap_or_else(|| "lanczos3".to_string())
+            .to_lowercase();
 
         if !private_origins.is_empty() {
             let mut sorted: Vec<&String> = private_origins.iter().collect();
@@ -478,6 +482,7 @@ impl Config {
             avif_speed,
             distinct_color_threshold,
             max_retry_pixels,
+            resize_filter,
         })
     }
 
@@ -545,6 +550,7 @@ impl Config {
             avif_speed: 6,
             distinct_color_threshold: 256,
             max_retry_pixels: 16_777_216,
+            resize_filter: "lanczos3".to_string(),
         }
     }
 }

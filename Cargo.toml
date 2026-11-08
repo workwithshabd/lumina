@@ -30,9 +30,16 @@ percent-encoding = "2.3"
 ipnet = "2.12"
 tower = { version = "0.5", features = ["limit", "timeout"] }
 tower-http = { version = "0.6", features = ["trace"] }
-image = { version = "0.25", features = ["jpeg", "png", "webp", "avif"] }
+image = { version = "0.25", features = ["jpeg", "png", "webp", "avif", "gif", "rayon"] }
+rayon = "1.12"
 
 [dev-dependencies]
 tower = { version = "0.5", features = ["util"] }
 http-body-util = "0.1"
 crc32fast = "1.4"
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+panic = "unwind"

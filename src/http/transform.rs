@@ -220,7 +220,9 @@ async fn handle_transform(
         CacheFormat::Auto(AcceptClass::Webp) => ImageFormat::WebP,
         CacheFormat::Auto(AcceptClass::Legacy) => ImageFormat::Jpeg,
     };
-    let quality = resolve_quality(default_fmt, params.quality_target);
+    let quality = params
+        .q
+        .unwrap_or_else(|| resolve_quality(default_fmt, params.quality_target));
 
     let cache_key = compute_cache_key(&CacheKeyParams {
         src: &params.src,
@@ -373,7 +375,9 @@ async fn execute_transform_pipeline(
     // Resolve target format and quality
     let (resolved_format, is_auto) =
         resolve_format(params.format, accept_header, info.has_alpha, info.format);
-    let resolved_quality = resolve_quality(resolved_format, params.quality_target);
+    let resolved_quality = params
+        .q
+        .unwrap_or_else(|| resolve_quality(resolved_format, params.quality_target));
 
     // 6. Dimension clamping & non-upscaling
     let max_out_dim = state.config.max_output_dimension;

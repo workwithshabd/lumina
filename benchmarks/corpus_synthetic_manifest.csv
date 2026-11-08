@@ -1,0 +1,21 @@
+id,filename,category,dimensions,source_url,license,license_notes,sha256
+synth_01,01_landscape.png,photo,1920x1080,local://generate_corpus.rs,Apache-2.0,Procedural stress asset,bcd523dd6edea25ab7f3d1b89570b27fc78f9248b9acef00cbd14309f2652125
+synth_02,02_portrait.jpg,photo,1200x1600,local://generate_corpus.rs,Apache-2.0,Procedural stress asset,949692d12c9e908099bc592af2229bbf5c55e6c4d4aa18b18d070cf57b613330
+synth_03,03_macro_texture.png,photo,1400x1400,local://generate_corpus.rs,Apache-2.0,Procedural stress asset,8ec52e07f369d21e4a19eed137cb1e12a6c0583c961f61ab4a7ebd21bd238a84
+synth_04,04_night_skyline.jpg,photo,1920x1080,local://generate_corpus.rs,Apache-2.0,Procedural stress asset,c8be9eab873ed4b8ab646dcace39029735223a2a3a7605f7862f3ad7090c367e
+synth_05,05_architecture.png,photo,1600x1200,local://generate_corpus.rs,Apache-2.0,Procedural stress asset,47d3bf54d7cf8eb7393869dcc6ffde86e23fc8752d0599a0cccb346e8469771c
+synth_06,06_vector_flat.png,vector_flat,1200x1200,local://generate_corpus.rs,Apache-2.0,Procedural stress asset,6efdf5722f445d0e1e17df5b783af7f70a6d1c18fd528f147dda589ec390393b
+synth_07,07_smooth_gradient.png,smooth_gradient,1920x1080,local://generate_corpus.rs,Apache-2.0,Procedural stress asset,ac3142337e9151821ac52616759d69cae4b1c634159bed6ef883f3ee8c0b0bd7
+synth_08,08_typography_poster.png,typography_poster,1200x1600,local://generate_corpus.rs,Apache-2.0,Procedural stress asset,6f79c0f62d01ac4eda3783ada4ffea9408f0e7e5f33aa778d38513bdd4f4e566
+synth_09,09_ui_desktop.png,ui_desktop,1920x1080,local://generate_corpus.rs,Apache-2.0,Procedural stress asset,5114c1d327304491b8405e5dff95ad711601448f4ce949cc8679903c834fb667
+synth_10,10_ui_mobile.png,ui_mobile,750x1334,local://generate_corpus.rs,Apache-2.0,Procedural stress asset,66f06517ef49c05b14787a9b4182a3ea528ebb247db995be086f1463d0aee8b9
+synth_11,11_document_text.png,document_text,1650x2338,local://generate_corpus.rs,Apache-2.0,Procedural stress asset,83775e24294bd4d2a53b9e3954ceab4c50fcb3bbc272b4e5635115f476260001
+synth_12,12_transparent_icon.png,transparent_icon,512x512,local://generate_corpus.rs,Apache-2.0,Procedural stress asset,f8a250708ac7c32fd6352c0c8adb1428b7e486016f5ac97d82356cf7da34bca3
+synth_13,13_transparent_shadow.png,transparent_shadow,800x800,local://generate_corpus.rs,Apache-2.0,Procedural stress asset,2516ed7d7e6c618553eea8eb4f9603a26e604e5194947b3b191a113c838197dc
+synth_14,14_hdr_highcontrast.jpg,hdr_highcontrast,1920x1080,local://generate_corpus.rs,Apache-2.0,Procedural stress asset,2c4fa7f4badb66fa97d42e99301793bc66f7a3806c91abcb2557e084ff1b2cc3
+synth_15,15_lowcontrast_fog.jpg,lowcontrast_fog,1600x1200,local://generate_corpus.rs,Apache-2.0,Procedural stress asset,466c0f0d8bbfe84a84d253974b6556ef45583c8c6fe22dea757a56991e14ec7d
+synth_16,16_pattern_checkerboard.png,pattern_checkerboard,1024x1024,local://generate_corpus.rs,Apache-2.0,Procedural stress asset,db303af5126837629100784ab60a923a8eee04c0483e5fbddeac8f7f33a7fa75
+synth_17,17_noise_grain.png,noise_grain,1280x720,local://generate_corpus.rs,Apache-2.0,Procedural stress asset,338e588d2a2360ba61a255e428f0ce866fcb1dfabc40490c52d982ab5a5db75f
+synth_18,18_photo_4k_large.jpg,photo_4k_large,3840x2160,local://generate_corpus.rs,Apache-2.0,Procedural stress asset,871a3b9cf0a58f3e687d1e4a09baea354cd091b2d63031537d24e8c4c322860f
+synth_19,19_photo_medium.jpg,photo,1200x800,local://generate_corpus.rs,Apache-2.0,Procedural stress asset,6165d47d7533ff324b22d432bc52c6b0b4b4304c77adc1410e056fadf63a43a1
+synth_20,20_thumbnail_small.png,thumbnail_small,400x300,local://generate_corpus.rs,Apache-2.0,Procedural stress asset,cd8244dd4aaacfb29822b4e452986b3b304ad1d92ff3f7e28c58ef99c6a11151

@@ -533,91 +533,264 @@ app.post('/api/test-transform', async (req, res) => {
   }
 });
 
-// 7. Batch Corpus Runner
+// Helper: Single transformation execution with timing and response decoding
+async function executeSingleTransform({
+  src,
+  w,
+  h,
+  fit = 'contain',
+  format,
+  q,
+  qt,
+  allow_upscale = 0,
+  isSigned = false,
+  keyHex,
+  acceptHeader,
+  originalBytes = 0,
+  label = '',
+}) {
+  const itemParams = {
+    src,
+    w,
+    h,
+    fit,
+    allow_upscale,
+  };
+  if (format && format !== 'auto') itemParams.format = format;
+  if (q) itemParams.q = q;
+  if (qt) itemParams.qt = qt;
+
+  let targetUrl = '';
+  if (isSigned) {
+    const exp = Math.floor(Date.now() / 1000) + 3600;
+    targetUrl = signAtihsrahUrl(ATIHSRAH_PROXY_URL, itemParams, {
+      keyHex: keyHex || DEFAULT_SIGNING_KEY,
+      exp,
+    });
+  } else {
+    const qp = Object.keys(itemParams)
+      .filter(k => itemParams[k] !== undefined && itemParams[k] !== null && itemParams[k] !== '')
+      .map(k => `${rfc3986Encode(k)}=${rfc3986Encode(itemParams[k])}`)
+      .join('&');
+    targetUrl = `${ATIHSRAH_PROXY_URL}/transform?${qp}`;
+  }
+
+  const headers = {};
+  if (acceptHeader) headers['Accept'] = acceptHeader;
+
+  const t0 = performance.now();
+  try {
+    const resp = await axios.get(targetUrl, {
+      headers,
+      responseType: 'arraybuffer',
+      timeout: 10000,
+    });
+    const latencyMs = Number((performance.now() - t0).toFixed(2));
+    const buf = Buffer.from(resp.data);
+    const transformedBytes = buf.length;
+    const orig = originalBytes || transformedBytes;
+    const deltaPct = Number((((transformedBytes - orig) / orig) * 100).toFixed(2));
+    const contentType = resp.headers['content-type'] || 'image/jpeg';
+    const base64Data = `data:${contentType};base64,${buf.toString('base64')}`;
+
+    return {
+      success: true,
+      label,
+      targetUrl,
+      status: resp.status,
+      latencyMs,
+      cache: resp.headers['x-atihsrah-cache'] || 'MISS',
+      contentType,
+      originalBytes: orig,
+      transformedBytes,
+      deltaPct,
+      largerThanSource: orig > 0 && transformedBytes > orig,
+      previewBase64: base64Data,
+      w,
+      h,
+      format: format || 'auto',
+      q: q || 65,
+    };
+  } catch (e) {
+    const latencyMs = Number((performance.now() - t0).toFixed(2));
+    return {
+      success: false,
+      label,
+      targetUrl,
+      status: e.response ? e.response.status : 502,
+      latencyMs,
+      error: e.response && e.response.data ? e.response.data.toString() : e.message,
+      originalBytes,
+      transformedBytes: 0,
+      deltaPct: 0,
+      w,
+      h,
+      format: format || 'auto',
+      q: q || 65,
+    };
+  }
+}
+
+// 7. Parallel Batch Corpus Runner (All Images and Variants at Once)
 app.post('/api/batch-test', async (req, res) => {
   try {
-    const { params = {}, isSigned = false, keyHex, acceptHeader } = req.body;
+    const { params = {}, isSigned = false, keyHex, acceptHeader, testAllVariants = false } = req.body;
     const manifest = loadCorpusManifest();
-    const results = [];
+    const wallStart = performance.now();
 
-    for (const img of manifest) {
-      const itemParams = {
-        src: img.localUrl,
-        w: params.w || 800,
-        h: params.h || 600,
-        fit: params.fit || 'cover',
-        allow_upscale: 0,
-      };
-      if (params.format && params.format !== 'auto') itemParams.format = params.format;
-      if (params.quality_target) itemParams.quality_target = params.quality_target;
-
-      let targetUrl = '';
-      if (isSigned) {
-        const exp = Math.floor(Date.now() / 1000) + 3600;
-        targetUrl = signAtihsrahUrl(ATIHSRAH_PROXY_URL, itemParams, {
-          keyHex: keyHex || DEFAULT_SIGNING_KEY,
-          exp,
-        });
-      } else {
-        const qp = Object.keys(itemParams)
-          .map(k => `${rfc3986Encode(k)}=${rfc3986Encode(itemParams[k])}`)
-          .join('&');
-        targetUrl = `${ATIHSRAH_PROXY_URL}/transform?${qp}`;
+    const tasks = [];
+    if (testAllVariants) {
+      // Full matrix across all corpus images in parallel
+      const formats = ['auto', 'avif', 'webp', 'jpeg', 'png'];
+      const sizes = [{ w: 400, h: 300 }, { w: 800, h: 600 }];
+      const qualities = [40, 65, 85];
+      for (const img of manifest) {
+        for (const f of formats) {
+          for (const s of sizes) {
+            for (const q of qualities) {
+              tasks.push({
+                src: img.localUrl,
+                originalBytes: img.sizeBytes,
+                filename: img.filename,
+                category: img.category,
+                w: s.w,
+                h: s.h,
+                fit: params.fit || 'contain',
+                format: f,
+                q,
+                label: `${img.filename} • ${f.toUpperCase()} • ${s.w}×${s.h} • q=${q}`,
+              });
+            }
+          }
+        }
       }
-
-      const headers = {};
-      if (acceptHeader) headers['Accept'] = acceptHeader;
-
-      const t0 = performance.now();
-      try {
-        const resp = await axios.get(targetUrl, {
-          headers,
-          responseType: 'arraybuffer',
-          timeout: 8000,
-        });
-        const latencyMs = Number((performance.now() - t0).toFixed(2));
-        const buf = Buffer.from(resp.data);
-        const transformedBytes = buf.length;
-        const deltaPct = Number((((transformedBytes - img.sizeBytes) / img.sizeBytes) * 100).toFixed(2));
-
-        results.push({
-          id: img.id,
+    } else {
+      // Standard batch: all 20 corpus images run simultaneously in parallel
+      for (const img of manifest) {
+        tasks.push({
+          src: img.localUrl,
+          originalBytes: img.sizeBytes,
           filename: img.filename,
           category: img.category,
-          status: resp.status,
-          latencyMs,
-          cache: resp.headers['x-atihsrah-cache'] || 'MISS',
-          contentType: resp.headers['content-type'],
-          originalBytes: img.sizeBytes,
-          transformedBytes,
-          deltaPct,
-          largerThanSource: transformedBytes > img.sizeBytes,
-        });
-      } catch (e) {
-        results.push({
-          id: img.id,
-          filename: img.filename,
-          category: img.category,
-          status: e.response ? e.response.status : 502,
-          error: e.message,
-          originalBytes: img.sizeBytes,
+          w: params.w || 800,
+          h: params.h || 600,
+          fit: params.fit || 'contain',
+          format: params.format,
+          q: params.q,
+          qt: params.qt,
+          label: img.filename,
         });
       }
     }
 
-    const successful = results.filter(r => r.status === 200);
-    const largerCount = successful.filter(r => r.largerThanSource).length;
+    // Execute all conversions concurrently
+    const rawResults = await Promise.all(
+      tasks.map(t =>
+        executeSingleTransform({
+          ...t,
+          isSigned,
+          keyHex,
+          acceptHeader,
+        }).then(r => ({ ...r, id: t.filename, filename: t.filename, category: t.category }))
+      )
+    );
+
+    const wallClockMs = Number((performance.now() - wallStart).toFixed(2));
+    const successful = rawResults.filter(r => r.status === 200);
+    const sumLatencyMs = Number(successful.reduce((acc, r) => acc + r.latencyMs, 0).toFixed(2));
     const avgLatency = successful.length > 0
-      ? Number((successful.reduce((acc, r) => acc + r.latencyMs, 0) / successful.length).toFixed(2))
+      ? Number((sumLatencyMs / successful.length).toFixed(2))
       : 0;
+    const largerCount = successful.filter(r => r.largerThanSource).length;
+    const speedup = wallClockMs > 0 ? Number((sumLatencyMs / wallClockMs).toFixed(1)) : 1;
 
     res.json({
       success: true,
-      totalCount: manifest.length,
+      totalCount: rawResults.length,
       successCount: successful.length,
       largerCount,
       avgLatencyMs: avgLatency,
-      results,
+      wallClockMs,
+      sumLatencyMs,
+      speedupMultiplier: `${speedup}x`,
+      parallelMode: true,
+      results: rawResults,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 7b. Multi-Variant Parallel Testing (All Qualities, Sizes & Formats at Once)
+app.post('/api/multi-variant-test', async (req, res) => {
+  try {
+    const {
+      src,
+      fit = 'contain',
+      formats = ['auto', 'avif', 'webp', 'jpeg', 'png'],
+      sizes = [
+        { label: 'Thumbnail', w: 200, h: 150 },
+        { label: 'Small', w: 400, h: 300 },
+        { label: 'Medium', w: 800, h: 600 },
+        { label: 'Large', w: 1200, h: 900 },
+      ],
+      qualities = [40, 65, 85],
+      isSigned = false,
+      keyHex,
+      acceptHeader,
+      originalBytes = 0,
+    } = req.body;
+
+    if (!src) {
+      return res.status(400).json({ success: false, error: 'src parameter is required' });
+    }
+
+    const wallStart = performance.now();
+    const tasks = [];
+
+    for (const f of formats) {
+      for (const s of sizes) {
+        for (const q of qualities) {
+          tasks.push({
+            src,
+            w: s.w,
+            h: s.h,
+            fit,
+            format: f,
+            q,
+            originalBytes,
+            label: `${f.toUpperCase()} • ${s.label} (${s.w}×${s.h}) • q=${q}`,
+            sizeLabel: s.label,
+          });
+        }
+      }
+    }
+
+    // Execute ALL variant conversions at once in parallel!
+    const results = await Promise.all(
+      tasks.map(t =>
+        executeSingleTransform({
+          ...t,
+          isSigned,
+          keyHex,
+          acceptHeader,
+        }).then(r => ({ ...r, sizeLabel: t.sizeLabel }))
+      )
+    );
+
+    const wallClockMs = Number((performance.now() - wallStart).toFixed(2));
+    const successful = results.filter(r => r.status === 200);
+    const sumLatencyMs = Number(successful.reduce((acc, r) => acc + r.latencyMs, 0).toFixed(2));
+    const speedup = wallClockMs > 0 ? Number((sumLatencyMs / wallClockMs).toFixed(1)) : 1;
+
+    res.json({
+      success: true,
+      totalVariants: tasks.length,
+      successCount: successful.length,
+      wallClockMs,
+      sumLatencyMs,
+      speedupMultiplier: `${speedup}x`,
+      variants: results,
     });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });

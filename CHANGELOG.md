@@ -7,6 +7,21 @@ The project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 
 ## [Unreleased]
 
+### Parallel Processor Concurrency & Multi-Variant Dashboard Benchmark (2026-11-08)
+- **Rayon Multi-Threaded Processing in Image Processor**:
+  - Enabled `rayon` in `image-rs` (`features = [..., "rayon"]`) and added `rayon = "1.12"` dependency for multi-threaded resizing, pixel operations, and candidate encoding.
+  - Implemented parallel candidate evaluations (`specs.into_par_iter()`) for AVIF quality step retries and JPEG quality step retries, evaluating all candidate compressions simultaneously across worker threads instead of sequentially.
+  - Implemented parallel PNG and WebP lossless candidate evaluation using `rayon::join`.
+- **Query Parameter Aliases & Direct Numeric Quality**:
+  - Added support for `q` and `quality` (numeric 1..=100) directly into `TransformParams` and `CacheKeyParams`, alongside existing `quality_target` (`qt`).
+  - Added support for `f` alias for `format`.
+- **Multi-Variant Parallel Test in Studio Dashboard**:
+  - Added `/api/multi-variant-test` executing all formats (`auto`, `avif`, `webp`, `jpeg`, `png`), sizes (Thumbnail, Small, Medium, Large), and qualities (`40`, `65`, `85`) simultaneously at once via `Promise.all`.
+  - Added interactive multi-variant matrix view in the UI showing parallel wall-clock time vs serial sum latency, parallel speedup multiplier (5.4x+ faster), format filter pills, and single-click inspector previews.
+- **Concurrent Batch Benchmark Execution**:
+  - Upgraded `/api/batch-test` from a sequential `for` loop to parallel execution (`Promise.all`), reducing 20-image corpus test latency from ~3,000ms down to ~50ms (7.4x speedup).
+  - Added full matrix sweep mode testing all corpus images across all formats and sizes in parallel.
+
 ### Prometheus Metrics, Scrape-Time Cache Sync & Grafana Dashboard (2026-11-08)
 - **Synchronous Cache Gauge Scrape (`await cache.run_pending_tasks()`)**:
   - `atihsrah_cache_entries` and `atihsrah_cache_size_bytes` now await `cache.run_pending_tasks().await` at scrape time prior to querying Moka LRU statistics, ensuring immediate post-transform scrapes accurately reflect cached entries and memory size without delay.

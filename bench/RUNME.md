@@ -1,27 +1,47 @@
-# Atihsrah Benchmark Reproduction Guide (Linux VPS)
+# Atihsrah Benchmark Reproduction Guide (macOS Local Execution)
 
-This guide provides exact step-by-step instructions to execute the reproducible benchmark suite on real deployment hardware (e.g. a dedicated Linux cloud instance or bare-metal server).
-
----
-
-## 1. System Requirements
-
-- **Target OS**: Linux (Ubuntu 22.04/24.04 LTS or Debian 12 recommended)
-- **Architecture**: x86_64 or aarch64
-- **Hardware Recommended**: Dedicated instance with at least 4 vCPUs and 8 GB RAM (e.g. Hetzner CPX31 / CCX23, AWS c6i.xlarge, or DigitalOcean CPU-Optimized).
-- **Software Dependencies**:
-  - Docker Engine 24.0+ & Docker Compose v2.20+ (`docker compose`)
-  - Python 3.10+ (with `Pillow` and `numpy`: `pip install Pillow numpy`)
-  - `curl` and `git`
-  - Optional: `ffmpeg` (compiled with `libvmaf` if computing VMAF scores)
+This guide provides exact step-by-step instructions to execute the reproducible benchmark suite locally on Apple Silicon macOS hardware.
 
 ---
 
-## 2. Test Corpus Composition & Licensing Notice
+## 1. System Requirements & Prerequisites
+
+- **Host Machine**: Apple Mac (Apple Silicon M-series recommended: M1/M2/M3/M4) running macOS 14+.
+- **Software Prerequisites**:
+  - `rustc` & `cargo` 1.80+ (Rust toolchain)
+  - `docker` (Docker Desktop or Colima virtualized container engine)
+  - `uv` (Fast Python package manager)
+  - `curl`, `openssl`, `git`
+  - Optional: `ffmpeg` with `libvmaf` filter (for optional video multi-method assessment fusion)
+
+---
+
+## 2. One-Command Local Execution
+
+The benchmark pipeline is fully automated and self-contained:
+
+```bash
+# Run full benchmark suite locally on Mac
+./bench/run_all.sh
+```
+
+For quick smoke testing (15-second sustained load instead of standard soak):
+```bash
+./bench/run_all.sh --quick
+```
+
+To run offline validation checks only (verifies image decoders, checksums, deterministic fixtures, and environment without spinning up background servers):
+```bash
+./bench/run_all.sh --validate-only
+```
+
+---
+
+## 3. Test Corpus Composition & Licensing
 
 The benchmark corpus consists of 20 real images defined in [`bench/corpus_manifest.csv`](./corpus_manifest.csv):
 - **14 Photographic images** from the standard Eastman Kodak True Color Lossless Suite (Public Domain).
-- **1 High-resolution nature photograph** (`moraine_lake.jpg`, Public Domain via Wikimedia Commons).
+- **1 High-resolution nature photograph** (`moraine_lake.jpg`, Public Domain via Wikimedia Commons, Gorgo).
 - **2 Real UI screenshots**:
   - `kde_spectacle.png`: LGPL-2.0-or-later (KDE Project)
   - `training_module.png`: CC-BY-SA-4.0 (Wikimedia Foundation)
@@ -30,90 +50,80 @@ The benchmark corpus consists of 20 real images defined in [`bench/corpus_manife
   - `alacritty_logo_alpha.png`: Apache-2.0 (Alacritty project)
   - `world_map_graphic.png`: Public Domain (Wikimedia Commons vector projection)
 
-> [!IMPORTANT]
-> **Licenses to Double-Check**:
-> If redistributing or modifying the benchmark package publicly, double-check attribution requirements for:
-> - `kde_spectacle.png` (LGPL-2.0)
-> - `training_module.png` (CC-BY-SA-4.0)
-> - `alacritty_logo_alpha.png` (Apache-2.0)
-> All other images (including the 14 Kodak suite images) are Public Domain.
+Checksums are verified automatically against SHA-256 before any benchmark execution.
 
 ---
 
-## 3. Step-by-Step Execution on VPS
+## 4. Fair Format Comparison & Competitor Settings
 
-### Step 1: Clone Repository
-```bash
-git clone https://github.com/your-org/lumina.git
-cd lumina
-```
+### Competitor Topology
+- **Atihsrah Native**: Pure-Rust release binary (`target/release/atihsrah`) running natively on macOS host silicon (`http://127.0.0.1:8080`, metrics on `:9090`).
+- **Atihsrah Docker**: Containerized pure-Rust build running in the Colima Linux VM (`http://127.0.0.1:8084`, metrics on `:9094`).
+- **imgproxy OSS**: Docker container (`darthsim/imgproxy:4.0.21@sha256:4dfe68cc26ea5cf010318d03818d4cd30f71fd33fa7e149c4be19adafc20c52e`) running in Colima VM (`http://127.0.0.1:8081`).
+- **imgproxy Cached**: Nginx reverse proxy caching imgproxy (`http://127.0.0.1:8082`).
+- **Thumbor Native**: Native macOS process via pinned Python 3.12 virtualenv (`http://127.0.0.1:8888`).
+- **Mock Origin**: Custom HTTPS origin with self-signed test CA (`https://127.0.0.1:8000`).
 
-### Step 2: Install Python Measurement Dependencies
-```bash
-python3 -m pip install --upgrade pip
-python3 -m pip install Pillow numpy
-```
-
-### Step 3: Pin imgproxy Version
-Set the exact imgproxy version you wish to evaluate:
-```bash
-export IMGPROXY_VERSION="v3.27.0"
-```
-
-### Step 4: Build Atihsrah Container
-Build the pure-Rust Atihsrah container image locally:
-```bash
-docker build -t atihsrah:latest -f Dockerfile .
-```
-
-### Step 5: Download and Verify Corpus Images
-Run the corpus downloader to fetch the 20 real benchmark images and verify their SHA256 checksums:
-```bash
-./bench/download_corpus.sh
-```
-
-### Step 6: Execute the Full Benchmark Suite
-Execute all benchmark scenarios:
-```bash
-# Standard run (includes 30-minute sustained load with 60s RSS sampling)
-./bench/run_all.sh --sustained-duration 1800
-
-# OR Quick test run (60-second sustained load for smoke testing)
-./bench/run_all.sh --quick
-```
+### Format Parity & Capability Disclosures
+- **Matched AVIF**: Evaluates Atihsrah (q=65) vs imgproxy (q=65). Both proxies encode lossy AVIF at matched target quality.
+- **Matched WebP**:
+  - Atihsrah generates lossless WebP via pure-Rust `image-rs` (`WebPEncoder::new_lossless`).
+  - imgproxy and Thumbor generate lossy WebP at q=75 via C `libwebp` / Pillow.
+  - *Disclosure*: Atihsrah's pure-Rust build does not link C `libwebp` and therefore does not support lossy WebP. WebP comparisons are clearly labeled as encoding mode trade-offs (lossless fidelity vs lossy compression).
+- **Client Auto Negotiation**: Tested as a distinct scenario (`Accept: image/avif,image/webp,*/*`) to evaluate format selection policies rather than compression efficiency at identical format.
 
 ---
 
-## 4. Benchmark Scenarios Executed
+## 5. Metrics & Decision Rules
 
-The runner executes 9 scenarios across identical hardware and resource allocations (4 concurrent workers):
-1. **Cold single request per image type**: JPEG, PNG, WebP, AVIF latency and delivered bytes.
-2. **Warm cache latency distribution**:
-   - Atihsrah (in-process Moka LRU cache)
-   - imgproxy standalone (no cache, re-decodes/re-encodes on every hit)
-   - imgproxy behind Nginx `proxy_cache` (fair comparison with `Vary: Accept`)
-3. **100 concurrent requests for SAME uncached URL**: Asserts exactly 1 origin fetch via single-flight request coalescing.
-4. **100 concurrent requests for DIFFERENT uncached URLs**: Throughput (req/s) and p50/p95 tail latency under cold concurrency.
-5. **Slow origin**: 2.0s upstream latency simulation.
-6. **Failing origin**: HTTP 500 upstream error mapping and structured JSON responses.
-7. **Sustained load memory stability**: Measures container RSS plateau over 30 minutes (or 60s).
-8. **AVIF vs WebP encode cost**: CPU processing duration vs byte compression trade-off.
-9. **20-image corpus quality and size comparison**:
-   - Builds exactly one ground-truth reference per image using Pillow Lanczos sinc filtering.
-   - Asserts identical output dimensions for both proxies.
-   - Computes SSIM and VMAF against ground truth.
-   - Fails if any lossless output SSIM < 0.99, if any metric is NaN/0.0, or dimensions mismatch.
-   - Flags any output larger than the source image.
+1. **Structural Similarity (SSIM)**:
+   - Standard 11x11 circular symmetric Gaussian window ($\sigma = 1.5$) via `scikit-image` (Wang et al. 2004).
+   - Alpha transparency composited over standard opaque white matte `(255, 255, 255)` to prevent hidden variations in $A=0$ pixels from corrupting RGB covariance.
+2. **Peak Signal-to-Noise Ratio (PSNR)**:
+   - Exact mathematical $10 \log_{10}(255^2 / MSE)$. Returns `inf` on exact pixel identity.
+3. **Lossless Verification**:
+   - `np.array_equal` exact pixel equality enforced for lossless transformations where dimensions match.
+4. **Decision Thresholds**:
+   - Minimum SSIM for lossy compression: $\ge 0.90$.
+   - A smaller file **cannot win** if its quality falls below the minimum threshold.
+   - Byte size difference $\le 1.0\%$ is recorded as a **Tie**.
 
 ---
 
-## 5. Artifacts & Reporting Results
+## 6. Output Directory Structure & Interpretation
 
-Upon completion, the harness generates:
-- `benchmarks/raw_results.json`: Full machine-readable timing, RSS samples, and HTTP logs.
-- `benchmarks/results.csv`: Per-image byte sizes, SSIM scores, and deltas.
-- `benchmarks/methodology.md`: Environmental record (kernel, CPU, RAM, Docker and tool versions).
+Every execution creates a unique, timestamped output directory (`benchmarks/runs/run_<YYYYMMDD_HHMMSS>/`):
 
-Copy the template from `bench/analysis_TEMPLATE.md` to `benchmarks/analysis.md` and populate each table with the real measured values from `benchmarks/raw_results.json` and `benchmarks/results.csv`.
-Apply the explicit decision rules in `analysis_TEMPLATE.md` to evaluate whether the optimization-layer hypothesis is supported, unsupported, or inconclusive.
+```text
+benchmarks/runs/run_<timestamp>/
+├── system_info.json        # Machine-readable host, OS, CPU, RAM, Docker, Git metadata
+├── raw_results.json        # Machine-readable latencies, RSS samples, HTTP statuses, and metrics
+├── results.csv             # Per-image CSV breakdown of bytes, SSIM, PSNR, and deltas
+├── methodology.md          # Environmental record and reproduction commands
+├── analysis.md             # Empirical comparative analysis and matrix
+├── validation.log          # Offline validation and health check log
+└── output/                 # Decoded and transformed image outputs
+    ├── reference/          # Ground-truth Pillow Lanczos reference PNGs
+    ├── atihsrah_native/    # Atihsrah Native transformed images
+    ├── atihsrah_docker/    # Atihsrah Docker transformed images
+    ├── imgproxy/           # imgproxy transformed images
+    └── thumbor/            # Thumbor transformed images
+```
 
+Existing prior runs in `benchmarks/` are never overwritten or deleted.
+
+---
+
+## 7. Security & Localhost Isolation
+
+- **Localhost-Only Bindings**: Every published service port binds strictly to `127.0.0.1`. No services are accessible from external or local area networks.
+- **Guaranteed Cleanup**: Bash `trap cleanup EXIT INT TERM` guarantees that background processes (`target/release/atihsrah`, `thumbor`) and Docker containers are terminated upon completion, failure, or interrupt (`Ctrl-C`).
+
+---
+
+## 8. Troubleshooting
+
+- **Missing Container Runtime**: If Docker is not running, start Colima (`colima start`) or Docker Desktop.
+- **Python Dependencies**: All dependencies are locked in `bench/requirements.txt` and installed into `.venv_bench`. Run `uv pip install -r bench/requirements.txt --python .venv_bench` to refresh.
+- **Port Conflicts**: Ensure ports 8000, 8080, 8081, 8082, 8084, 8888, 9090, 9094 are free before starting.
+- **Optional VMAF**: If FFmpeg lacks `libvmaf`, VMAF is safely omitted and recorded as `None` without failing the run.

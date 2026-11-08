@@ -16,14 +16,23 @@ pub struct ImageRsProcessor {
     pub avif_speed: u8,
     pub distinct_color_threshold: u32,
     pub max_retry_pixels: u64,
+    pub resize_filter: FilterType,
 }
 
 impl Default for ImageRsProcessor {
     fn default() -> Self {
+        let filter = match std::env::var("ATIHSRAH_RESIZE_FILTER").as_deref() {
+            Ok("catmullrom") => FilterType::CatmullRom,
+            Ok("triangle") => FilterType::Triangle,
+            Ok("nearest") => FilterType::Nearest,
+            Ok("gaussian") => FilterType::Gaussian,
+            _ => FilterType::Lanczos3,
+        };
         Self {
             avif_speed: 6,
             distinct_color_threshold: 256,
             max_retry_pixels: 16_777_216,
+            resize_filter: filter,
         }
     }
 }
@@ -34,10 +43,18 @@ impl ImageRsProcessor {
     }
 
     pub fn new_with_config(config: &crate::config::Config) -> Self {
+        let filter = match config.resize_filter.to_lowercase().as_str() {
+            "catmullrom" => FilterType::CatmullRom,
+            "triangle" => FilterType::Triangle,
+            "nearest" => FilterType::Nearest,
+            "gaussian" => FilterType::Gaussian,
+            _ => FilterType::Lanczos3,
+        };
         Self {
             avif_speed: config.avif_speed,
             distinct_color_threshold: config.distinct_color_threshold,
             max_retry_pixels: config.max_retry_pixels,
+            resize_filter: filter,
         }
     }
 }
@@ -91,6 +108,11 @@ impl ImageProcessor for ImageRsProcessor {
         })?;
 
         let format = map_from_image_format(raw_format)?;
+        if format == ImageFormat::Avif {
+            return Err(ProcessError::UnsupportedFormat(
+                "Decoding 'avif' is not supported in pure-Rust configuration (output only)".to_string(),
+            ));
+        }
 
         let decoder = reader.into_decoder().map_err(|e| {
             ProcessError::DecodeFailed(format!("Failed to initialize decoder: {e}"))
@@ -117,9 +139,14 @@ impl ImageProcessor for ImageRsProcessor {
         // 1. Probe input to determine source format
         let info = self.probe(input)?;
 
-        // Ensure source format is supported for decoding (JPEG, PNG, WebP)
+        // Ensure source format is supported for decoding (JPEG, PNG, WebP, GIF)
+        // Note: AVIF is output-only via ravif; decoding AVIF requires C libdav1d (avif-native),
+        // which is disallowed by our #![forbid(unsafe_code)] pure-Rust invariant.
         match info.format {
-            ImageFormat::Jpeg | ImageFormat::Png | ImageFormat::WebP => {}
+            ImageFormat::Jpeg
+            | ImageFormat::Png
+            | ImageFormat::WebP
+            | ImageFormat::Gif => {}
             other => {
                 return Err(ProcessError::UnsupportedFormat(format!(
                     "Decoding '{other}' is not supported"
@@ -153,12 +180,17 @@ impl ImageProcessor for ImageRsProcessor {
             calculate_dimensions(orig_w, orig_h, opts.target_w, opts.target_h);
 
         if (target_w, target_h) != (orig_w, orig_h) {
+            let filter = self.resize_filter;
             dyn_img = match opts.fit {
-                FitMode::Cover => dyn_img.resize_to_fill(target_w, target_h, FilterType::Lanczos3),
-                FitMode::Contain | FitMode::Inside => {
-                    dyn_img.resize(target_w, target_h, FilterType::Lanczos3)
+                FitMode::Cover => {
+                    dyn_img.resize_to_fill(target_w, target_h, filter)
                 }
-                FitMode::Fill => dyn_img.resize_exact(target_w, target_h, FilterType::Lanczos3),
+                FitMode::Contain | FitMode::Inside => {
+                    dyn_img.resize(target_w, target_h, filter)
+                }
+                FitMode::Fill => {
+                    dyn_img.resize_exact(target_w, target_h, filter)
+                }
                 FitMode::Outside => {
                     // Scale such that both dimensions are at least target dimensions
                     let scale_w = target_w as f64 / orig_w as f64;
@@ -166,7 +198,7 @@ impl ImageProcessor for ImageRsProcessor {
                     let scale = scale_w.max(scale_h);
                     let new_w = ((orig_w as f64 * scale).round() as u32).max(1);
                     let new_h = ((orig_h as f64 * scale).round() as u32).max(1);
-                    dyn_img.resize_exact(new_w, new_h, FilterType::Lanczos3)
+                    dyn_img.resize_exact(new_w, new_h, filter)
                 }
             };
         }
@@ -210,26 +242,77 @@ impl ImageProcessor for ImageRsProcessor {
 
                 if info.has_alpha || !is_photo {
                     // Source has alpha or graphic/flat content:
-                    // Smaller of lossless WebP (if allowed) and PNG.
-                    let png_bytes = encode_image(&dyn_img, ImageFormat::Png, 100, self.avif_speed)?;
-                    if client_accept_webp {
-                        let webp_bytes =
-                            encode_image(&dyn_img, ImageFormat::WebP, 100, self.avif_speed)?;
-                        if webp_bytes.len() < png_bytes.len() {
+                    // If client accepts AVIF, AVIF supports alpha and flat graphics with lossy compression.
+                    // Otherwise smaller of lossless WebP (if allowed) and PNG.
+                    if client_accept_avif {
+                        let avif_q = opts.quality.unwrap_or_else(|| {
+                            crate::processor::resolve_quality(
+                                ImageFormat::Avif,
+                                opts.quality_target,
+                            )
+                        });
+                        let primary_bytes =
+                            encode_image(&dyn_img, ImageFormat::Avif, avif_q, self.avif_speed)?;
+
+                        if primary_bytes.len() <= input.len() || !can_retry {
                             Candidate {
-                                bytes: webp_bytes,
-                                format: ImageFormat::WebP,
+                                bytes: primary_bytes,
+                                format: ImageFormat::Avif,
+                            }
+                        } else {
+                            // Larger than source: try lower quality steps in parallel across worker threads
+                            use rayon::prelude::*;
+                            let specs = [(ImageFormat::Avif, 40), (ImageFormat::Avif, 20)];
+                            let mut candidates = vec![Candidate {
+                                bytes: primary_bytes,
+                                format: ImageFormat::Avif,
+                            }];
+                            let extra: Vec<Candidate> = specs
+                                .into_par_iter()
+                                .filter_map(|(fmt, q)| {
+                                    encode_image(&dyn_img, fmt, q, self.avif_speed).ok().map(|b| {
+                                        Candidate {
+                                            bytes: b,
+                                            format: fmt,
+                                        }
+                                    })
+                                })
+                                .collect();
+                            candidates.extend(extra);
+                            candidates.sort_by_key(|c| c.bytes.len());
+                            candidates.into_iter().next().unwrap()
+                        }
+                    } else {
+                        // Encode PNG and WebP concurrently using rayon::join for maximum speed
+                        let (png_res, webp_res) = rayon::join(
+                            || encode_image(&dyn_img, ImageFormat::Png, 100, self.avif_speed),
+                            || {
+                                if client_accept_webp {
+                                    encode_image(&dyn_img, ImageFormat::WebP, 100, self.avif_speed).ok()
+                                } else {
+                                    None
+                                }
+                            },
+                        );
+
+                        let png_bytes = png_res?;
+                        if let Some(webp_bytes) = webp_res {
+                            if webp_bytes.len() < png_bytes.len() {
+                                Candidate {
+                                    bytes: webp_bytes,
+                                    format: ImageFormat::WebP,
+                                }
+                            } else {
+                                Candidate {
+                                    bytes: png_bytes,
+                                    format: ImageFormat::Png,
+                                }
                             }
                         } else {
                             Candidate {
                                 bytes: png_bytes,
                                 format: ImageFormat::Png,
                             }
-                        }
-                    } else {
-                        Candidate {
-                            bytes: png_bytes,
-                            format: ImageFormat::Png,
                         }
                     }
                 } else {
@@ -250,27 +333,29 @@ impl ImageProcessor for ImageRsProcessor {
                                 format: ImageFormat::Avif,
                             }
                         } else {
-                            // Larger than source: try up to 2 candidates (lower quality step or alternate format)
+                            // Larger than source: evaluate candidate lower-quality/alternate formats in parallel
+                            use rayon::prelude::*;
+                            let specs = [
+                                (ImageFormat::Avif, 40),
+                                (ImageFormat::Avif, 25),
+                                (ImageFormat::Jpeg, 65),
+                            ];
                             let mut candidates = vec![Candidate {
                                 bytes: primary_bytes,
                                 format: ImageFormat::Avif,
                             }];
-                            if let Ok(b) =
-                                encode_image(&dyn_img, ImageFormat::Avif, 50, self.avif_speed)
-                            {
-                                candidates.push(Candidate {
-                                    bytes: b,
-                                    format: ImageFormat::Avif,
-                                });
-                            }
-                            if let Ok(b) =
-                                encode_image(&dyn_img, ImageFormat::Jpeg, 65, self.avif_speed)
-                            {
-                                candidates.push(Candidate {
-                                    bytes: b,
-                                    format: ImageFormat::Jpeg,
-                                });
-                            }
+                            let extra: Vec<Candidate> = specs
+                                .into_par_iter()
+                                .filter_map(|(fmt, q)| {
+                                    encode_image(&dyn_img, fmt, q, self.avif_speed).ok().map(|b| {
+                                        Candidate {
+                                            bytes: b,
+                                            format: fmt,
+                                        }
+                                    })
+                                })
+                                .collect();
+                            candidates.extend(extra);
                             candidates.sort_by_key(|c| c.bytes.len());
                             candidates.into_iter().next().unwrap()
                         }
@@ -289,29 +374,27 @@ impl ImageProcessor for ImageRsProcessor {
                                 format: ImageFormat::Jpeg,
                             }
                         } else {
-                            // Larger than source: try up to 2 candidates (lower quality steps)
+                            // Larger than source: evaluate lower-quality JPEG candidates in parallel
+                            use rayon::prelude::*;
+                            let lower_q = if jpeg_q > 65 { 65 } else { 50 };
+                            let lowest_q = if lower_q > 50 { 50 } else { 40 };
+                            let specs = [(ImageFormat::Jpeg, lower_q), (ImageFormat::Jpeg, lowest_q)];
                             let mut candidates = vec![Candidate {
                                 bytes: primary_bytes,
                                 format: ImageFormat::Jpeg,
                             }];
-                            let lower_q = if jpeg_q > 65 { 65 } else { 50 };
-                            if let Ok(b) =
-                                encode_image(&dyn_img, ImageFormat::Jpeg, lower_q, self.avif_speed)
-                            {
-                                candidates.push(Candidate {
-                                    bytes: b,
-                                    format: ImageFormat::Jpeg,
-                                });
-                            }
-                            let lowest_q = if lower_q > 50 { 50 } else { 40 };
-                            if let Ok(b) =
-                                encode_image(&dyn_img, ImageFormat::Jpeg, lowest_q, self.avif_speed)
-                            {
-                                candidates.push(Candidate {
-                                    bytes: b,
-                                    format: ImageFormat::Jpeg,
-                                });
-                            }
+                            let extra: Vec<Candidate> = specs
+                                .into_par_iter()
+                                .filter_map(|(fmt, q)| {
+                                    encode_image(&dyn_img, fmt, q, self.avif_speed).ok().map(|b| {
+                                        Candidate {
+                                            bytes: b,
+                                            format: fmt,
+                                        }
+                                    })
+                                })
+                                .collect();
+                            candidates.extend(extra);
                             candidates.sort_by_key(|c| c.bytes.len());
                             candidates.into_iter().next().unwrap()
                         }
@@ -530,6 +613,37 @@ mod tests {
     }
 
     #[test]
+    fn test_image_rs_decode_avif_fails_safely_as_unsupported() {
+        let processor = ImageRsProcessor::new();
+        let png_bytes = make_test_png(20, 20);
+        let opts = ProcessOptions {
+            target_w: Some(10),
+            target_h: Some(10),
+            fit: FitMode::Fill,
+            format: Some(ImageFormat::Avif),
+            ..Default::default()
+        };
+        let avif_out = processor.process(&png_bytes, opts).unwrap();
+        assert_eq!(avif_out.format, ImageFormat::Avif);
+
+        let decode_opts = ProcessOptions {
+            target_w: Some(5),
+            target_h: Some(5),
+            fit: FitMode::Fill,
+            format: Some(ImageFormat::Png),
+            ..Default::default()
+        };
+        // Pure-Rust configuration does not link C libdav1d; AVIF input must fail fast with UnsupportedFormat
+        let res = processor.process(&avif_out.bytes, decode_opts);
+        match res {
+            Err(ProcessError::UnsupportedFormat(msg)) => {
+                assert!(msg.contains("avif"), "Expected unsupported avif message: {msg}");
+            }
+            other => panic!("Expected Err(UnsupportedFormat), got {:?}", other),
+        }
+    }
+
+    #[test]
     fn test_image_rs_encode_all_target_formats() {
         let processor = ImageRsProcessor::new();
         let png_bytes = make_test_png(20, 20);
@@ -555,5 +669,59 @@ mod tests {
             assert_eq!(out.height, 10);
             assert!(!out.bytes.is_empty());
         }
+    }
+
+    #[test]
+    fn test_image_rs_decode_all_supported_input_formats() {
+        let processor = ImageRsProcessor::new();
+        let png_bytes = make_test_png(20, 20);
+
+        for input_fmt in [ImageFormat::Jpeg, ImageFormat::Png, ImageFormat::WebP] {
+            let encode_opts = ProcessOptions {
+                target_w: Some(20),
+                target_h: Some(20),
+                fit: FitMode::Fill,
+                format: Some(input_fmt),
+                quality: Some(85),
+                ..Default::default()
+            };
+            let encoded = processor.process(&png_bytes, encode_opts).expect("encode ok");
+            assert_eq!(encoded.format, input_fmt);
+
+            // Now decode this format into a target PNG
+            let decode_opts = ProcessOptions {
+                target_w: Some(10),
+                target_h: Some(10),
+                fit: FitMode::Fill,
+                format: Some(ImageFormat::Png),
+                ..Default::default()
+            };
+            let decoded = processor.process(&encoded.bytes, decode_opts).expect("decode ok");
+            assert_eq!(decoded.format, ImageFormat::Png);
+            assert_eq!(decoded.width, 10);
+            assert_eq!(decoded.height, 10);
+        }
+    }
+
+    #[test]
+    fn test_image_rs_parallel_candidate_evaluation() {
+        let processor = ImageRsProcessor::new();
+        let png_bytes = make_test_png(64, 64);
+
+        // When requesting auto format with Accept: image/avif on a small image where primary output exceeds input,
+        // parallel Rayon evaluation triggers for lower-quality candidate steps
+        let opts = ProcessOptions {
+            target_w: Some(60),
+            target_h: Some(60),
+            fit: FitMode::Contain,
+            format: None,
+            accept_header: Some("image/avif,image/webp,*/*".to_string()),
+            ..Default::default()
+        };
+
+        let out = processor.process(&png_bytes, opts).expect("Parallel candidate processing should succeed");
+        assert_eq!(out.width, 60);
+        assert_eq!(out.height, 60);
+        assert!(!out.bytes.is_empty());
     }
 }

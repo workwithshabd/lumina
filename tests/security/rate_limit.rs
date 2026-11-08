@@ -47,6 +47,7 @@ async fn test_rate_limit_bypass_spoofed_x_forwarded_for_ignored() {
         avif_speed: 6,
         distinct_color_threshold: 256,
         max_retry_pixels: 16_777_216,
+        resize_filter: "lanczos3".to_string(),
     });
 
     let fetcher = Arc::new(SourceFetcher::new_mock(

@@ -1,0 +1,719 @@
+{
+  "presets": [
+    {
+      "id": "preset_avif_hero",
+      "name": "AVIF High-Res Hero",
+      "description": "Compress high-resolution hero photo into AVIF with cover crop",
+      "params": {
+        "w": 800,
+        "h": 600,
+        "fit": "cover",
+        "format": "avif",
+        "q": 65,
+        "allow_upscale": 0
+      },
+      "headers": {
+        "accept": "image/avif,image/webp,*/*"
+      },
+      "createdAt": "2026-11-08T09:24:39.343Z"
+    },
+    {
+      "id": "preset_auto_negotiation",
+      "name": "Modern Browser Auto-Negotiation",
+      "description": "Automatic format selection (AVIF for modern, WebP/JPEG fallback)",
+      "params": {
+        "w": 600,
+        "h": 400,
+        "fit": "cover",
+        "format": "auto",
+        "allow_upscale": 0
+      },
+      "headers": {
+        "accept": "image/avif,image/webp,*/*"
+      },
+      "createdAt": "2026-11-08T09:24:39.344Z"
+    },
+    {
+      "id": "preset_alpha_logo",
+      "name": "Transparent Icon & Logo",
+      "description": "Contain fit preserving transparency with alpha optimization",
+      "params": {
+        "w": 250,
+        "h": 250,
+        "fit": "contain",
+        "format": "auto",
+        "allow_upscale": 1
+      },
+      "headers": {
+        "accept": "image/avif,image/webp,*/*"
+      },
+      "createdAt": "2026-11-08T09:24:39.344Z"
+    },
+    {
+      "id": "preset_thumbnail_fast",
+      "name": "Fast Compact Thumbnail",
+      "description": "Small preview thumbnail at quality 50",
+      "params": {
+        "w": 150,
+        "h": 150,
+        "fit": "cover",
+        "format": "auto",
+        "q": 50,
+        "allow_upscale": 0
+      },
+      "headers": {
+        "accept": "image/avif,image/webp,*/*"
+      },
+      "createdAt": "2026-11-08T09:24:39.344Z"
+    },
+    {
+      "id": "preset_retina_lossless",
+      "name": "Retina Crisp Lossless Graphic",
+      "description": "Lossless target for UI screenshots and diagrams",
+      "params": {
+        "w": 1200,
+        "h": 800,
+        "fit": "inside",
+        "qt": "lossless",
+        "allow_upscale": 1
+      },
+      "headers": {
+        "accept": "image/webp,*/*"
+      },
+      "createdAt": "2026-11-08T09:24:39.344Z"
+    }
+  ],
+  "history": [
+    {
+      "testUrl": "http://127.0.0.1:8080/transform?src=http%3A%2F%2F127.0.0.1%3A5001%2Fimages%2Fuploads%2F1794134827816_IMG_0172_HEIC_transcoded.png&w=1200&fit=contain&format=jpeg&quality_target=good&exp=1794138513&sig=8a62fd970dfb4652eee39481078f6591856a4de706ad3cba9fc0d126c418bc7e",
+      "params": {
+        "src": "http://127.0.0.1:5001/images/uploads/1794134827816_IMG_0172_HEIC_transcoded.png",
+        "w": 1200,
+        "fit": "contain",
+        "format": "jpeg",
+        "quality_target": "good"
+      },
+      "status": 200,
+      "latencyMs": 416.65,
+      "cacheStatus": "MISS",
+      "contentType": "image/jpeg",
+      "originalBytes": 19055939,
+      "transformedBytes": 158929,
+      "byteDeltaPct": -99.17,
+      "id": "hist_1794134913922_rr5r7",
+      "timestamp": "2026-11-08T10:48:33.922Z"
+    },
+    {
+      "testUrl": "http://127.0.0.1:8080/transform?src=http%3A%2F%2F127.0.0.1%3A5001%2Fimages%2Fuploads%2F1794134827816_IMG_0172_HEIC_transcoded.png&w=1200&fit=contain&format=webp&quality_target=good&exp=1794138443&sig=9e54c7f0757c8ea80ce5c7f9cab455573de058177fd2369b934343998932e1bd",
+      "params": {
+        "src": "http://127.0.0.1:5001/images/uploads/1794134827816_IMG_0172_HEIC_transcoded.png",
+        "w": 1200,
+        "fit": "contain",
+        "format": "webp",
+        "quality_target": "good"
+      },
+      "status": 200,
+      "latencyMs": 379.35,
+      "cacheStatus": "MISS",
+      "contentType": "image/webp",
+      "originalBytes": 19055939,
+      "transformedBytes": 1431452,
+      "byteDeltaPct": -92.49,
+      "id": "hist_1794134843768_u1cu0",
+      "timestamp": "2026-11-08T10:47:23.768Z"
+    },
+    {
+      "testUrl": "http://127.0.0.1:8080/transform?src=http%3A%2F%2F127.0.0.1%3A5001%2Fimages%2Fuploads%2F1794134443282_IMG_0005_HEIC_transcoded.png&w=800&fit=contain&format=jpeg&quality_target=good&exp=1794138044&sig=2e18b89abeb007e948223cd5f10a436e50f668fc527249a165a40df3a0b4bde0",
+      "params": {
+        "src": "http://127.0.0.1:5001/images/uploads/1794134443282_IMG_0005_HEIC_transcoded.png",
+        "w": 800,
+        "fit": "contain",
+        "format": "jpeg",
+        "quality_target": "good"
+      },
+      "status": 200,
+      "latencyMs": 189.18,
+      "cacheStatus": "MISS",
+      "contentType": "image/jpeg",
+      "originalBytes": 13220400,
+      "transformedBytes": 183814,
+      "byteDeltaPct": -98.61,
+      "id": "hist_1794134445141_j1ud2",
+      "timestamp": "2026-11-08T10:40:45.141Z"
+    },
+    {
+      "testUrl": "http://127.0.0.1:8080/transform?src=http%3A%2F%2F127.0.0.1%3A5001%2Fimages%2Fuploads%2F1794133546981_IMG_0172_HEIC_transcoded.png&w=1200&fit=contain&quality_target=good&exp=1794137658&sig=08645538cc9a833497f201366d1d850489c077473b6185ce5c734e4328f934e1",
+      "params": {
+        "src": "http://127.0.0.1:5001/images/uploads/1794133546981_IMG_0172_HEIC_transcoded.png",
+        "w": 1200,
+        "fit": "contain",
+        "quality_target": "good"
+      },
+      "status": 200,
+      "latencyMs": 597.41,
+      "cacheStatus": "MISS",
+      "contentType": "image/avif",
+      "originalBytes": 19055939,
+      "transformedBytes": 36383,
+      "byteDeltaPct": -99.81,
+      "id": "hist_1794134058715_w2500",
+      "timestamp": "2026-11-08T10:34:18.715Z"
+    },
+    {
+      "testUrl": "http://127.0.0.1:8080/transform?src=http%3A%2F%2F127.0.0.1%3A5001%2Fimages%2Fuploads%2F1794133546981_IMG_0172_HEIC_transcoded.png&w=200&fit=contain&quality_target=good&exp=1794137521&sig=c19c9cf3497f72abae09dfe7b5b02c6550e59780dbff48da7076030cd4f0dc0a",
+      "params": {
+        "src": "http://127.0.0.1:5001/images/uploads/1794133546981_IMG_0172_HEIC_transcoded.png",
+        "w": 200,
+        "fit": "contain",
+        "quality_target": "good"
+      },
+      "status": 200,
+      "latencyMs": 370.43,
+      "cacheStatus": "MISS",
+      "contentType": "image/avif",
+      "originalBytes": 19055939,
+      "transformedBytes": 3960,
+      "byteDeltaPct": -99.98,
+      "id": "hist_1794133921486_md1n3",
+      "timestamp": "2026-11-08T10:32:01.486Z"
+    },
+    {
+      "testUrl": "http://127.0.0.1:8080/transform?src=http%3A%2F%2F127.0.0.1%3A5001%2Fimages%2Fuploads%2F1794133546981_IMG_0172_HEIC_transcoded.png&w=800&fit=contain&quality_target=good&exp=1794137395&sig=5317a8807d65f4983610451fa550078fa0f1507034e9d399295ebae398eff440",
+      "params": {
+        "src": "http://127.0.0.1:5001/images/uploads/1794133546981_IMG_0172_HEIC_transcoded.png",
+        "w": 800,
+        "fit": "contain",
+        "quality_target": "good"
+      },
+      "status": 200,
+      "latencyMs": 0.79,
+      "cacheStatus": "HIT",
+      "contentType": "image/avif",
+      "originalBytes": 19055939,
+      "transformedBytes": 21622,
+      "byteDeltaPct": -99.89,
+      "id": "hist_1794133795283_l6nzw",
+      "timestamp": "2026-11-08T10:29:55.283Z"
+    },
+    {
+      "testUrl": "http://127.0.0.1:8080/transform?src=http%3A%2F%2F127.0.0.1%3A5001%2Fimages%2Fcorpus%2Fkodim01.png&w=800&fit=contain&quality_target=good&exp=1794137387&sig=a50db007a37e73e22f463d1e1c3ca6318c29944463e2ca615c5f98bad891130f",
+      "params": {
+        "src": "http://127.0.0.1:5001/images/corpus/kodim01.png",
+        "w": 800,
+        "fit": "contain",
+        "quality_target": "good"
+      },
+      "status": 200,
+      "latencyMs": 61.34,
+      "cacheStatus": "MISS",
+      "contentType": "image/avif",
+      "originalBytes": 736501,
+      "transformedBytes": 56247,
+      "byteDeltaPct": -92.36,
+      "id": "hist_1794133787945_qier4",
+      "timestamp": "2026-11-08T10:29:47.945Z"
+    },
+    {
+      "testUrl": "http://127.0.0.1:8080/transform?src=http%3A%2F%2F127.0.0.1%3A5001%2Fimages%2Fuploads%2F1794133546981_IMG_0172_HEIC_transcoded.png&w=800&fit=contain&quality_target=good&exp=1794137148&sig=a6adbf140921aba7b38439ed0c35bda1ae4f82453de09488f60cccdeaaa9e968",
+      "params": {
+        "src": "http://127.0.0.1:5001/images/uploads/1794133546981_IMG_0172_HEIC_transcoded.png",
+        "w": 800,
+        "fit": "contain",
+        "quality_target": "good"
+      },
+      "status": 200,
+      "latencyMs": 467.1,
+      "cacheStatus": "MISS",
+      "contentType": "image/avif",
+      "originalBytes": 19055939,
+      "transformedBytes": 21622,
+      "byteDeltaPct": -99.89,
+      "id": "hist_1794133548948_mngug",
+      "timestamp": "2026-11-08T10:25:48.948Z"
+    },
+    {
+      "testUrl": "http://127.0.0.1:8080/transform?src=https%3A%2F%2Funsplash.com%2Fphotos%2Fperson-on-canopy-walkway-in-rainforest-M8NGoZuq22A&w=800&fit=contain&quality_target=good&exp=1794137126&sig=4e5bda7b2ecb7f6cd4e7e7bf7c2396bb54f50deeb9f7d09d17e1c6a96c7af875",
+      "params": {
+        "src": "https://unsplash.com/photos/person-on-canopy-walkway-in-rainforest-M8NGoZuq22A",
+        "w": 800,
+        "fit": "contain",
+        "quality_target": "good"
+      },
+      "status": 403,
+      "latencyMs": 0.63,
+      "cacheStatus": "NONE",
+      "contentType": "application/json",
+      "originalBytes": 67781,
+      "transformedBytes": 242,
+      "byteDeltaPct": -99.64,
+      "id": "hist_1794133527004_hwcfe",
+      "timestamp": "2026-11-08T10:25:27.004Z"
+    },
+    {
+      "testUrl": "http://127.0.0.1:8080/transform?src=http%3A%2F%2F127.0.0.1%3A5001%2Fimages%2Fuploads%2F1794132693320_IMG_0005_HEIC_transcoded.png&w=800&fit=contain&format=avif&exp=1794136953&sig=10deb68e3eadf0ee3c0ee73c4a7f96fe7fd5cac9d8277cdb15bf60813c63e6a9",
+      "params": {
+        "src": "http://127.0.0.1:5001/images/uploads/1794132693320_IMG_0005_HEIC_transcoded.png",
+        "w": 800,
+        "fit": "contain",
+        "format": "avif"
+      },
+      "status": 200,
+      "latencyMs": 296.01,
+      "cacheStatus": "MISS",
+      "contentType": "image/avif",
+      "originalBytes": 13220400,
+      "transformedBytes": 70430,
+      "byteDeltaPct": -99.47,
+      "id": "hist_1794133354120_salmh",
+      "timestamp": "2026-11-08T10:22:34.120Z"
+    },
+    {
+      "testUrl": "http://127.0.0.1:8080/transform?src=http%3A%2F%2F127.0.0.1%3A5001%2Fimages%2Fuploads%2F1794132693320_IMG_0005_HEIC_transcoded.png&w=800&h=600&fit=contain&exp=1794136592&sig=674e3b6b9f8e97adf4eff2b7e7ae4c1f2083b4095ead3196f853cf218bafb21e",
+      "params": {
+        "src": "http://127.0.0.1:5001/images/uploads/1794132693320_IMG_0005_HEIC_transcoded.png",
+        "w": 800,
+        "h": 600,
+        "fit": "contain"
+      },
+      "status": 200,
+      "latencyMs": 165.85,
+      "cacheStatus": "MISS",
+      "contentType": "image/jpeg",
+      "originalBytes": 13220400,
+      "transformedBytes": 74156,
+      "byteDeltaPct": -99.44,
+      "id": "hist_1794132992300_4q45n",
+      "timestamp": "2026-11-08T10:16:32.300Z"
+    },
+    {
+      "testUrl": "http://127.0.0.1:8080/transform?src=http%3A%2F%2F127.0.0.1%3A5001%2Fimages%2Fuploads%2F1794132693320_IMG_0005_HEIC_transcoded.png&w=800&fit=contain&exp=1794136591&sig=0d6bee1e2306d65d7e6399e4efb87b4bade7bd9264ff3047e9a0d5399b57e015",
+      "params": {
+        "src": "http://127.0.0.1:5001/images/uploads/1794132693320_IMG_0005_HEIC_transcoded.png",
+        "w": 800,
+        "fit": "contain"
+      },
+      "status": 200,
+      "latencyMs": 177.58,
+      "cacheStatus": "MISS",
+      "contentType": "image/jpeg",
+      "originalBytes": 13220400,
+      "transformedBytes": 183814,
+      "byteDeltaPct": -98.61,
+      "id": "hist_1794132992132_mad8w",
+      "timestamp": "2026-11-08T10:16:32.132Z"
+    },
+    {
+      "testUrl": "http://127.0.0.1:8080/transform?src=http%3A%2F%2F127.0.0.1%3A5001%2Fimages%2Fuploads%2F1794132693320_IMG_0005_HEIC_transcoded.png&w=800&h=600&fit=cover&exp=1794136591&sig=72c75e8c6e4894b02af13e71d6ced66f99af4ad8e0995afb80c433d0e971f86f",
+      "params": {
+        "src": "http://127.0.0.1:5001/images/uploads/1794132693320_IMG_0005_HEIC_transcoded.png",
+        "w": 800,
+        "h": 600,
+        "fit": "cover"
+      },
+      "status": 200,
+      "latencyMs": 178.67,
+      "cacheStatus": "MISS",
+      "contentType": "image/jpeg",
+      "originalBytes": 13220400,
+      "transformedBytes": 116353,
+      "byteDeltaPct": -99.12,
+      "id": "hist_1794132991953_vtf63",
+      "timestamp": "2026-11-08T10:16:31.953Z"
+    },
+    {
+      "testUrl": "http://127.0.0.1:8080/transform?src=http%3A%2F%2F127.0.0.1%3A5001%2Fimages%2Fuploads%2F1794132693320_IMG_0005_HEIC_transcoded.png&w=800&h=600&fit=contain&exp=1794136570&sig=b8cf6d8427fdd5c56d4b640854737c64ec391be1e318d589fd86f2e55bd286cf",
+      "params": {
+        "src": "http://127.0.0.1:5001/images/uploads/1794132693320_IMG_0005_HEIC_transcoded.png",
+        "w": 800,
+        "h": 600,
+        "fit": "contain"
+      },
+      "status": 200,
+      "latencyMs": 166.95,
+      "cacheStatus": "MISS",
+      "contentType": "image/jpeg",
+      "originalBytes": 13220400,
+      "transformedBytes": 74156,
+      "byteDeltaPct": -99.44,
+      "id": "hist_1794132971040_51tf4",
+      "timestamp": "2026-11-08T10:16:11.040Z"
+    },
+    {
+      "testUrl": "http://127.0.0.1:8080/transform?src=http%3A%2F%2F127.0.0.1%3A5001%2Fimages%2Fuploads%2F1794132693320_IMG_0005_HEIC_transcoded.png&w=800&fit=contain&exp=1794136570&sig=3b37be3607236a29ad4dcaddb84159be587775fa4cb905927b5ae2342892f829",
+      "params": {
+        "src": "http://127.0.0.1:5001/images/uploads/1794132693320_IMG_0005_HEIC_transcoded.png",
+        "w": 800,
+        "fit": "contain"
+      },
+      "status": 200,
+      "latencyMs": 177.48,
+      "cacheStatus": "MISS",
+      "contentType": "image/jpeg",
+      "originalBytes": 13220400,
+      "transformedBytes": 183814,
+      "byteDeltaPct": -98.61,
+      "id": "hist_1794132970871_ud43v",
+      "timestamp": "2026-11-08T10:16:10.871Z"
+    },
+    {
+      "testUrl": "http://127.0.0.1:8080/transform?src=http%3A%2F%2F127.0.0.1%3A5001%2Fimages%2Fuploads%2F1794132693320_IMG_0005_HEIC_transcoded.png&w=800&h=600&fit=cover&exp=1794136570&sig=5c419fb049a655b8fdf9fa55be39928214193f4bc2aad933e541798833e3701a",
+      "params": {
+        "src": "http://127.0.0.1:5001/images/uploads/1794132693320_IMG_0005_HEIC_transcoded.png",
+        "w": 800,
+        "h": 600,
+        "fit": "cover"
+      },
+      "status": 200,
+      "latencyMs": 181.39,
+      "cacheStatus": "MISS",
+      "contentType": "image/jpeg",
+      "originalBytes": 13220400,
+      "transformedBytes": 116353,
+      "byteDeltaPct": -99.12,
+      "id": "hist_1794132970692_gvbbs",
+      "timestamp": "2026-11-08T10:16:10.692Z"
+    },
+    {
+      "testUrl": "http://127.0.0.1:8080/transform?src=http%3A%2F%2F127.0.0.1%3A5001%2Fimages%2Fuploads%2F1794132693320_IMG_0005_HEIC_transcoded.png&w=800&h=600&fit=contain&quality_target=lossless&exp=1794136503&sig=722979b12427e8c128fb57edd50b61e70bd937a28371080af01b70727e69a8ed",
+      "params": {
+        "src": "http://127.0.0.1:5001/images/uploads/1794132693320_IMG_0005_HEIC_transcoded.png",
+        "w": 800,
+        "h": 600,
+        "fit": "contain",
+        "quality_target": "lossless"
+      },
+      "status": 200,
+      "latencyMs": 0.74,
+      "cacheStatus": "HIT",
+      "contentType": "image/avif",
+      "originalBytes": 13220400,
+      "transformedBytes": 281948,
+      "byteDeltaPct": -97.87,
+      "id": "hist_1794132903996_e8lh8",
+      "timestamp": "2026-11-08T10:15:03.996Z"
+    },
+    {
+      "testUrl": "http://127.0.0.1:8080/transform?src=http%3A%2F%2F127.0.0.1%3A5001%2Fimages%2Fuploads%2F1794132693320_IMG_0005_HEIC_transcoded.png&w=800&h=600&fit=fill&quality_target=lossless&exp=1794136498&sig=c76d21eede9856bdf2e1d48cff339718a545e1271662967bdff9fb5039076841",
+      "params": {
+        "src": "http://127.0.0.1:5001/images/uploads/1794132693320_IMG_0005_HEIC_transcoded.png",
+        "w": 800,
+        "h": 600,
+        "fit": "fill",
+        "quality_target": "lossless"
+      },
+      "status": 200,
+      "latencyMs": 270.13,
+      "cacheStatus": "MISS",
+      "contentType": "image/avif",
+      "originalBytes": 13220400,
+      "transformedBytes": 438009,
+      "byteDeltaPct": -96.69,
+      "id": "hist_1794132898833_yqu13",
+      "timestamp": "2026-11-08T10:14:58.833Z"
+    },
+    {
+      "testUrl": "http://127.0.0.1:8080/transform?src=http%3A%2F%2F127.0.0.1%3A5001%2Fimages%2Fuploads%2F1794132693320_IMG_0005_HEIC_transcoded.png&w=800&h=600&fit=contain&quality_target=lossless&exp=1794136484&sig=8f2e119022a8b815a61bf3ed4cacd5dba863708c305ddb1c053f18d73ef25457",
+      "params": {
+        "src": "http://127.0.0.1:5001/images/uploads/1794132693320_IMG_0005_HEIC_transcoded.png",
+        "w": 800,
+        "h": 600,
+        "fit": "contain",
+        "quality_target": "lossless"
+      },
+      "status": 200,
+      "latencyMs": 223.76,
+      "cacheStatus": "MISS",
+      "contentType": "image/avif",
+      "originalBytes": 13220400,
+      "transformedBytes": 281948,
+      "byteDeltaPct": -97.87,
+      "id": "hist_1794132884719_gmb0f",
+      "timestamp": "2026-11-08T10:14:44.719Z"
+    },
+    {
+      "testUrl": "http://127.0.0.1:8080/transform?src=http%3A%2F%2F127.0.0.1%3A5001%2Fimages%2Fuploads%2F1794132693320_IMG_0005_HEIC_transcoded.png&w=800&h=600&fit=cover&quality_target=good&exp=1794136295&sig=735fec0c9e98644e324706402aefc3429aecbab9b9f36849f170f5a2e0c2763c",
+      "params": {
+        "src": "http://127.0.0.1:5001/images/uploads/1794132693320_IMG_0005_HEIC_transcoded.png",
+        "w": 800,
+        "h": 600,
+        "fit": "cover",
+        "quality_target": "good"
+      },
+      "status": 200,
+      "latencyMs": 271.56,
+      "cacheStatus": "MISS",
+      "contentType": "image/avif",
+      "originalBytes": 13220400,
+      "transformedBytes": 47310,
+      "byteDeltaPct": -99.64,
+      "id": "hist_1794132695639_10kda",
+      "timestamp": "2026-11-08T10:11:35.639Z"
+    },
+    {
+      "testUrl": "http://127.0.0.1:8080/transform?src=http%3A%2F%2F127.0.0.1%3A5001%2Fimages%2Fuploads%2F1794131118106_IMG_0005_HEIC.heic&w=600&fit=cover&format=jpeg&quality_target=good&exp=1794135090&sig=c2d0947495f0091b959f6b9278d9afc79e35ae4afd523906ef96247d50e35bf1",
+      "params": {
+        "src": "http://127.0.0.1:5001/images/uploads/1794131118106_IMG_0005_HEIC.heic",
+        "w": 600,
+        "fit": "cover",
+        "format": "jpeg",
+        "quality_target": "good"
+      },
+      "status": 200,
+      "latencyMs": 181.41,
+      "cacheStatus": "MISS",
+      "contentType": "image/jpeg",
+      "originalBytes": 1246265,
+      "transformedBytes": 116985,
+      "byteDeltaPct": -90.61,
+      "id": "hist_1794131490282_ro71x",
+      "timestamp": "2026-11-08T09:51:30.282Z"
+    },
+    {
+      "testUrl": "http://127.0.0.1:8080/transform?src=http%3A%2F%2F127.0.0.1%3A5001%2Fimages%2Fuploads%2F1794131118106_IMG_0005_HEIC.png&w=800&fit=cover&format=avif&quality_target=good&exp=1794135055&sig=b9f04c72ccecfe5a3d8e1c6e2773b55eaadf7236fbe13fb38c8ff31233344582",
+      "params": {
+        "src": "http://127.0.0.1:5001/images/uploads/1794131118106_IMG_0005_HEIC.png",
+        "w": 800,
+        "fit": "cover",
+        "format": "avif",
+        "quality_target": "good"
+      },
+      "status": 200,
+      "latencyMs": 296.92,
+      "cacheStatus": "MISS",
+      "contentType": "image/avif",
+      "originalBytes": 13220400,
+      "transformedBytes": 70430,
+      "byteDeltaPct": -99.47,
+      "id": "hist_1794131455721_cycpw",
+      "timestamp": "2026-11-08T09:50:55.721Z"
+    },
+    {
+      "testUrl": "http://127.0.0.1:8080/transform?src=http%3A%2F%2F127.0.0.1%3A5001%2Fimages%2Fuploads%2F1794131118106_IMG_0005_HEIC.heic&w=800&h=600&fit=cover&quality_target=good&exp=1794134719&sig=311b5a0a153a0c1c3d851f19cbe1134d0c9f4cc2184e501e193f16198f5f7c36",
+      "params": {
+        "src": "http://127.0.0.1:5001/images/uploads/1794131118106_IMG_0005_HEIC.heic",
+        "w": 800,
+        "h": 600,
+        "fit": "cover",
+        "quality_target": "good"
+      },
+      "status": 415,
+      "latencyMs": 1.79,
+      "cacheStatus": "NONE",
+      "contentType": "application/json",
+      "originalBytes": 1246265,
+      "transformedBytes": 235,
+      "byteDeltaPct": -99.98,
+      "id": "hist_1794131119860_1dpah",
+      "timestamp": "2026-11-08T09:45:19.860Z"
+    },
+    {
+      "testUrl": "http://127.0.0.1:8080/transform?src=http%3A%2F%2F127.0.0.1%3A5001%2Fimages%2Fuploads%2F1794131049338_kodim01.png&w=400&h=300&fit=cover&quality_target=good&exp=1794134664&sig=aa6f68838b0e065e4afa938ab220fdc91421c4e6765de0df700d86761ac06e2e",
+      "params": {
+        "src": "http://127.0.0.1:5001/images/uploads/1794131049338_kodim01.png",
+        "w": 400,
+        "h": 300,
+        "fit": "cover",
+        "quality_target": "good"
+      },
+      "status": 200,
+      "latencyMs": 0.57,
+      "cacheStatus": "HIT",
+      "contentType": "image/jpeg",
+      "originalBytes": 736501,
+      "transformedBytes": 37032,
+      "byteDeltaPct": -94.97,
+      "id": "hist_1794131064849_2fhg7",
+      "timestamp": "2026-11-08T09:44:24.849Z"
+    },
+    {
+      "testUrl": "http://127.0.0.1:8080/transform?src=http%3A%2F%2F127.0.0.1%3A5001%2Fimages%2Fuploads%2F1794131049338_kodim01.png&w=400&h=300&fit=cover&quality_target=good&exp=1794134655&sig=ea04752dfccdfd9f26381a21b5d2ad6bde2f1e9b54ecc4afccd3a608eaed7ac4",
+      "params": {
+        "src": "http://127.0.0.1:5001/images/uploads/1794131049338_kodim01.png",
+        "w": 400,
+        "h": 300,
+        "fit": "cover",
+        "quality_target": "good"
+      },
+      "status": 200,
+      "latencyMs": 9.42,
+      "cacheStatus": "MISS",
+      "contentType": "image/jpeg",
+      "originalBytes": 736501,
+      "transformedBytes": 37032,
+      "byteDeltaPct": -94.97,
+      "id": "hist_1794131055941_zqtkt",
+      "timestamp": "2026-11-08T09:44:15.941Z"
+    },
+    {
+      "testUrl": "http://127.0.0.1:8080/transform?src=http%3A%2F%2F127.0.0.1%3A5001%2Fimages%2Fuploads%2F1794131000598_IMG_0001_HEIC.heic&w=800&h=600&fit=cover&quality_target=good&exp=1794134603&sig=6d889a3abd00cbea4c6b781d9a1207ee0f29d3d0167f77a05e01f2f9a0706036",
+      "params": {
+        "src": "http://127.0.0.1:5001/images/uploads/1794131000598_IMG_0001_HEIC.heic",
+        "w": 800,
+        "h": 600,
+        "fit": "cover",
+        "quality_target": "good"
+      },
+      "status": 415,
+      "latencyMs": 5.39,
+      "cacheStatus": "NONE",
+      "contentType": "application/json",
+      "originalBytes": 1195356,
+      "transformedBytes": 235,
+      "byteDeltaPct": -99.98,
+      "id": "hist_1794131003016_jtcqg",
+      "timestamp": "2026-11-08T09:43:23.016Z"
+    },
+    {
+      "testUrl": "http://127.0.0.1:8080/transform?src=http%3A%2F%2F127.0.0.1%3A5001%2Fimages%2Fcorpus%2Fkodim01.png&w=800&h=600&fit=cover&exp=1794134384&sig=4fc806d3e0057b779e58c04e9ba756b4104159d5d3ab966fd2ebe02d7a257623",
+      "params": {
+        "src": "http://127.0.0.1:5001/images/corpus/kodim01.png",
+        "w": 800,
+        "h": 600,
+        "fit": "cover"
+      },
+      "status": 200,
+      "latencyMs": 0.64,
+      "cacheStatus": "HIT",
+      "contentType": "image/jpeg",
+      "originalBytes": 736501,
+      "transformedBytes": 116257,
+      "byteDeltaPct": -84.21,
+      "id": "hist_1794130784869_yoxtn",
+      "timestamp": "2026-11-08T09:39:44.869Z"
+    },
+    {
+      "testUrl": "http://127.0.0.1:8080/transform?src=http%3A%2F%2F127.0.0.1%3A5001%2Fimages%2Fcorpus%2Fkodim01.png&w=800&h=600&fit=cover&exp=1794134378&sig=5c6dbf342388a79a693a908c1013ff9db71d669194cb15dcdfeac819b2852ea0",
+      "params": {
+        "src": "http://127.0.0.1:5001/images/corpus/kodim01.png",
+        "w": 800,
+        "h": 600,
+        "fit": "cover"
+      },
+      "status": 200,
+      "latencyMs": 12.23,
+      "cacheStatus": "MISS",
+      "contentType": "image/jpeg",
+      "originalBytes": 736501,
+      "transformedBytes": 116257,
+      "byteDeltaPct": -84.21,
+      "id": "hist_1794130778137_9v73o",
+      "timestamp": "2026-11-08T09:39:38.137Z"
+    },
+    {
+      "testUrl": "http://127.0.0.1:8080/transform?src=http%3A%2F%2F127.0.0.1%3A5001%2Fimages%2Fuploads%2F1794130725457_IMG_0001_HEIC.heic&w=800&h=600&fit=cover&q=65&allow_upscale=1&exp=1794134341&sig=e4c06146e5610161c7466a61abd8c7fe51e02f14b37912db94adcc44a533972b",
+      "params": {
+        "src": "http://127.0.0.1:5001/images/uploads/1794130725457_IMG_0001_HEIC.heic",
+        "w": 800,
+        "h": 600,
+        "fit": "cover",
+        "q": 65,
+        "allow_upscale": 1
+      },
+      "status": 422,
+      "latencyMs": 0.57,
+      "cacheStatus": "NONE",
+      "contentType": "application/json",
+      "originalBytes": 1195356,
+      "transformedBytes": 173,
+      "byteDeltaPct": -99.99,
+      "id": "hist_1794130741971_q5zi7",
+      "timestamp": "2026-11-08T09:39:01.971Z"
+    },
+    {
+      "testUrl": "http://127.0.0.1:8080/transform?src=http%3A%2F%2F127.0.0.1%3A5001%2Fimages%2Fuploads%2F1794130725457_IMG_0001_HEIC.heic&w=800&h=600&fit=cover&q=65&allow_upscale=1&exp=1794134341&sig=e4c06146e5610161c7466a61abd8c7fe51e02f14b37912db94adcc44a533972b",
+      "params": {
+        "src": "http://127.0.0.1:5001/images/uploads/1794130725457_IMG_0001_HEIC.heic",
+        "w": 800,
+        "h": 600,
+        "fit": "cover",
+        "q": 65,
+        "allow_upscale": 1
+      },
+      "status": 422,
+      "latencyMs": 0.62,
+      "cacheStatus": "NONE",
+      "contentType": "application/json",
+      "originalBytes": 1195356,
+      "transformedBytes": 173,
+      "byteDeltaPct": -99.99,
+      "id": "hist_1794130741121_ik69m",
+      "timestamp": "2026-11-08T09:39:01.121Z"
+    },
+    {
+      "testUrl": "http://127.0.0.1:8080/transform?src=http%3A%2F%2F127.0.0.1%3A5001%2Fimages%2Fuploads%2F1794130725457_IMG_0001_HEIC.heic&w=800&h=600&fit=cover&q=65&allow_upscale=1&exp=1794134340&sig=6c5151bc6a55e7010f23cd98d1e5a0225d4159d042d6ea25082096cd6663fa21",
+      "params": {
+        "src": "http://127.0.0.1:5001/images/uploads/1794130725457_IMG_0001_HEIC.heic",
+        "w": 800,
+        "h": 600,
+        "fit": "cover",
+        "q": 65,
+        "allow_upscale": 1
+      },
+      "status": 422,
+      "latencyMs": 0.57,
+      "cacheStatus": "NONE",
+      "contentType": "application/json",
+      "originalBytes": 1195356,
+      "transformedBytes": 173,
+      "byteDeltaPct": -99.99,
+      "id": "hist_1794130740487_en4o4",
+      "timestamp": "2026-11-08T09:39:00.487Z"
+    },
+    {
+      "testUrl": "http://127.0.0.1:8080/transform?src=http%3A%2F%2F127.0.0.1%3A5001%2Fimages%2Fuploads%2F1794130725457_IMG_0001_HEIC.heic&w=800&h=600&fit=cover&q=65&allow_upscale=1&exp=1794134339&sig=39e944a4d50fb9a506ec5a20e60c6b8ad6e52648ba50b5eb0b0f6ceca34d6859",
+      "params": {
+        "src": "http://127.0.0.1:5001/images/uploads/1794130725457_IMG_0001_HEIC.heic",
+        "w": 800,
+        "h": 600,
+        "fit": "cover",
+        "q": 65,
+        "allow_upscale": 1
+      },
+      "status": 422,
+      "latencyMs": 1.34,
+      "cacheStatus": "NONE",
+      "contentType": "application/json",
+      "originalBytes": 1195356,
+      "transformedBytes": 173,
+      "byteDeltaPct": -99.99,
+      "id": "hist_1794130739363_milb6",
+      "timestamp": "2026-11-08T09:38:59.363Z"
+    },
+    {
+      "testUrl": "http://127.0.0.1:8080/transform?src=http%3A%2F%2F127.0.0.1%3A5001%2Fimages%2Fcorpus%2Fkodim01.png&w=400&h=300&fit=cover&exp=1794133576&sig=f9d969b12f14b004cb992738012ef0a8e74d2efa5d8244a9bfebf8267f33b996",
+      "params": {
+        "src": "http://127.0.0.1:5001/images/corpus/kodim01.png",
+        "w": 400,
+        "h": 300,
+        "fit": "cover"
+      },
+      "status": 200,
+      "latencyMs": 0.83,
+      "cacheStatus": "HIT",
+      "contentType": "image/jpeg",
+      "originalBytes": 736501,
+      "transformedBytes": 37032,
+      "byteDeltaPct": -94.97,
+      "id": "hist_1794129976543_r1t6l",
+      "timestamp": "2026-11-08T09:26:16.543Z"
+    },
+    {
+      "testUrl": "http://127.0.0.1:8080/transform?src=http%3A%2F%2F127.0.0.1%3A5001%2Fimages%2Fcorpus%2Fkodim01.png&w=400&h=300&fit=cover&exp=1794133569&sig=a1ec6c104649ef83a1bc6a669e2e548b3dcfd2102220706efcda3873082c7129",
+      "params": {
+        "src": "http://127.0.0.1:5001/images/corpus/kodim01.png",
+        "w": 400,
+        "h": 300,
+        "fit": "cover"
+      },
+      "status": 200,
+      "latencyMs": 14.71,
+      "cacheStatus": "MISS",
+      "contentType": "image/jpeg",
+      "originalBytes": 736501,
+      "transformedBytes": 37032,
+      "byteDeltaPct": -94.97,
+      "id": "hist_1794129969627_uoe81",
+      "timestamp": "2026-11-08T09:26:09.627Z"
+    }
+  ]
+}

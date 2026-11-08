@@ -96,6 +96,7 @@ fn test_config(
         avif_speed: 6,
         distinct_color_threshold: 256,
         max_retry_pixels: 16_777_216,
+        resize_filter: "lanczos3".to_string(),
     })
 }
 

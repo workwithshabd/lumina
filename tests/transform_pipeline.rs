@@ -91,6 +91,7 @@ fn test_setup(
         avif_speed: 6,
         distinct_color_threshold: 256,
         max_retry_pixels: 16_777_216,
+        resize_filter: "lanczos3".to_string(),
     });
 
     let mock_fetcher = Arc::new(SourceFetcher::new_mock(
@@ -432,6 +433,7 @@ async fn test_signed_mode_cache_control_and_vary_headers_pinned() {
         avif_speed: 6,
         distinct_color_threshold: 256,
         max_retry_pixels: 16_777_216,
+        resize_filter: "lanczos3".to_string(),
     });
 
     let mock_fetcher = Arc::new(SourceFetcher::new_mock(

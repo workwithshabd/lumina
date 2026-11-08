@@ -5,6 +5,11 @@ fuzz/
 tests/
 docs/
 benchmarks/
+bench/
+dashboard/
+monitoring/
+.venv*
+*.zip
 *.md
 LICENSE
 .system_generated/

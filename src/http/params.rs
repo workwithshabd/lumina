@@ -38,6 +38,7 @@ pub struct TransformParams {
     pub h: Option<u32>,
     pub format: Option<FormatParam>,
     pub quality_target: Option<QualityTarget>,
+    pub q: Option<u8>,
     pub fit: FitMode,
     pub v: Option<String>,
     pub sig: Option<String>,
@@ -71,7 +72,11 @@ impl TransformParams {
             "w",
             "h",
             "format",
+            "f",
             "quality_target",
+            "qt",
+            "q",
+            "quality",
             "fit",
             "v",
             "sig",
@@ -171,19 +176,45 @@ impl TransformParams {
             _ => None,
         };
 
-        // format (optional webp|avif|jpeg|png|auto)
-        let format = match params_map.remove("format") {
+        // format (optional webp|avif|jpeg|png|auto, f accepted as alias)
+        let format = match params_map.remove("format").or_else(|| params_map.remove("f")) {
             Some(s) if !s.is_empty() => Some(s.parse::<FormatParam>()?),
             _ => None,
         };
 
-        // quality_target (optional draft|good|high|lossless)
-        let quality_target = match params_map.remove("quality_target") {
+        // q / quality (optional u8 between 1 and 100)
+        let q = match params_map.remove("q").or_else(|| params_map.remove("quality")) {
+            Some(s) if !s.is_empty() => {
+                let val = s.parse::<u8>().map_err(|_| {
+                    AppError::InvalidParam("Parameter 'q' must be an integer between 1 and 100".to_string())
+                })?;
+                if !(1..=100).contains(&val) {
+                    return Err(AppError::InvalidParam(
+                        "Parameter 'q' must be between 1 and 100".to_string(),
+                    ));
+                }
+                Some(val)
+            }
+            _ => None,
+        };
+
+        // quality_target / qt (optional draft|good|high|lossless)
+        let quality_target = match params_map.remove("quality_target").or_else(|| params_map.remove("qt")) {
             Some(s) if !s.is_empty() => Some(
                 s.parse::<QualityTarget>()
                     .map_err(|e| AppError::InvalidParam(e.to_string()))?,
             ),
-            _ => None,
+            _ => q.map(|val| {
+                if val >= 95 {
+                    QualityTarget::Lossless
+                } else if val >= 80 {
+                    QualityTarget::High
+                } else if val >= 60 {
+                    QualityTarget::Good
+                } else {
+                    QualityTarget::Draft
+                }
+            }),
         };
 
         // fit (cover|contain|fill, default: cover)
@@ -268,6 +299,7 @@ impl TransformParams {
             h,
             format,
             quality_target,
+            q,
             fit,
             v,
             sig,
@@ -304,8 +336,15 @@ pub enum CacheFormat {
 impl CacheFormat {
     pub fn as_str(&self) -> &'static str {
         match self {
-            Self::Specific(f) => f.file_extension(),
-            Self::Auto(ac) => ac.as_str(),
+            Self::Specific(ImageFormat::Jpeg) => "specific:jpeg",
+            Self::Specific(ImageFormat::Png) => "specific:png",
+            Self::Specific(ImageFormat::WebP) => "specific:webp",
+            Self::Specific(ImageFormat::Avif) => "specific:avif",
+            Self::Specific(ImageFormat::Gif) => "specific:gif",
+            Self::Specific(ImageFormat::Svg) => "specific:svg",
+            Self::Auto(AcceptClass::Avif) => "auto:avif",
+            Self::Auto(AcceptClass::Webp) => "auto:webp",
+            Self::Auto(AcceptClass::Legacy) => "auto:legacy",
         }
     }
 }
@@ -505,9 +544,11 @@ pub fn resolve_format(
         Some(FormatParam::Auto) | None => {
             let accept_class = resolve_accept_class(accept_header);
             if source_has_alpha {
-                // Source has alpha -> smaller of lossless WebP and PNG
+                // Source has alpha -> AVIF if accepted (natively supports alpha with superior compression),
+                // else WebP (lossless alpha), else PNG.
                 match accept_class {
-                    AcceptClass::Avif | AcceptClass::Webp => (ImageFormat::WebP, true),
+                    AcceptClass::Avif => (ImageFormat::Avif, true),
+                    AcceptClass::Webp => (ImageFormat::WebP, true),
                     AcceptClass::Legacy => (ImageFormat::Png, true),
                 }
             } else if source_format == ImageFormat::Jpeg {
@@ -518,9 +559,10 @@ pub fn resolve_format(
                     AcceptClass::Webp | AcceptClass::Legacy => (ImageFormat::Jpeg, true),
                 }
             } else {
-                // Graphic / flat content hint (PNG/WebP sources without alpha) -> smaller of lossless WebP and PNG
+                // Graphic / flat content hint (PNG/WebP sources without alpha) -> AVIF if accepted, else WebP/PNG
                 match accept_class {
-                    AcceptClass::Avif | AcceptClass::Webp => (ImageFormat::WebP, true),
+                    AcceptClass::Avif => (ImageFormat::Avif, true),
+                    AcceptClass::Webp => (ImageFormat::WebP, true),
                     AcceptClass::Legacy => match source_format {
                         ImageFormat::Png | ImageFormat::Jpeg => (source_format, true),
                         _ => (ImageFormat::Png, true),
@@ -628,5 +670,19 @@ mod tests {
         );
         assert_eq!(f4, ImageFormat::Png);
         assert!(!is_auto4);
+    }
+
+    #[test]
+    fn test_quality_and_format_aliases_parsing() {
+        let p = TransformParams::parse(Some("src=https://example.com/img.jpg&f=webp&q=85&allow_upscale=1")).unwrap();
+        assert_eq!(p.format, Some(FormatParam::Specific(ImageFormat::WebP)));
+        assert_eq!(p.q, Some(85));
+        assert_eq!(p.quality_target, Some(QualityTarget::High));
+        assert!(p.allow_upscale);
+
+        let p2 = TransformParams::parse(Some("src=https://example.com/img.jpg&format=jpeg&qt=lossless")).unwrap();
+        assert_eq!(p2.format, Some(FormatParam::Specific(ImageFormat::Jpeg)));
+        assert_eq!(p2.quality_target, Some(QualityTarget::Lossless));
+        assert_eq!(p2.q, None);
     }
 }

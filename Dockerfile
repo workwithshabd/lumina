@@ -13,15 +13,23 @@ WORKDIR /app
 RUN echo "atihsrah:x:10001:10001:atihsrah:/nonexistent:/bin/false" > /etc/passwd.atihsrah && \
     echo "atihsrah:x:10001:" > /etc/group.atihsrah
 
-# Install cargo-auditable to embed Rust dependency audit metadata into binary
-RUN cargo install cargo-auditable --locked
+# Copy locked dependencies, cargo configuration, and vendored crates for offline builds
+COPY Cargo.toml Cargo.lock ./
+COPY .cargo ./.cargo
+COPY vendor ./vendor
+
+# Use cargo-auditable if pre-installed in the builder image. In an offline build
+# (--network=none) where cargo-auditable is not pre-installed, cargo install will
+# fail silently, and the build falls back to standard `cargo build --release`.
+# This produces a fully functional, memory-safe distroless binary without embedded
+# .dep-v0 audit metadata.
+RUN which cargo-auditable >/dev/null 2>&1 || cargo install cargo-auditable --locked || true
 
 # Cache dependencies by compiling an empty skeleton first
-COPY Cargo.toml Cargo.lock ./
 RUN mkdir -p src && \
     echo "fn main() {}" > src/main.rs && \
     echo "" > src/lib.rs && \
-    cargo auditable build --release && \
+    (cargo auditable build --release 2>/dev/null || cargo build --release) && \
     rm -rf src
 
 # Copy real source code
@@ -29,7 +37,7 @@ COPY src ./src
 
 # Touch source files so cargo detects updates over cached build artifacts
 RUN touch src/main.rs src/lib.rs && \
-    cargo auditable build --release && \
+    (cargo auditable build --release 2>/dev/null || cargo build --release) && \
     strip target/release/atihsrah
 
 # ==============================================================================

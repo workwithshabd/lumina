@@ -17,6 +17,11 @@ CORPUS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "benc
 if not os.path.isdir(CORPUS_DIR):
     if os.path.isdir("/benchmarks/corpus"):
         CORPUS_DIR = "/benchmarks/corpus"
+
+SYNTH_CORPUS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "benchmarks", "corpus_synthetic"))
+if not os.path.isdir(SYNTH_CORPUS_DIR):
+    if os.path.isdir("/benchmarks/corpus_synthetic"):
+        SYNTH_CORPUS_DIR = "/benchmarks/corpus_synthetic"
 FETCH_COUNT = 0
 
 class MockOriginHandler(http.server.BaseHTTPRequestHandler):
@@ -59,7 +64,7 @@ class MockOriginHandler(http.server.BaseHTTPRequestHandler):
             return
 
         # Slow origin simulation
-        if path.startswith("/slow/"):
+        if path.startswith("/slow/") or "delay" in query:
             FETCH_COUNT += 1
             delay = float(query.get("delay", [2.0])[0])
             time.sleep(delay)
@@ -67,11 +72,18 @@ class MockOriginHandler(http.server.BaseHTTPRequestHandler):
             self.serve_file(filename)
             return
 
+        # Synthetic corpus serve
+        if path.startswith("/corpus_synthetic/"):
+            FETCH_COUNT += 1
+            filename = os.path.basename(path)
+            self.serve_file(filename, base_dir=SYNTH_CORPUS_DIR)
+            return
+
         # Normal corpus serve
         if path.startswith("/corpus/"):
             FETCH_COUNT += 1
             filename = os.path.basename(path)
-            self.serve_file(filename)
+            self.serve_file(filename, base_dir=CORPUS_DIR)
             return
 
         self.send_response(404)
@@ -79,8 +91,10 @@ class MockOriginHandler(http.server.BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(b"Not Found\n")
 
-    def serve_file(self, filename):
-        file_path = os.path.join(CORPUS_DIR, filename)
+    def serve_file(self, filename, base_dir=None):
+        if base_dir is None:
+            base_dir = CORPUS_DIR
+        file_path = os.path.join(base_dir, filename)
         if not os.path.isfile(file_path):
             self.send_response(404)
             self.send_header("Content-Type", "text/plain")
