@@ -147,7 +147,7 @@ The calibration run provides clear evidence of an inherent size-versus-quality t
 - Under explicit AVIF at nominal q=90, Atihsrah achieved near-lossless fidelity (SSIM 0.9931 > 0.98, PSNR 49.31 dB), but container overhead and high-frequency edge encoding expanded the file to 10,477 bytes (+190.1% larger than source).
 - Under `format=auto`, Atihsrah's `never_larger_than_source` guard detected that the primary q=90 candidate exceeded 3,612 bytes and triggered the fallback quality ladder down to q=40.
 - The q=40 fallback successfully reduced the output size to 3,401 bytes (≤ 3,612 bytes, achieving the size constraint). However, coarse quantization dropped visual fidelity to SSIM 0.9674, breaching the 0.98 gate.
-- **Finding**: For highly optimized, tiny palette assets, lossy AVIF cannot simultaneously guarantee both "strictly smaller than source" and "near-lossless SSIM ≥ 0.98". Enforcing the byte budget forces quality loss below the gate.
+- **Finding (Tested Configuration & Fallback Policy)**: Under the tested configuration and fallback policy (jumping from nominal q=90 to q=40), meeting the byte limit on `alacritty_logo_alpha.png` resulted in missing the 0.98 SSIM threshold. While this demonstrates a direct size-versus-quality trade-off under Atihsrah's current fallback ladder, determining whether an intermediate AVIF quality setting or alternative encoder tuning could simultaneously satisfy both constraints would require a full quality-versus-size parameter sweep.
 
 ---
 

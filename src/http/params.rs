@@ -526,11 +526,10 @@ pub fn resolve_candidate_format(
 /// Resolves the concrete output format, evaluating `Accept` header when `format=auto`.
 ///
 /// Stage 1 (Option A - pure Rust) format=auto policy:
-/// - Source has alpha -> smaller of lossless WebP and PNG (WebP if accepted, else PNG).
-/// - Photographic content -> AVIF if Accept allows it, else JPEG. Never lossless WebP for photos.
-/// - Graphic/flat content -> smaller of lossless WebP (if allowed) and PNG.
-/// - Photo-vs-graphic: JPEG source format is photographic hint. For PNG/WebP sources,
-///   the processor applies a downscaled distinct-color heuristic.
+/// - Source has alpha -> AVIF if Accept allows it (native 8-bit alpha support via ravif),
+///   else lossless WebP (if accepted), else PNG.
+/// - Photographic content (e.g. JPEG source) -> AVIF if Accept allows it, else JPEG. Never lossless WebP for photos.
+/// - Graphic/flat content (PNG/WebP sources without alpha) -> AVIF if Accept allows it, else WebP, else source format / PNG.
 ///
 /// Returns `(resolved_format, is_auto)`.
 pub fn resolve_format(
