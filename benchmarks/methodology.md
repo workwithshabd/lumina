@@ -1,6 +1,6 @@
 # Reproducible Benchmark Methodology: Atihsrah vs imgproxy vs Thumbor
 
-Generated automatically by the benchmark harness on 2026-11-08 19:13:25 UTC.
+Generated automatically by the benchmark harness on 2026-11-08 19:45:05 UTC.
 
 ---
 
@@ -18,7 +18,7 @@ Generated automatically by the benchmark harness on 2026-11-08 19:13:25 UTC.
   - Python Executable: `/Users/shabd/Desktop/dev/lumina/.venv_bench/bin/python3`
   - Docker: `Docker version 29.9.2, build a82e528901` (Context: `colima`)
   - Docker Container VM: `Ubuntu 24.04.4 LTS | Arch: aarch64 | CPUs: 2 | Mem: 2054844416`
-  - Git Commit: `9f106bb6c0f6b7c6473dd3d53df1940771efb2d6` (Dirty worktree: `False`)
+  - Git Commit: `a2aa92b47ee9040f178f806c7299633bd3b550cd` (Dirty worktree: `True`)
   - FFmpeg / libvmaf: Available `True`, libvmaf `True`
 
 ---

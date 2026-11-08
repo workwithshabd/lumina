@@ -103,18 +103,18 @@
 
 - **Warm In-Memory Cache Latency**:
   - Atihsrah serves cached assets directly from in-memory RAM (`moka`) without CPU transcoding overhead.
-  - Measured Result (Apple M4, 10 cores, macOS 27.2, `run_20261108_191324`): **0.32 ms median p50** (p95: **0.42 ms**, p99: **0.64 ms**), compared to imgproxy Direct (19.18 ms p50, p95: 20.23 ms) and imgproxy + Nginx cache (0.68 ms p50, p95: 0.80 ms).
+  - Measured Result (Apple M4, 10 cores, macOS 27.2, `run_20261108_194505`): **0.33 ms median p50** (p95: **0.44 ms**, p99: **0.67 ms**), compared to imgproxy Direct (20.08 ms p50, p95: 21.91 ms) and imgproxy + Nginx cache (0.69 ms p50, p95: 1.05 ms).
 - **Single-Flight Request Coalescing**:
-  - Under 100 concurrent requests for the exact same uncached URL, Atihsrah initiates **exactly 1 origin fetch** in 36.2 ms, eliminating thundering-herd cache stampedes. Uncached imgproxy initiates 100 origin fetches in 1,536.5 ms.
+  - Under 100 concurrent requests for the exact same uncached URL, Atihsrah initiates **exactly 1 origin fetch** in 34.4 ms, eliminating thundering-herd cache stampedes. Uncached imgproxy initiates 100 origin fetches in 1,560.4 ms.
 - **Cold Transformation Throughput (100 Concurrent Different URLs)**:
-  - `libvips` utilizes multi-threaded C pipelines and SIMD vectorization for image transformation, reaching **105.1 req/s** (p95: 113.5 ms) under 100 concurrent uncached requests.
-  - Pure-Rust `image-rs` and `ravif` run single-process software codecs within Tokio blocking threads, achieving **95.2 req/s** (native, p95: 33.6 ms) and **204.1 req/s** (containerized, p95: 70.0 ms).
+  - `libvips` utilizes multi-threaded C pipelines and SIMD vectorization for image transformation, reaching **105.8 req/s** (p95: 113.9 ms) under 100 concurrent uncached requests.
+  - Pure-Rust `image-rs` and `ravif` run single-process software codecs within Tokio blocking threads, achieving **94.4 req/s** (native, p95: 30.5 ms) and **211.6 req/s** (containerized, p95: 67.0 ms).
 - **20-Image Corpus Compression & Quality**:
-  - On the 20-image real calibration corpus under explicit AVIF $q=90$, Atihsrah met quality gates on **19 of 20 images** (95.0%, all 15 photos, 1/2 alpha, 3/3 graphics) with average SSIM of **0.9807** vs imgproxy's **0.9110**.
-  - On the $N=2$ mutually quality-passing pairs (`moraine_lake.jpg` and `alacritty_logo_alpha.png`), Atihsrah delivered smaller files on both (-21.2% and -46.6%, conventional median **-33.9%**). $N=2$ is an illustrative observation on specific images, not a broad demonstration of market superiority.
-  - Under `format=auto`, Atihsrah met quality gates on **19 of 20 images** (95.0%) on the real calibration corpus, confirmed empirically in `run_20261108_191324`. On `alacritty_logo_alpha.png`, the engine selected the quality-passing AVIF $q=40$ candidate (4,329 B, SSIM 0.9807 $\ge 0.98$), exceeding source (3,612 B) and incrementing `atihsrah_output_larger_than_source_total`. `python_logo_alpha.png` misses the 0.98 gate by 0.0001 (SSIM 0.9799), and synthetic checkerboard scores 0.9721 (< 0.98 gate under $q=40$). Output size was $\le$ source on 19 of 20 calibration images (95.0%) and 19 of 20 synthetic images (95.0%).
+  - On the 20-image real calibration corpus under explicit AVIF $q=90$, Atihsrah met quality gates on **20 of 20 images** (100%, all 15 photos, 2/2 alpha, 3/3 graphics) with average SSIM of **0.9816** vs imgproxy's **0.9110** (3 of 20 passed).
+  - On the $N=3$ mutually quality-passing pairs (`moraine_lake.jpg`, `alacritty_logo_alpha.png`, and `python_logo_alpha.png`), Atihsrah delivered smaller files on 2 of 3 (-21.2% and -46.6% vs +15.8%, conventional median **-21.2%**, mean -17.3%). $N=3$ is an illustrative observation on specific images, not a broad demonstration of market superiority.
+  - Under `format=auto`, Atihsrah met quality gates on **20 of 20 images (100%)** on the real calibration corpus and **20 of 20 images (100%)** on the held-out synthetic stress suite, confirmed empirically in `run_20261108_194505`. `python_logo_alpha.png` achieved SSIM **0.9984** $\ge 0.98$ via alpha-premultiplied resampling. On `alacritty_logo_alpha.png`, the engine selected the quality-passing AVIF $q=40$ candidate (4,329 B, SSIM 0.9807 $\ge 0.98$). On `16_pattern_checkerboard.png`, the engine selected lossless WebP (49,312 B, SSIM 1.0000 $\ge 0.98$). Output size was $\le$ source on 18 of 20 calibration images (90.0%) and 18 of 20 synthetic images (90.0%), permitting larger outputs when quality mandates it.
 - **Docker Virtualization Overhead on macOS**:
-  - Running Atihsrah containerized inside Colima's Linux VM incurs a **~0.63 ms network and virtualization penalty** on warm cache lookups (0.95 ms vs 0.32 ms native).
+  - Running Atihsrah containerized inside Colima's Linux VM incurs a **~0.85 ms network and virtualization penalty** on warm cache lookups (1.18 ms vs 0.33 ms native).
 
 ---
 

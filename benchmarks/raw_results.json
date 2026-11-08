@@ -2,65 +2,65 @@
   "scenario_1_cold_requests": {
     "atihsrah_native": {
       "jpeg": {
-        "median_ms": 49.9,
-        "min_ms": 48.9,
-        "max_ms": 56.1,
-        "spread_ms": 7.2,
-        "duration_ms": 49.9,
+        "median_ms": 50.0,
+        "min_ms": 49.1,
+        "max_ms": 56.7,
+        "spread_ms": 7.6,
+        "duration_ms": 50.0,
         "runs": [
-          56.1,
-          50.8,
-          49.6,
-          49.9,
-          48.9
+          56.7,
+          50.9,
+          49.1,
+          50.0,
+          49.1
         ],
         "bytes": 122345,
         "mime": "image/jpeg"
       },
       "png": {
-        "median_ms": 8.7,
-        "min_ms": 8.2,
-        "max_ms": 9.1,
-        "spread_ms": 0.9,
-        "duration_ms": 8.7,
+        "median_ms": 8.5,
+        "min_ms": 8.3,
+        "max_ms": 8.8,
+        "spread_ms": 0.5,
+        "duration_ms": 8.5,
         "runs": [
-          9.1,
-          8.7,
-          8.4,
-          8.2,
-          9.0
+          8.8,
+          8.5,
+          8.5,
+          8.3,
+          8.5
         ],
         "bytes": 889703,
         "mime": "image/png"
       },
       "webp": {
-        "median_ms": 9.5,
-        "min_ms": 9.4,
-        "max_ms": 9.9,
-        "spread_ms": 0.5,
-        "duration_ms": 9.5,
+        "median_ms": 9.9,
+        "min_ms": 9.3,
+        "max_ms": 10.9,
+        "spread_ms": 1.7,
+        "duration_ms": 9.9,
         "runs": [
+          10.9,
+          10.5,
           9.6,
-          9.5,
-          9.4,
           9.9,
-          9.4
+          9.3
         ],
         "bytes": 656566,
         "mime": "image/webp"
       },
       "avif": {
-        "median_ms": 120.3,
-        "min_ms": 119.8,
-        "max_ms": 127.5,
-        "spread_ms": 7.6,
-        "duration_ms": 120.3,
+        "median_ms": 124.6,
+        "min_ms": 123.6,
+        "max_ms": 132.0,
+        "spread_ms": 8.4,
+        "duration_ms": 124.6,
         "runs": [
-          127.5,
-          122.3,
-          120.3,
-          120.3,
-          119.8
+          124.6,
+          129.0,
+          124.6,
+          123.6,
+          132.0
         ],
         "bytes": 51590,
         "mime": "image/avif"
@@ -68,65 +68,65 @@
     },
     "atihsrah_docker": {
       "jpeg": {
-        "median_ms": 51.1,
-        "min_ms": 49.4,
-        "max_ms": 66.6,
-        "spread_ms": 17.2,
-        "duration_ms": 51.1,
+        "median_ms": 53.5,
+        "min_ms": 51.5,
+        "max_ms": 59.3,
+        "spread_ms": 7.9,
+        "duration_ms": 53.5,
         "runs": [
-          66.6,
-          54.6,
-          51.1,
-          50.3,
-          49.4
+          59.3,
+          56.4,
+          52.2,
+          53.5,
+          51.5
         ],
         "bytes": 122345,
         "mime": "image/jpeg"
       },
       "png": {
         "median_ms": 8.4,
-        "min_ms": 8.3,
-        "max_ms": 8.6,
-        "spread_ms": 0.4,
+        "min_ms": 8.1,
+        "max_ms": 8.9,
+        "spread_ms": 0.8,
         "duration_ms": 8.4,
         "runs": [
-          8.5,
-          8.4,
-          8.3,
-          8.4,
-          8.6
+          8.9,
+          8.1,
+          8.2,
+          8.8,
+          8.4
         ],
         "bytes": 889703,
         "mime": "image/png"
       },
       "webp": {
-        "median_ms": 8.8,
-        "min_ms": 8.7,
-        "max_ms": 9.0,
-        "spread_ms": 0.3,
-        "duration_ms": 8.8,
+        "median_ms": 9.3,
+        "min_ms": 9.0,
+        "max_ms": 9.9,
+        "spread_ms": 0.8,
+        "duration_ms": 9.3,
         "runs": [
-          8.8,
-          8.9,
-          8.7,
+          9.3,
+          9.2,
+          9.6,
           9.0,
-          8.8
+          9.9
         ],
         "bytes": 656566,
         "mime": "image/webp"
       },
       "avif": {
-        "median_ms": 279.9,
-        "min_ms": 279.3,
-        "max_ms": 283.0,
-        "spread_ms": 3.7,
-        "duration_ms": 279.9,
+        "median_ms": 293.7,
+        "min_ms": 283.4,
+        "max_ms": 296.8,
+        "spread_ms": 13.4,
+        "duration_ms": 293.7,
         "runs": [
-          283.0,
-          281.9,
-          279.3,
-          279.3,
-          279.9
+          293.8,
+          284.8,
+          293.7,
+          296.8,
+          283.4
         ],
         "bytes": 50301,
         "mime": "image/avif"
@@ -134,65 +134,65 @@
     },
     "imgproxy": {
       "jpeg": {
-        "median_ms": 23.0,
-        "min_ms": 20.6,
-        "max_ms": 38.7,
-        "spread_ms": 18.1,
-        "duration_ms": 23.0,
+        "median_ms": 22.3,
+        "min_ms": 21.2,
+        "max_ms": 33.8,
+        "spread_ms": 12.6,
+        "duration_ms": 22.3,
         "runs": [
-          38.7,
-          24.0,
-          23.0,
-          20.7,
-          20.6
+          33.8,
+          22.3,
+          21.3,
+          22.5,
+          21.2
         ],
         "bytes": 94995,
         "mime": "image/jpeg"
       },
       "png": {
-        "median_ms": 29.1,
-        "min_ms": 28.8,
-        "max_ms": 30.1,
-        "spread_ms": 1.3,
-        "duration_ms": 29.1,
+        "median_ms": 29.2,
+        "min_ms": 28.6,
+        "max_ms": 30.3,
+        "spread_ms": 1.7,
+        "duration_ms": 29.2,
         "runs": [
-          30.1,
-          29.1,
-          28.8,
-          29.0,
-          29.8
+          29.7,
+          30.3,
+          28.9,
+          29.2,
+          28.6
         ],
         "bytes": 792619,
         "mime": "image/png"
       },
       "webp": {
-        "median_ms": 47.9,
-        "min_ms": 47.5,
-        "max_ms": 48.9,
-        "spread_ms": 1.4,
-        "duration_ms": 47.9,
+        "median_ms": 49.8,
+        "min_ms": 49.0,
+        "max_ms": 51.5,
+        "spread_ms": 2.5,
+        "duration_ms": 49.8,
         "runs": [
-          48.1,
-          47.9,
-          48.9,
-          47.7,
-          47.5
+          49.0,
+          51.5,
+          49.4,
+          50.9,
+          49.8
         ],
         "bytes": 90144,
         "mime": "image/webp"
       },
       "avif": {
-        "median_ms": 40.0,
-        "min_ms": 39.0,
-        "max_ms": 49.7,
-        "spread_ms": 10.7,
-        "duration_ms": 40.0,
+        "median_ms": 41.5,
+        "min_ms": 38.3,
+        "max_ms": 44.9,
+        "spread_ms": 6.5,
+        "duration_ms": 41.5,
         "runs": [
-          49.7,
+          41.5,
+          44.9,
           40.7,
-          39.8,
-          40.0,
-          39.0
+          41.8,
+          38.3
         ],
         "bytes": 31650,
         "mime": "image/avif"
@@ -200,65 +200,65 @@
     },
     "thumbor": {
       "jpeg": {
-        "median_ms": 22.4,
-        "min_ms": 22.2,
-        "max_ms": 29.5,
-        "spread_ms": 7.3,
-        "duration_ms": 22.4,
+        "median_ms": 22.8,
+        "min_ms": 22.3,
+        "max_ms": 28.7,
+        "spread_ms": 6.4,
+        "duration_ms": 22.8,
         "runs": [
-          29.5,
-          23.0,
-          22.4,
-          22.2,
+          28.7,
+          22.8,
+          22.8,
+          22.3,
           22.3
         ],
         "bytes": 93685,
         "mime": "image/jpeg"
       },
       "png": {
-        "median_ms": 26.7,
-        "min_ms": 26.4,
-        "max_ms": 28.3,
-        "spread_ms": 1.9,
-        "duration_ms": 26.7,
+        "median_ms": 26.6,
+        "min_ms": 26.2,
+        "max_ms": 28.2,
+        "spread_ms": 2.0,
+        "duration_ms": 26.6,
         "runs": [
-          28.3,
+          28.2,
+          26.6,
+          26.2,
           26.4,
-          26.7,
-          27.1,
-          26.4
+          27.7
         ],
         "bytes": 827166,
         "mime": "image/png"
       },
       "webp": {
-        "median_ms": 38.0,
+        "median_ms": 40.0,
         "min_ms": 37.8,
-        "max_ms": 80.6,
-        "spread_ms": 42.8,
-        "duration_ms": 38.0,
+        "max_ms": 59.9,
+        "spread_ms": 22.1,
+        "duration_ms": 40.0,
         "runs": [
-          80.6,
-          37.8,
-          38.2,
-          37.8,
-          38.0
+          59.9,
+          41.2,
+          40.0,
+          39.4,
+          37.8
         ],
         "bytes": 98538,
         "mime": "image/webp"
       },
       "avif": {
-        "median_ms": 57.7,
-        "min_ms": 56.1,
-        "max_ms": 62.4,
-        "spread_ms": 6.2,
-        "duration_ms": 57.7,
+        "median_ms": 61.8,
+        "min_ms": 57.3,
+        "max_ms": 64.3,
+        "spread_ms": 7.0,
+        "duration_ms": 61.8,
         "runs": [
-          62.4,
-          57.5,
-          57.7,
-          56.1,
-          57.8
+          64.3,
+          61.8,
+          57.3,
+          62.5,
+          58.6
         ],
         "bytes": 52117,
         "mime": "image/avif"
@@ -268,99 +268,99 @@
   "scenario_2_warm_cache": {
     "atihsrah_native": {
       "samples": 100,
-      "p50_ms": 0.32,
+      "p50_ms": 0.33,
       "p90_ms": 0.4,
-      "p95_ms": 0.42,
-      "p99_ms": 0.64,
-      "min_ms": 0.27,
-      "max_ms": 0.64,
+      "p95_ms": 0.44,
+      "p99_ms": 0.67,
+      "min_ms": 0.28,
+      "max_ms": 0.67,
       "mean_ms": 0.34,
       "stddev_ms": 0.06
     },
     "atihsrah_docker": {
       "samples": 100,
-      "p50_ms": 0.95,
-      "p90_ms": 1.1,
-      "p95_ms": 1.17,
-      "p99_ms": 1.4,
-      "min_ms": 0.86,
-      "max_ms": 1.4,
-      "mean_ms": 0.98,
-      "stddev_ms": 0.09
+      "p50_ms": 1.18,
+      "p90_ms": 1.61,
+      "p95_ms": 1.86,
+      "p99_ms": 3.32,
+      "min_ms": 0.93,
+      "max_ms": 3.32,
+      "mean_ms": 1.25,
+      "stddev_ms": 0.34
     },
     "imgproxy_direct": {
       "samples": 100,
-      "p50_ms": 19.18,
-      "p90_ms": 19.94,
-      "p95_ms": 20.23,
-      "p99_ms": 30.72,
-      "min_ms": 18.18,
-      "max_ms": 30.72,
-      "mean_ms": 19.29,
-      "stddev_ms": 1.31
+      "p50_ms": 20.08,
+      "p90_ms": 21.43,
+      "p95_ms": 21.91,
+      "p99_ms": 23.04,
+      "min_ms": 18.42,
+      "max_ms": 23.04,
+      "mean_ms": 20.22,
+      "stddev_ms": 0.9
     },
     "imgproxy_cached": {
       "samples": 100,
-      "p50_ms": 0.68,
-      "p90_ms": 0.77,
-      "p95_ms": 0.8,
-      "p99_ms": 0.98,
-      "min_ms": 0.61,
-      "max_ms": 0.98,
-      "mean_ms": 0.7,
-      "stddev_ms": 0.05
+      "p50_ms": 0.69,
+      "p90_ms": 0.87,
+      "p95_ms": 1.05,
+      "p99_ms": 1.19,
+      "min_ms": 0.58,
+      "max_ms": 1.19,
+      "mean_ms": 0.73,
+      "stddev_ms": 0.12
     },
     "thumbor": {
       "samples": 100,
-      "p50_ms": 14.94,
-      "p90_ms": 15.23,
-      "p95_ms": 15.39,
-      "p99_ms": 20.33,
-      "min_ms": 14.67,
-      "max_ms": 20.33,
-      "mean_ms": 15.04,
-      "stddev_ms": 0.57
+      "p50_ms": 15.06,
+      "p90_ms": 15.99,
+      "p95_ms": 16.33,
+      "p99_ms": 21.98,
+      "min_ms": 14.7,
+      "max_ms": 21.98,
+      "mean_ms": 15.32,
+      "stddev_ms": 0.94
     }
   },
   "scenario_3_concurrent_same_url": {
     "atihsrah_native": {
-      "duration_ms": 36.2,
+      "duration_ms": 34.4,
       "origin_fetches": 1,
       "success_rate": 100
     },
     "imgproxy": {
-      "duration_ms": 1536.5,
+      "duration_ms": 1560.4,
       "origin_fetches": 100,
       "success_rate": 100
     }
   },
   "scenario_4_concurrent_different_urls": {
     "atihsrah_native": {
-      "duration_ms": 1050.7,
-      "throughput_rps": 95.2,
-      "p50_ms": 24.8,
-      "p95_ms": 33.6,
+      "duration_ms": 1059.6,
+      "throughput_rps": 94.4,
+      "p50_ms": 23.8,
+      "p95_ms": 30.5,
       "success_count": 100
     },
     "atihsrah_docker": {
-      "duration_ms": 490.0,
-      "throughput_rps": 204.1,
-      "p50_ms": 47.9,
-      "p95_ms": 70.0,
+      "duration_ms": 472.6,
+      "throughput_rps": 211.6,
+      "p50_ms": 45.5,
+      "p95_ms": 67.0,
       "success_count": 100
     },
     "imgproxy": {
-      "duration_ms": 951.1,
-      "throughput_rps": 105.1,
-      "p50_ms": 91.5,
-      "p95_ms": 113.5,
+      "duration_ms": 945.4,
+      "throughput_rps": 105.8,
+      "p50_ms": 91.1,
+      "p95_ms": 113.9,
       "success_count": 100
     }
   },
   "scenario_5_slow_origin": {
     "atihsrah_native": {
       "status": 200,
-      "duration_s": 2.02
+      "duration_s": 2.01
     },
     "imgproxy": {
       "status": 200,
@@ -382,91 +382,91 @@
     "samples": [
       {
         "timestamp_s": 0.0,
-        "atihsrah_native_rss_mb": 124.53,
-        "atihsrah_docker_rss_mb": 167.2,
-        "imgproxy_rss_mb": 103.2,
-        "thumbor_rss_mb": 69.67
+        "atihsrah_native_rss_mb": 130.28,
+        "atihsrah_docker_rss_mb": 166.9,
+        "imgproxy_rss_mb": 45.55,
+        "thumbor_rss_mb": 78.73
       },
       {
-        "timestamp_s": 13.0,
-        "atihsrah_native_rss_mb": 125.5,
-        "atihsrah_docker_rss_mb": 166.9,
-        "imgproxy_rss_mb": 97.47,
-        "thumbor_rss_mb": 69.67
+        "timestamp_s": 13.1,
+        "atihsrah_native_rss_mb": 113.48,
+        "atihsrah_docker_rss_mb": 166.6,
+        "imgproxy_rss_mb": 34.14,
+        "thumbor_rss_mb": 66.45
       },
       {
         "timestamp_s": 26.1,
-        "atihsrah_native_rss_mb": 125.52,
-        "atihsrah_docker_rss_mb": 166.9,
-        "imgproxy_rss_mb": 97.07,
-        "thumbor_rss_mb": 69.64
+        "atihsrah_native_rss_mb": 107.61,
+        "atihsrah_docker_rss_mb": 166.6,
+        "imgproxy_rss_mb": 34.05,
+        "thumbor_rss_mb": 66.45
       },
       {
-        "timestamp_s": 39.1,
-        "atihsrah_native_rss_mb": 84.48,
-        "atihsrah_docker_rss_mb": 166.9,
-        "imgproxy_rss_mb": 97.08,
-        "thumbor_rss_mb": 64.0
+        "timestamp_s": 39.2,
+        "atihsrah_native_rss_mb": 103.14,
+        "atihsrah_docker_rss_mb": 166.6,
+        "imgproxy_rss_mb": 34.05,
+        "thumbor_rss_mb": 65.2
       },
       {
         "timestamp_s": 52.2,
-        "atihsrah_native_rss_mb": 63.31,
-        "atihsrah_docker_rss_mb": 166.9,
-        "imgproxy_rss_mb": 98.65,
-        "thumbor_rss_mb": 60.73
+        "atihsrah_native_rss_mb": 102.34,
+        "atihsrah_docker_rss_mb": 166.6,
+        "imgproxy_rss_mb": 34.04,
+        "thumbor_rss_mb": 65.2
       }
     ],
     "initial_rss": {
       "timestamp_s": 0.0,
-      "atihsrah_native_rss_mb": 124.53,
-      "atihsrah_docker_rss_mb": 167.2,
-      "imgproxy_rss_mb": 103.2,
-      "thumbor_rss_mb": 69.67
+      "atihsrah_native_rss_mb": 130.28,
+      "atihsrah_docker_rss_mb": 166.9,
+      "imgproxy_rss_mb": 45.55,
+      "thumbor_rss_mb": 78.73
     },
     "final_rss": {
       "timestamp_s": 52.2,
-      "atihsrah_native_rss_mb": 63.31,
-      "atihsrah_docker_rss_mb": 166.9,
-      "imgproxy_rss_mb": 98.65,
-      "thumbor_rss_mb": 60.73
+      "atihsrah_native_rss_mb": 102.34,
+      "atihsrah_docker_rss_mb": 166.6,
+      "imgproxy_rss_mb": 34.04,
+      "thumbor_rss_mb": 65.2
     }
   },
   "scenario_8_avif_vs_webp": [
     {
       "image": "kodim01.png",
-      "webp_ms": 11.9,
+      "webp_ms": 21.2,
       "webp_bytes": 603274,
-      "avif_ms": 140.4,
+      "avif_ms": 173.0,
       "avif_bytes": 124684,
       "byte_delta_percent": -79.3,
-      "cpu_time_ratio": 11.82
+      "cpu_time_ratio": 8.15
     },
     {
       "image": "kodim05.png",
-      "webp_ms": 11.1,
+      "webp_ms": 10.2,
       "webp_bytes": 656566,
-      "avif_ms": 159.1,
+      "avif_ms": 159.5,
       "avif_bytes": 127153,
       "byte_delta_percent": -80.6,
-      "cpu_time_ratio": 14.38
+      "cpu_time_ratio": 15.71
     },
     {
       "image": "kodim13.png",
-      "webp_ms": 32.3,
+      "webp_ms": 10.1,
       "webp_bytes": 684468,
-      "avif_ms": 140.6,
+      "avif_ms": 137.4,
       "avif_bytes": 162249,
       "byte_delta_percent": -76.3,
-      "cpu_time_ratio": 4.36
+      "cpu_time_ratio": 13.62
     },
     {
       "image": "moraine_lake.jpg",
-      "webp_ms": 49.1,
+      "webp_ms": 49.6,
       "webp_bytes": 845412,
-      "avif_ms": 227.2,
+      "avif_ms": 234.4,
       "avif_bytes": 134470,
       "byte_delta_percent": -84.1,
-      "cpu_time_ratio": 4.63
+      "cpu_time_ratio": 4.73
     }
   ],
   "scenario_9_corpus_summary": {
@@ -1040,32 +1040,53 @@
         "category": "alpha",
         "required_ssim": 0.98,
         "original_bytes": 15770,
-        "at_webp_bytes": 54606,
-        "at_webp_ssim": 0.9797,
-        "at_webp_psnr": 41.51,
+        "at_webp_bytes": 58576,
+        "at_webp_ssim": 0.999,
+        "at_webp_psnr": 57.05,
         "img_webp_bytes": 19156,
         "img_webp_ssim": 0.9873,
         "img_webp_psnr": 44.62,
         "th_webp_bytes": 33482,
         "th_webp_ssim": 0.9666,
         "th_webp_psnr": 39.58,
-        "at_avif_bytes": 13950,
-        "at_avif_ssim": 0.9799,
-        "at_avif_psnr": 41.43,
+        "at_avif_bytes": 26361,
+        "at_avif_ssim": 0.9984,
+        "at_avif_psnr": 54.96,
         "img_avif_bytes": 22764,
         "img_avif_ssim": 0.9897,
         "img_avif_psnr": 45.37,
-        "at_avif_meets_gate": false,
+        "at_avif_meets_gate": true,
         "img_avif_meets_gate": true,
         "at_auto_format": "avif",
-        "at_auto_bytes": 13950,
-        "at_auto_ssim": 0.9799,
-        "at_auto_psnr": 41.43,
+        "at_auto_bytes": 26361,
+        "at_auto_ssim": 0.9984,
+        "at_auto_psnr": 54.96,
         "at_auto_vmaf": null,
-        "at_auto_larger": false,
-        "fallback_candidates": null,
-        "webp_delta_vs_imgproxy": 185.1,
-        "avif_delta_vs_imgproxy": -38.7
+        "at_auto_larger": true,
+        "fallback_candidates": [
+          {
+            "format": "avif",
+            "quality": 90,
+            "bytes": 26361,
+            "ssim": 0.9984,
+            "psnr_db": 54.96,
+            "larger_than_source": true,
+            "selected": true,
+            "role": "nominal_primary"
+          },
+          {
+            "format": "webp",
+            "quality": 100,
+            "bytes": 58576,
+            "ssim": 0.999,
+            "psnr_db": 57.05,
+            "larger_than_source": true,
+            "selected": false,
+            "role": "lossless_fallback"
+          }
+        ],
+        "webp_delta_vs_imgproxy": 205.8,
+        "avif_delta_vs_imgproxy": 15.8
       },
       {
         "id": "img_19",
@@ -1073,18 +1094,18 @@
         "category": "alpha",
         "required_ssim": 0.98,
         "original_bytes": 3612,
-        "at_webp_bytes": 163650,
+        "at_webp_bytes": 163652,
         "at_webp_ssim": 0.9987,
-        "at_webp_psnr": 56.68,
+        "at_webp_psnr": 56.8,
         "img_webp_bytes": 7494,
         "img_webp_ssim": 0.9725,
         "img_webp_psnr": 38.25,
         "th_webp_bytes": 7598,
         "th_webp_ssim": 0.9772,
         "th_webp_psnr": 38.07,
-        "at_avif_bytes": 10477,
+        "at_avif_bytes": 10481,
         "at_avif_ssim": 0.9931,
-        "at_avif_psnr": 49.31,
+        "at_avif_psnr": 49.34,
         "img_avif_bytes": 19633,
         "img_avif_ssim": 0.98,
         "img_avif_psnr": 39.06,
@@ -1093,16 +1114,16 @@
         "at_auto_format": "avif",
         "at_auto_bytes": 4329,
         "at_auto_ssim": 0.9807,
-        "at_auto_psnr": 42.59,
-        "at_auto_vmaf": 84.4,
+        "at_auto_psnr": 42.58,
+        "at_auto_vmaf": 84.45,
         "at_auto_larger": true,
         "fallback_candidates": [
           {
             "format": "avif",
             "quality": 90,
-            "bytes": 10477,
+            "bytes": 10481,
             "ssim": 0.9931,
-            "psnr_db": 49.31,
+            "psnr_db": 49.34,
             "larger_than_source": true,
             "selected": false,
             "role": "nominal_primary"
@@ -1112,7 +1133,7 @@
             "quality": 40,
             "bytes": 4329,
             "ssim": 0.9807,
-            "psnr_db": 42.59,
+            "psnr_db": 42.58,
             "larger_than_source": true,
             "selected": true,
             "role": "fallback_ladder"
@@ -1120,15 +1141,15 @@
           {
             "format": "webp",
             "quality": 100,
-            "bytes": 163650,
+            "bytes": 163652,
             "ssim": 0.9987,
-            "psnr_db": 56.68,
+            "psnr_db": 56.8,
             "larger_than_source": true,
             "selected": false,
             "role": "lossless_fallback"
           }
         ],
-        "webp_delta_vs_imgproxy": 2083.7,
+        "webp_delta_vs_imgproxy": 2083.8,
         "avif_delta_vs_imgproxy": -46.6
       },
       {
@@ -1137,31 +1158,31 @@
         "category": "graphic",
         "required_ssim": 0.98,
         "original_bytes": 87924,
-        "at_webp_bytes": 82416,
+        "at_webp_bytes": 82402,
         "at_webp_ssim": 0.9999,
-        "at_webp_psnr": 53.1,
+        "at_webp_psnr": 53.17,
         "img_webp_bytes": 65118,
         "img_webp_ssim": 0.8925,
         "img_webp_psnr": 19.2,
         "th_webp_bytes": 64472,
         "th_webp_ssim": 0.9933,
         "th_webp_psnr": 31.87,
-        "at_avif_bytes": 60061,
+        "at_avif_bytes": 60065,
         "at_avif_ssim": 0.9963,
-        "at_avif_psnr": 47.57,
+        "at_avif_psnr": 47.59,
         "img_avif_bytes": 51768,
         "img_avif_ssim": 0.8923,
         "img_avif_psnr": 19.2,
         "at_avif_meets_gate": true,
         "img_avif_meets_gate": false,
         "at_auto_format": "avif",
-        "at_auto_bytes": 60061,
+        "at_auto_bytes": 60065,
         "at_auto_ssim": 0.9963,
-        "at_auto_psnr": 47.57,
-        "at_auto_vmaf": 70.61,
+        "at_auto_psnr": 47.59,
+        "at_auto_vmaf": 80.31,
         "at_auto_larger": false,
         "fallback_candidates": null,
-        "webp_delta_vs_imgproxy": 26.6,
+        "webp_delta_vs_imgproxy": 26.5,
         "avif_delta_vs_imgproxy": 16.0
       }
     ]
@@ -1539,32 +1560,53 @@
         "category": "transparent_icon",
         "required_ssim": 0.98,
         "original_bytes": 13040,
-        "at_webp_bytes": 32340,
-        "at_webp_ssim": 0.9948,
-        "at_webp_psnr": 46.61,
+        "at_webp_bytes": 28954,
+        "at_webp_ssim": 0.9999,
+        "at_webp_psnr": 62.37,
         "img_webp_bytes": 10972,
         "img_webp_ssim": 0.9958,
         "img_webp_psnr": 39.59,
         "th_webp_bytes": 16016,
         "th_webp_ssim": 0.9984,
         "th_webp_psnr": 50.72,
-        "at_avif_bytes": 11511,
-        "at_avif_ssim": 0.9952,
-        "at_avif_psnr": 45.04,
+        "at_avif_bytes": 14631,
+        "at_avif_ssim": 0.9992,
+        "at_avif_psnr": 48.8,
         "img_avif_bytes": 14247,
         "img_avif_ssim": 0.9965,
         "img_avif_psnr": 39.49,
         "at_avif_meets_gate": true,
         "img_avif_meets_gate": true,
         "at_auto_format": "avif",
-        "at_auto_bytes": 11511,
-        "at_auto_ssim": 0.9952,
-        "at_auto_psnr": 45.04,
-        "at_auto_vmaf": 13.69,
-        "at_auto_larger": false,
-        "fallback_candidates": null,
-        "webp_delta_vs_imgproxy": 194.8,
-        "avif_delta_vs_imgproxy": -19.2
+        "at_auto_bytes": 14631,
+        "at_auto_ssim": 0.9992,
+        "at_auto_psnr": 48.8,
+        "at_auto_vmaf": null,
+        "at_auto_larger": true,
+        "fallback_candidates": [
+          {
+            "format": "avif",
+            "quality": 90,
+            "bytes": 14631,
+            "ssim": 0.9992,
+            "psnr_db": 48.8,
+            "larger_than_source": true,
+            "selected": true,
+            "role": "nominal_primary"
+          },
+          {
+            "format": "webp",
+            "quality": 100,
+            "bytes": 28954,
+            "ssim": 0.9999,
+            "psnr_db": 62.37,
+            "larger_than_source": true,
+            "selected": false,
+            "role": "lossless_fallback"
+          }
+        ],
+        "webp_delta_vs_imgproxy": 163.9,
+        "avif_delta_vs_imgproxy": 2.7
       },
       {
         "id": "synth_13",
@@ -1688,11 +1730,11 @@
         "img_avif_psnr": 46.59,
         "at_avif_meets_gate": true,
         "img_avif_meets_gate": true,
-        "at_auto_format": "avif",
-        "at_auto_bytes": 46853,
-        "at_auto_ssim": 0.9721,
-        "at_auto_psnr": 29.72,
-        "at_auto_vmaf": 88.3,
+        "at_auto_format": "webp",
+        "at_auto_bytes": 49312,
+        "at_auto_ssim": 1.0,
+        "at_auto_psnr": 53.74,
+        "at_auto_vmaf": 97.52,
         "at_auto_larger": true,
         "fallback_candidates": [
           {
@@ -1706,23 +1748,13 @@
             "role": "nominal_primary"
           },
           {
-            "format": "avif",
-            "quality": 40,
-            "bytes": 46853,
-            "ssim": 0.9721,
-            "psnr_db": 29.72,
-            "larger_than_source": true,
-            "selected": true,
-            "role": "fallback_ladder"
-          },
-          {
             "format": "webp",
             "quality": 100,
             "bytes": 49312,
             "ssim": 1.0,
             "psnr_db": 53.74,
             "larger_than_source": true,
-            "selected": false,
+            "selected": true,
             "role": "lossless_fallback"
           }
         ],
