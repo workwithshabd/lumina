@@ -43,12 +43,12 @@ Atihsrah is designed primarily for **self-hosting engineers and small-to-medium 
 | :--- | :--- | :--- |
 | **Pure-Rust First-Party Code (`#![forbid(unsafe_code)]`)** | Eliminates C codec zero-days, simplifies cross-compilation, zero system C image libraries. | Cannot decode HEIC natively. AVIF is output-only. WebP output is limited to lossless VP8L (larger output bytes than C `libwebp` lossy). |
 | **Lossless-Only WebP** | No unsafe C `libwebp` dependency; maximum fidelity for screenshots and logos. | Cannot produce lossy WebP (e.g. 30 KB photographic WebP); AVIF is the primary lossy format. |
-| **Embedded In-Memory Cache (`moka`)** | Zero Redis/Memcached dependency; sub-millisecond local RAM response times (p50: 0.18 ms). | Cache is local to each instance node; scaling across multiple instances requires consistent hashing or a shared reverse proxy (e.g., NGINX/Envoy/Cloudflare). |
+| **Embedded In-Memory Cache (`moka`)** | Zero Redis/Memcached dependency; sub-millisecond local RAM response times (p50: 0.34 ms, p95: 0.42 ms). | Cache is local to each instance node; scaling across multiple instances requires consistent hashing or a shared reverse proxy (e.g., NGINX/Envoy/Cloudflare). |
 | **Fail-Closed Aspect Containment** | `fit=contain` preserves exact image aspect ratio without crop distortion. | Rendered canvas dimensions (e.g., 450×600) differ from requested bounding box (800×600) unless padded. |
 | **No Original Byte Leakage** | Never returns raw origin bytes to prevent leaking un-sanitized camera EXIF, GPS, or malformed bytes. | When transformed output is larger than source, Atihsrah serves the transformed output anyway, recording `atihsrah_output_larger_than_source_total`. |
 
 ### 1.5 Measurable Acceptance Criteria
-- **Observable Reliability**: 0 panics across all dynamically discovered cargo unit/integration tests (currently 135 passing tests) and security attack suites; bounded execution time (max 15s) and bounded memory (max 25 MB input, max 40 MP decoded raster).
+- **Observable Reliability**: 0 panics across all dynamically discovered cargo unit/integration tests (currently 159 passing Rust test cases across all targets + 7 candidate validation tests) and security attack suites; bounded execution time (max 15s) and bounded memory (max 25 MB input, max 40 MP decoded raster).
 - **Deterministic Error Handling**: Tested and predictable HTTP error status codes (400, 403, 404, 415, 422, 502) with structured JSON error bodies.
 - **Quality Gates**:
   - Photos: `SSIM ≥ 0.95` against canonical Pillow Lanczos3 reference.

@@ -65,7 +65,7 @@ Isolated counter deltas captured during this specific evaluation run:
 
 ## 5. Independent Metric Verification (SSIM & PSNR)
 
-To independently confirm both the SSIM and PSNR calculations without relying on pre-computed values, execute [`monitoring/verify_quality.py`](file:///Users/shabd/Desktop/dev/lumina/monitoring/verify_quality.py):
+To independently confirm both the SSIM and PSNR calculations without relying on pre-computed values, execute [`monitoring/verify_quality.py`](verify_quality.py):
 
 ```bash
 ./.venv_bench/bin/python monitoring/verify_quality.py

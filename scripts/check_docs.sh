@@ -5,11 +5,11 @@ echo "==> Running Documentation Quality and Ground Truth Guardrail Check..."
 
 ERRORS=0
 
-# 1. Check for forbidden phrases across all documentation files (*.md)
+# 1. Check for forbidden phrases across all project documentation files (*.md, excluding vendored crates)
 FORBIDDEN_PATTERNS=("FIPS" "100% safe" "0 CVEs" "Auditor:")
 
 for pattern in "${FORBIDDEN_PATTERNS[@]}"; do
-    MATCHES=$(git grep -in "$pattern" -- '*.md' || true)
+    MATCHES=$(git grep -in "$pattern" -- '*.md' ':!vendor/**' || true)
     if [ -n "$MATCHES" ]; then
         echo "ERROR: Found forbidden pattern '$pattern' in documentation:"
         echo "$MATCHES"
@@ -18,7 +18,7 @@ for pattern in "${FORBIDDEN_PATTERNS[@]}"; do
 done
 
 # 2. Check for absolute file:/// links in documentation (relative links required)
-FILE_MATCHES=$(git grep -in "file:///" -- '*.md' || true)
+FILE_MATCHES=$(git grep -in "file:///" -- '*.md' ':!vendor/**' || true)
 if [ -n "$FILE_MATCHES" ]; then
     echo "ERROR: Found absolute 'file:///' link in documentation (use relative links):"
     echo "$FILE_MATCHES"
