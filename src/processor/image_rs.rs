@@ -80,7 +80,8 @@ pub fn is_photographic(dyn_img: &DynamicImage, src_format: ImageFormat, threshol
     let sample = dyn_img.resize_exact(sample_w, sample_h, FilterType::Nearest);
     let rgb = sample.to_rgb8();
 
-    let mut distinct_colors = std::collections::HashSet::new();
+    let mut distinct_colors =
+        std::collections::HashSet::with_capacity((threshold as usize).min(1024) + 1);
     for pixel in rgb.pixels() {
         distinct_colors.insert(pixel.0);
         if distinct_colors.len() > threshold as usize {
@@ -110,7 +111,8 @@ impl ImageProcessor for ImageRsProcessor {
         let format = map_from_image_format(raw_format)?;
         if format == ImageFormat::Avif {
             return Err(ProcessError::UnsupportedFormat(
-                "Decoding 'avif' is not supported in pure-Rust configuration (output only)".to_string(),
+                "Decoding 'avif' is not supported in pure-Rust configuration (output only)"
+                    .to_string(),
             ));
         }
 
@@ -143,10 +145,7 @@ impl ImageProcessor for ImageRsProcessor {
         // Note: AVIF is output-only via ravif; decoding AVIF requires C libdav1d (avif-native),
         // which is disallowed by our #![forbid(unsafe_code)] pure-Rust invariant.
         match info.format {
-            ImageFormat::Jpeg
-            | ImageFormat::Png
-            | ImageFormat::WebP
-            | ImageFormat::Gif => {}
+            ImageFormat::Jpeg | ImageFormat::Png | ImageFormat::WebP | ImageFormat::Gif => {}
             other => {
                 return Err(ProcessError::UnsupportedFormat(format!(
                     "Decoding '{other}' is not supported"
@@ -182,15 +181,9 @@ impl ImageProcessor for ImageRsProcessor {
         if (target_w, target_h) != (orig_w, orig_h) {
             let filter = self.resize_filter;
             dyn_img = match opts.fit {
-                FitMode::Cover => {
-                    dyn_img.resize_to_fill(target_w, target_h, filter)
-                }
-                FitMode::Contain | FitMode::Inside => {
-                    dyn_img.resize(target_w, target_h, filter)
-                }
-                FitMode::Fill => {
-                    dyn_img.resize_exact(target_w, target_h, filter)
-                }
+                FitMode::Cover => dyn_img.resize_to_fill(target_w, target_h, filter),
+                FitMode::Contain | FitMode::Inside => dyn_img.resize(target_w, target_h, filter),
+                FitMode::Fill => dyn_img.resize_exact(target_w, target_h, filter),
                 FitMode::Outside => {
                     // Scale such that both dimensions are at least target dimensions
                     let scale_w = target_w as f64 / orig_w as f64;
@@ -270,12 +263,12 @@ impl ImageProcessor for ImageRsProcessor {
                             let extra: Vec<Candidate> = specs
                                 .into_par_iter()
                                 .filter_map(|(fmt, q)| {
-                                    encode_image(&dyn_img, fmt, q, self.avif_speed).ok().map(|b| {
-                                        Candidate {
+                                    encode_image(&dyn_img, fmt, q, self.avif_speed)
+                                        .ok()
+                                        .map(|b| Candidate {
                                             bytes: b,
                                             format: fmt,
-                                        }
-                                    })
+                                        })
                                 })
                                 .collect();
                             candidates.extend(extra);
@@ -288,7 +281,8 @@ impl ImageProcessor for ImageRsProcessor {
                             || encode_image(&dyn_img, ImageFormat::Png, 100, self.avif_speed),
                             || {
                                 if client_accept_webp {
-                                    encode_image(&dyn_img, ImageFormat::WebP, 100, self.avif_speed).ok()
+                                    encode_image(&dyn_img, ImageFormat::WebP, 100, self.avif_speed)
+                                        .ok()
                                 } else {
                                     None
                                 }
@@ -347,12 +341,12 @@ impl ImageProcessor for ImageRsProcessor {
                             let extra: Vec<Candidate> = specs
                                 .into_par_iter()
                                 .filter_map(|(fmt, q)| {
-                                    encode_image(&dyn_img, fmt, q, self.avif_speed).ok().map(|b| {
-                                        Candidate {
+                                    encode_image(&dyn_img, fmt, q, self.avif_speed)
+                                        .ok()
+                                        .map(|b| Candidate {
                                             bytes: b,
                                             format: fmt,
-                                        }
-                                    })
+                                        })
                                 })
                                 .collect();
                             candidates.extend(extra);
@@ -378,7 +372,8 @@ impl ImageProcessor for ImageRsProcessor {
                             use rayon::prelude::*;
                             let lower_q = if jpeg_q > 65 { 65 } else { 50 };
                             let lowest_q = if lower_q > 50 { 50 } else { 40 };
-                            let specs = [(ImageFormat::Jpeg, lower_q), (ImageFormat::Jpeg, lowest_q)];
+                            let specs =
+                                [(ImageFormat::Jpeg, lower_q), (ImageFormat::Jpeg, lowest_q)];
                             let mut candidates = vec![Candidate {
                                 bytes: primary_bytes,
                                 format: ImageFormat::Jpeg,
@@ -386,12 +381,12 @@ impl ImageProcessor for ImageRsProcessor {
                             let extra: Vec<Candidate> = specs
                                 .into_par_iter()
                                 .filter_map(|(fmt, q)| {
-                                    encode_image(&dyn_img, fmt, q, self.avif_speed).ok().map(|b| {
-                                        Candidate {
+                                    encode_image(&dyn_img, fmt, q, self.avif_speed)
+                                        .ok()
+                                        .map(|b| Candidate {
                                             bytes: b,
                                             format: fmt,
-                                        }
-                                    })
+                                        })
                                 })
                                 .collect();
                             candidates.extend(extra);
@@ -457,20 +452,29 @@ fn encode_image(
     quality: u8,
     avif_speed: u8,
 ) -> Result<Vec<u8>, ProcessError> {
-    let mut out = Vec::new();
+    let mut out = Vec::with_capacity(32 * 1024);
 
     match format {
         ImageFormat::Jpeg => {
-            // JPEG cannot represent alpha; convert to RGB8
-            let rgb_img = img.to_rgb8();
+            // JPEG cannot represent alpha; convert to RGB8 if needed
             let mut encoder = JpegEncoder::new_with_quality(&mut out, quality);
+            let (raw_bytes, width, height) = match img {
+                DynamicImage::ImageRgb8(rgb) => (
+                    std::borrow::Cow::Borrowed(rgb.as_raw()),
+                    rgb.width(),
+                    rgb.height(),
+                ),
+                _ => {
+                    let rgb = img.to_rgb8();
+                    (
+                        std::borrow::Cow::Owned(rgb.into_raw()),
+                        img.width(),
+                        img.height(),
+                    )
+                }
+            };
             encoder
-                .encode(
-                    rgb_img.as_raw(),
-                    rgb_img.width(),
-                    rgb_img.height(),
-                    image::ExtendedColorType::Rgb8,
-                )
+                .encode(&raw_bytes, width, height, image::ExtendedColorType::Rgb8)
                 .map_err(|e| ProcessError::ProcessingFailed(format!("JPEG encode error: {e}")))?;
         }
         ImageFormat::Png => {
@@ -504,13 +508,31 @@ fn encode_image(
     Ok(out)
 }
 
-fn color_and_bytes(img: &DynamicImage) -> (Vec<u8>, image::ExtendedColorType) {
-    if img.color().has_alpha() {
-        let rgba = img.to_rgba8();
-        (rgba.into_raw(), image::ExtendedColorType::Rgba8)
-    } else {
-        let rgb = img.to_rgb8();
-        (rgb.into_raw(), image::ExtendedColorType::Rgb8)
+fn color_and_bytes<'a>(
+    img: &'a DynamicImage,
+) -> (std::borrow::Cow<'a, [u8]>, image::ExtendedColorType) {
+    match img {
+        DynamicImage::ImageRgb8(rgb) => (
+            std::borrow::Cow::Borrowed(rgb.as_raw()),
+            image::ExtendedColorType::Rgb8,
+        ),
+        DynamicImage::ImageRgba8(rgba) => (
+            std::borrow::Cow::Borrowed(rgba.as_raw()),
+            image::ExtendedColorType::Rgba8,
+        ),
+        _ => {
+            if img.color().has_alpha() {
+                (
+                    std::borrow::Cow::Owned(img.to_rgba8().into_raw()),
+                    image::ExtendedColorType::Rgba8,
+                )
+            } else {
+                (
+                    std::borrow::Cow::Owned(img.to_rgb8().into_raw()),
+                    image::ExtendedColorType::Rgb8,
+                )
+            }
+        }
     }
 }
 
@@ -637,7 +659,10 @@ mod tests {
         let res = processor.process(&avif_out.bytes, decode_opts);
         match res {
             Err(ProcessError::UnsupportedFormat(msg)) => {
-                assert!(msg.contains("avif"), "Expected unsupported avif message: {msg}");
+                assert!(
+                    msg.contains("avif"),
+                    "Expected unsupported avif message: {msg}"
+                );
             }
             other => panic!("Expected Err(UnsupportedFormat), got {:?}", other),
         }
@@ -685,7 +710,9 @@ mod tests {
                 quality: Some(85),
                 ..Default::default()
             };
-            let encoded = processor.process(&png_bytes, encode_opts).expect("encode ok");
+            let encoded = processor
+                .process(&png_bytes, encode_opts)
+                .expect("encode ok");
             assert_eq!(encoded.format, input_fmt);
 
             // Now decode this format into a target PNG
@@ -696,7 +723,9 @@ mod tests {
                 format: Some(ImageFormat::Png),
                 ..Default::default()
             };
-            let decoded = processor.process(&encoded.bytes, decode_opts).expect("decode ok");
+            let decoded = processor
+                .process(&encoded.bytes, decode_opts)
+                .expect("decode ok");
             assert_eq!(decoded.format, ImageFormat::Png);
             assert_eq!(decoded.width, 10);
             assert_eq!(decoded.height, 10);
@@ -719,7 +748,9 @@ mod tests {
             ..Default::default()
         };
 
-        let out = processor.process(&png_bytes, opts).expect("Parallel candidate processing should succeed");
+        let out = processor
+            .process(&png_bytes, opts)
+            .expect("Parallel candidate processing should succeed");
         assert_eq!(out.width, 60);
         assert_eq!(out.height, 60);
         assert!(!out.bytes.is_empty());

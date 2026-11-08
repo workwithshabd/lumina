@@ -8,8 +8,8 @@ static PROMETHEUS_HANDLE: OnceLock<PrometheusHandle> = OnceLock::new();
 
 /// Explicit histogram bucket boundaries from 1 ms to 30 s.
 pub const DURATION_BUCKETS: &[f64] = &[
-    0.001, 0.002, 0.005, 0.010, 0.025, 0.050, 0.075, 0.100, 0.250, 0.500, 0.750, 1.0, 2.5,
-    5.0, 10.0, 15.0, 30.0,
+    0.001, 0.002, 0.005, 0.010, 0.025, 0.050, 0.075, 0.100, 0.250, 0.500, 0.750, 1.0, 2.5, 5.0,
+    10.0, 15.0, 30.0,
 ];
 
 /// Pre-registers all application counters and base gauges at 0 on startup
@@ -20,7 +20,8 @@ pub fn preregister_metrics() {
     metrics::counter!("atihsrah_signature_invalid_total").absolute(0);
     metrics::counter!("atihsrah_oversize_not_cached_total").absolute(0);
     metrics::counter!("atihsrah_output_larger_than_source_total").absolute(0);
-    metrics::counter!("atihsrah_source_rejected_total", "reason" => "disallowed_origin").absolute(0);
+    metrics::counter!("atihsrah_source_rejected_total", "reason" => "disallowed_origin")
+        .absolute(0);
     metrics::counter!("atihsrah_cache_hits_total").absolute(0);
     metrics::counter!("atihsrah_cache_misses_total").absolute(0);
     metrics::counter!("atihsrah_cache_hit_bytes_total").absolute(0);

@@ -101,6 +101,22 @@ pub struct CacheKeyParams<'a> {
     pub v: Option<&'a str>,
 }
 
+#[inline]
+fn update_u32(hasher: &mut Sha256, mut n: u32) {
+    if n == 0 {
+        hasher.update(b"0");
+        return;
+    }
+    let mut buf = [0u8; 10];
+    let mut i = 10;
+    while n > 0 {
+        i -= 1;
+        buf[i] = b'0' + (n % 10) as u8;
+        n /= 10;
+    }
+    hasher.update(&buf[i..]);
+}
+
 /// Generates a deterministic, canonical cache key for a transform operation.
 ///
 /// Ensures every output-affecting parameter is represented:
@@ -118,20 +134,20 @@ pub fn compute_cache_key(params: &CacheKeyParams<'_>) -> String {
     hasher.update(params.src.as_bytes());
     hasher.update(b"|w=");
     if let Some(width) = params.w {
-        hasher.update(width.to_string().as_bytes());
+        update_u32(&mut hasher, width);
     } else {
         hasher.update(b"auto");
     }
     hasher.update(b"|h=");
     if let Some(height) = params.h {
-        hasher.update(height.to_string().as_bytes());
+        update_u32(&mut hasher, height);
     } else {
         hasher.update(b"auto");
     }
     hasher.update(b"|fmt=");
     hasher.update(params.format.as_str().as_bytes());
     hasher.update(b"|q=");
-    hasher.update(params.quality.to_string().as_bytes());
+    update_u32(&mut hasher, params.quality as u32);
     hasher.update(b"|fit=");
     let fit_str = match params.fit {
         FitMode::Cover => "cover",

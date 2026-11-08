@@ -66,7 +66,7 @@ impl TransformParams {
             ));
         }
 
-        let allowed_keys: HashSet<&'static str> = [
+        const ALLOWED_KEYS: &[&str] = &[
             "src",
             "url",
             "w",
@@ -84,21 +84,22 @@ impl TransformParams {
             "kid",
             "allow_upscale",
             "upscale",
-        ]
-        .into_iter()
-        .collect();
+        ];
 
-        let mut seen_keys = HashSet::new();
-        let mut params_map = HashMap::new();
-
-        let pairs: Vec<&str> = query_str.split('&').filter(|s| !s.is_empty()).collect();
-        if pairs.len() > MAX_QUERY_PARAMS_COUNT {
+        let param_count = query_str.split('&').filter(|s| !s.is_empty()).count();
+        if param_count > MAX_QUERY_PARAMS_COUNT {
             return Err(AppError::InvalidParam(format!(
                 "Number of query parameters exceeds maximum of {MAX_QUERY_PARAMS_COUNT}"
             )));
         }
 
-        for pair in pairs {
+        let mut seen_keys = HashSet::with_capacity(param_count);
+        let mut params_map = HashMap::with_capacity(param_count);
+
+        for pair in query_str.split('&') {
+            if pair.is_empty() {
+                continue;
+            }
             let mut parts = pair.splitn(2, '=');
             let key = parts.next().unwrap_or("").trim();
             let raw_val = parts.next().unwrap_or("").trim();
@@ -108,12 +109,12 @@ impl TransformParams {
             }
 
             // 1. Strict duplicate param check (reject with 422)
-            if !seen_keys.insert(key.to_string()) {
+            if !seen_keys.insert(key) {
                 return Err(AppError::DuplicateParam(key.to_string()));
             }
 
             // 2. Strict unknown param check (reject with 422)
-            if !allowed_keys.contains(key) {
+            if !ALLOWED_KEYS.contains(&key) {
                 return Err(AppError::UnknownParam(key.to_string()));
             }
 
@@ -125,7 +126,7 @@ impl TransformParams {
                 })?
                 .to_string();
 
-            params_map.insert(key.to_string(), decoded_val);
+            params_map.insert(key, decoded_val);
         }
 
         // src is mandatory (url accepted as alias)
@@ -177,16 +178,24 @@ impl TransformParams {
         };
 
         // format (optional webp|avif|jpeg|png|auto, f accepted as alias)
-        let format = match params_map.remove("format").or_else(|| params_map.remove("f")) {
+        let format = match params_map
+            .remove("format")
+            .or_else(|| params_map.remove("f"))
+        {
             Some(s) if !s.is_empty() => Some(s.parse::<FormatParam>()?),
             _ => None,
         };
 
         // q / quality (optional u8 between 1 and 100)
-        let q = match params_map.remove("q").or_else(|| params_map.remove("quality")) {
+        let q = match params_map
+            .remove("q")
+            .or_else(|| params_map.remove("quality"))
+        {
             Some(s) if !s.is_empty() => {
                 let val = s.parse::<u8>().map_err(|_| {
-                    AppError::InvalidParam("Parameter 'q' must be an integer between 1 and 100".to_string())
+                    AppError::InvalidParam(
+                        "Parameter 'q' must be an integer between 1 and 100".to_string(),
+                    )
                 })?;
                 if !(1..=100).contains(&val) {
                     return Err(AppError::InvalidParam(
@@ -199,7 +208,10 @@ impl TransformParams {
         };
 
         // quality_target / qt (optional draft|good|high|lossless)
-        let quality_target = match params_map.remove("quality_target").or_else(|| params_map.remove("qt")) {
+        let quality_target = match params_map
+            .remove("quality_target")
+            .or_else(|| params_map.remove("qt"))
+        {
             Some(s) if !s.is_empty() => Some(
                 s.parse::<QualityTarget>()
                     .map_err(|e| AppError::InvalidParam(e.to_string()))?,
@@ -673,13 +685,19 @@ mod tests {
 
     #[test]
     fn test_quality_and_format_aliases_parsing() {
-        let p = TransformParams::parse(Some("src=https://example.com/img.jpg&f=webp&q=85&allow_upscale=1")).unwrap();
+        let p = TransformParams::parse(Some(
+            "src=https://example.com/img.jpg&f=webp&q=85&allow_upscale=1",
+        ))
+        .unwrap();
         assert_eq!(p.format, Some(FormatParam::Specific(ImageFormat::WebP)));
         assert_eq!(p.q, Some(85));
         assert_eq!(p.quality_target, Some(QualityTarget::High));
         assert!(p.allow_upscale);
 
-        let p2 = TransformParams::parse(Some("src=https://example.com/img.jpg&format=jpeg&qt=lossless")).unwrap();
+        let p2 = TransformParams::parse(Some(
+            "src=https://example.com/img.jpg&format=jpeg&qt=lossless",
+        ))
+        .unwrap();
         assert_eq!(p2.format, Some(FormatParam::Specific(ImageFormat::Jpeg)));
         assert_eq!(p2.quality_target, Some(QualityTarget::Lossless));
         assert_eq!(p2.q, None);

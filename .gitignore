@@ -2,17 +2,21 @@
 .env
 *.swp
 *.bak
+*~
 .DS_Store
+**/.DS_Store
 benchmarks/output/
 benchmarks/runs/
 bench/certs/
 bench/corpus/
 __pycache__/
-*.pyc
+**/__pycache__/
+*.py[cod]
 .venv*/
 bench/.venv*/
 dashboard/node_modules/
 dashboard/client/node_modules/
 dashboard/server/uploads/*
 !dashboard/server/uploads/.gitkeep
+
 

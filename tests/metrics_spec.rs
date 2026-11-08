@@ -296,10 +296,22 @@ async fn test_3_cache_counters_replace_gauges() {
     let resp_bytes = parse_metric_value(&metrics_text, "atihsrah_response_bytes_total")
         .expect("atihsrah_response_bytes_total must exist");
 
-    assert!(hits >= 1.0, "Expected atihsrah_cache_hits_total >= 1, got {hits}");
-    assert!(misses >= 1.0, "Expected atihsrah_cache_misses_total >= 1, got {misses}");
-    assert!(hit_bytes > 0.0, "Expected atihsrah_cache_hit_bytes_total > 0, got {hit_bytes}");
-    assert!(resp_bytes > 0.0, "Expected atihsrah_response_bytes_total > 0, got {resp_bytes}");
+    assert!(
+        hits >= 1.0,
+        "Expected atihsrah_cache_hits_total >= 1, got {hits}"
+    );
+    assert!(
+        misses >= 1.0,
+        "Expected atihsrah_cache_misses_total >= 1, got {misses}"
+    );
+    assert!(
+        hit_bytes > 0.0,
+        "Expected atihsrah_cache_hit_bytes_total > 0, got {hit_bytes}"
+    );
+    assert!(
+        resp_bytes > 0.0,
+        "Expected atihsrah_response_bytes_total > 0, got {resp_bytes}"
+    );
 }
 
 /// 4. Pre-register every counter at 0 at startup, including ssrf_blocked_total,
@@ -355,7 +367,8 @@ async fn test_4_preregistered_counters_on_fresh_scrape_and_source_rejected() {
         .uri(bad_uri)
         .body(Body::empty())
         .unwrap();
-    bad_req.extensions_mut()
+    bad_req
+        .extensions_mut()
         .insert(ConnectInfo(SocketAddr::from(([127, 0, 0, 1], 12349))));
 
     let bad_resp = app.clone().oneshot(bad_req).await.unwrap();
@@ -369,7 +382,12 @@ async fn test_4_preregistered_counters_on_fresh_scrape_and_source_rejected() {
         .unwrap();
 
     let metrics_resp2 = metrics_router.oneshot(metrics_req2).await.unwrap();
-    let metrics_bytes2 = metrics_resp2.into_body().collect().await.unwrap().to_bytes();
+    let metrics_bytes2 = metrics_resp2
+        .into_body()
+        .collect()
+        .await
+        .unwrap()
+        .to_bytes();
     let metrics_text2 = String::from_utf8(metrics_bytes2.to_vec()).unwrap();
 
     assert!(

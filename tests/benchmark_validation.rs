@@ -130,7 +130,10 @@ fn test_benchmark_python_validation_suite() {
 fn test_fallback_candidate_records_and_failure_modes() {
     let root = get_workspace_root();
     let script = root.join("bench").join("test_candidate_validation.py");
-    assert!(script.exists(), "bench/test_candidate_validation.py must exist");
+    assert!(
+        script.exists(),
+        "bench/test_candidate_validation.py must exist"
+    );
 
     let venv_python = root.join(".venv_bench").join("bin").join("python3");
     let python_bin = if venv_python.exists() {
