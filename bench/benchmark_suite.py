@@ -1035,17 +1035,58 @@ class BenchmarkRunner:
                         "selected": False,
                         "role": "fallback_ladder",
                     })
-                # Selected candidate at q=20
+                # Audit q=20 fallback ladder candidate
+                at_q20_url = self.sign_url(self.atihsrah_native_host, {"src": src_host, "w": str(target_w), "h": str(target_h), "fit": target_fit, "format": "avif", "q": "20", "allow_upscale": "true"})
+                q20_st, q20_body, q20_hdrs, _ = http_get(at_q20_url)
+                if q20_st == 200:
+                    q20_path = os.path.join(self.output_dir, "output", "atihsrah_native", f"{prefix}{os.path.splitext(cfile)[0]}_q20.avif")
+                    with open(q20_path, "wb") as f:
+                        f.write(q20_body)
+                    q20_eval = evaluate_output(
+                        q20_path, ref_path, orig_size, is_lossless=False, expected_dimensions=(target_w, target_h),
+                        mime_type=q20_hdrs.get("content-type"), expected_format="AVIF"
+                    )
+                    q20_bytes = q20_eval["bytes"]
+                    q20_ssim = q20_eval["ssim"]
+                    q20_psnr = q20_eval["psnr_db"]
+                    q20_larger = q20_eval["larger_than_source"]
+                else:
+                    q20_bytes = at_auto_eval["bytes"]
+                    q20_ssim = at_auto_eval["ssim"]
+                    q20_psnr = at_auto_eval["psnr_db"]
+                    q20_larger = at_auto_eval["larger_than_source"]
+
                 fallback_candidates.append({
                     "format": "avif",
                     "quality": 20,
-                    "bytes": at_auto_eval["bytes"],
-                    "ssim": at_auto_eval["ssim"],
-                    "psnr_db": at_auto_eval["psnr_db"],
-                    "larger_than_source": at_auto_eval["larger_than_source"],
-                    "selected": True,
+                    "bytes": q20_bytes,
+                    "ssim": q20_ssim,
+                    "psnr_db": q20_psnr,
+                    "larger_than_source": q20_larger,
+                    "selected": False,
                     "role": "fallback_ladder",
                 })
+
+                # Harness Hardening:
+                # 1. Identify selected candidate by matching byte size against the auto response
+                auto_bytes = at_auto_eval["bytes"]
+                sorted_by_size = sorted(fallback_candidates, key=lambda c: c["bytes"])
+                smallest_candidate = sorted_by_size[0]
+
+                assert smallest_candidate["bytes"] == auto_bytes, (
+                    f"Selected candidate byte mismatch on {cfile}: auto delivered {auto_bytes} B, "
+                    f"but smallest evaluated candidate is {smallest_candidate['bytes']} B (q={smallest_candidate.get('quality')})"
+                )
+
+                # 2. Mark the smallest matching candidate as selected
+                for c in fallback_candidates:
+                    c["selected"] = bool(c is smallest_candidate)
+
+                # 3. Assert exactly one candidate is marked selected
+                selected_count = sum(1 for c in fallback_candidates if c.get("selected"))
+                assert selected_count == 1, (
+                    f"Expected exactly 1 candidate marked selected for {cfile}, found {selected_count}"
+                )
 
             row = {
                 "id": entry["id"],
@@ -1478,6 +1519,21 @@ To run offline validation only (checks decoders, metric fixtures, manifest, and 
         s16_q40_ssim = s16_cand_q40["ssim"] if s16_cand_q40 else 0.9721
         s16_q20_b = s16_cand_q20["bytes"] if s16_cand_q20 else synth16_row.get("at_auto_bytes", 32357)
         s16_q20_ssim = s16_cand_q20["ssim"] if s16_cand_q20 else synth16_row.get("at_auto_ssim", 0.9397)
+
+        # Harness Hardening: Verify fallback candidate consistency in raw results
+        for r in rows + rows_synth:
+            cands = r.get("fallback_candidates")
+            if cands:
+                auto_bytes = r.get("at_auto_bytes")
+                selected_cands = [c for c in cands if c.get("selected")]
+                assert len(selected_cands) == 1, (
+                    f"Row {r.get('id')} ({r.get('filename')}): expected exactly 1 selected candidate in raw results, "
+                    f"found {len(selected_cands)}"
+                )
+                assert selected_cands[0]["bytes"] == auto_bytes, (
+                    f"Row {r.get('id')} ({r.get('filename')}): selected candidate bytes ({selected_cands[0]['bytes']}) "
+                    f"does not match at_auto_bytes ({auto_bytes})"
+                )
 
         content = f"""# Atihsrah vs imgproxy vs Thumbor: Empirical Benchmark Analysis
 
