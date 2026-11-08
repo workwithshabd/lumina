@@ -36,6 +36,39 @@ else
     ERRORS=$((ERRORS + 1))
 fi
 
+# 4. Cross-validate empirical numbers in docs against benchmarks/raw_results.json
+if [ -f "benchmarks/raw_results.json" ]; then
+    python3 -c "
+import json, sys
+
+with open('benchmarks/raw_results.json') as f:
+    raw = json.load(f)
+
+sc2 = raw.get('scenario_2_warm_cache', {})
+sc4 = raw.get('scenario_4_concurrent_different_urls', {})
+
+# Discredited/stale benchmark figures that must never appear in documented comparison claims
+discredited = ['50.56 ms', '93.3 req/s', '22.8 req/s', '44.9 req/s', '0.82 ms median', '1.03 ms p95']
+errors = 0
+
+docs_to_check = ['docs/CLAIMS.md', 'docs/FINAL_AUDIT_REPORT.md', 'docs/FINAL_AUDIT_AND_VERDICT.md']
+for path in docs_to_check:
+    try:
+        with open(path) as df:
+            content = df.read()
+        for disc in discredited:
+            if disc in content:
+                print(f'ERROR: {path} contains stale/discredited benchmark figure: {disc}')
+                errors += 1
+    except Exception as e:
+        print(f'ERROR: Failed to read {path}: {e}')
+        errors += 1
+
+if errors > 0:
+    sys.exit(1)
+" || ERRORS=$((ERRORS + 1))
+fi
+
 if [ "$ERRORS" -gt 0 ]; then
     echo "==> Documentation guardrail check FAILED with $ERRORS error(s)."
     exit 1

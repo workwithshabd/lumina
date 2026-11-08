@@ -50,8 +50,9 @@ All metrics below are drawn directly from [`benchmarks/raw_results.json`](../ben
   - Conventional Median Delta ($N=2$): **-33.9%** (Mean: **-33.9%**).
 
 ### 2.2 Auto-Negotiation Pipeline (`format=auto`)
-- **Calibration Quality**: **18 / 20 passed** in the recorded run. Failures: `python_logo_alpha.png` (SSIM 0.9799) and `alacritty_logo_alpha.png` (SSIM 0.9674).
-- **Held-Out Synthetic Quality**: **19 / 20 passed**. Failure: `synth_16` / `16_pattern_checkerboard.png` (SSIM 0.9397 in recorded run; 0.9721 under $q=40$).
+- **Calibration Quality**: **18 / 20 passed** in the recorded baseline run (`run_20261108_171424`). Failures: `python_logo_alpha.png` (SSIM 0.9799) and `alacritty_logo_alpha.png` (SSIM 0.9674).
+  *Post-Fix Analytical Projection*: Under the $q \ge 40$ policy, `alacritty_logo_alpha.png` evaluates to $q=40$ (SSIM 0.9807 $\ge 0.98$), projecting 19/20 passes. However, this is an inferred analytical projection based on isolated candidate evaluation and unit tests (`test_quality_first_policy_on_graphics_and_alpha`); a full-corpus quality run on the updated code has not been committed.
+- **Held-Out Synthetic Quality**: **19 / 20 passed**. Failure: `synth_16` / `16_pattern_checkerboard.png` (SSIM 0.9397 in baseline run; 0.9721 under $q=40$, still below the 0.98 gate).
 - **Byte Budget Compliance**: **20 / 20 calibration** and **20 / 20 synthetic** outputs $\le$ source bytes in recorded baseline `run_20261108_171424`.
 - **Scope Clarification**: Quality metrics and auto-negotiation evaluations were performed on **Atihsrah Native**. The Docker tier was evaluated for cold/warm latency and concurrency; the harness does not collect duplicate per-image quality grids for Docker.
 
@@ -86,7 +87,7 @@ In the baseline implementation (`aafd82e4`), candidate selection is driven prima
 | **Deployment Model** | Self-hosted, single binary or container in customer infrastructure/VPC. | Self-hosted standalone container in customer infrastructure/VPC. | Managed cloud SaaS across Cloudflare's global edge network. |
 | **Local macOS Execution** | **Yes** (tested: Native binary and Docker container). | **Yes** (tested: Docker container). | **No** (proprietary edge service; cannot be run locally). |
 | **Internal Implementation** | First-party pure Rust (`#![forbid(unsafe_code)]`); excludes C image-codec libraries. | C / C++ (`libvips`, `glib`, `libheif`, `libwebp`). | **Proprietary / vendor-internal** (undisclosed edge architecture). |
-| **Caching Model** | Embedded in-process Moka LRU RAM cache (Native: 0.34 ms p50, 0.42 ms p95 in this run). | Standalone stateless operation; persistent internal cache is an **imgproxy Pro** feature. Fronting with NGINX or a CDN is an optional deployment choice. | Distributed edge caching across Cloudflare PoPs with tiered caching and data center request collapsing. *(Network latency unmeasured in this benchmark)*. |
+| **Caching Model** | Embedded in-process Moka LRU RAM cache (Native: 0.34 ms p50, 0.42 ms p95 in this run). | Standalone stateless operation (Direct: 19.25 ms p50, 21.17 ms p95; with Nginx proxy_cache: 0.64 ms p50, 0.70 ms p95). Persistent internal cache is an **imgproxy Pro** feature. Fronting with NGINX or a CDN is an optional deployment choice. | Distributed edge caching across Cloudflare PoPs with tiered caching and data center request collapsing. *(Network latency unmeasured in this benchmark)*. |
 | **Request Coalescing** | Built-in `InflightManager` coalesced 100 concurrent requests into **1 origin fetch** in this run. | Standalone OSS passes concurrent requests through to origin unless protected by an upstream shield. | Cloudflare documents request collapsing per edge data center to shield customer origins. |
 | **Licensing & Costs** | **No software license fee** (AGPL-3.0); customer pays only their own server compute/hosting. | **No software license fee** for OSS (MIT); Pro features require a commercial license. | **Metered SaaS pricing**: includes 5,000 unique transformations, then **\$0.50 per 1,000 transformations**; storage is **\$5 per 100,000 images**; delivery is **\$1 per 100,000 delivered images**. |
 

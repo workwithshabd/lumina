@@ -50,12 +50,18 @@ SYNTHETIC_MANIFEST_PATH = os.path.join(ROOT_DIR, "benchmarks", "corpus_synthetic
 if SCRIPT_DIR not in sys.path:
     sys.path.insert(0, SCRIPT_DIR)
 
-from measure_quality import (
-    evaluate_output,
-    generate_reference_image,
-    inspect_and_verify_image,
-    run_deterministic_metric_fixtures,
-)
+try:
+    from measure_quality import (
+        evaluate_output,
+        generate_reference_image,
+        inspect_and_verify_image,
+        run_deterministic_metric_fixtures,
+    )
+except ImportError:
+    evaluate_output = None
+    generate_reference_image = None
+    inspect_and_verify_image = None
+    run_deterministic_metric_fixtures = None
 
 # SSL context for local/test origin communication (self-signed cert)
 SSL_CTX = ssl.create_default_context()
@@ -620,6 +626,11 @@ class BenchmarkRunner:
         self.log_validation(f"Synthetic stress manifest OK: {len(synth_entries)} images verified.")
 
         self.log_validation("Running deterministic quality and format metric fixtures...")
+        if run_deterministic_metric_fixtures is None:
+            raise RuntimeError(
+                "Quality evaluation dependencies (numpy, scikit-image, pillow) are missing. "
+                "Please execute benchmarks using '.venv_bench/bin/python3' or './bench/run_all.sh'."
+            )
         fixtures = run_deterministic_metric_fixtures()
         for name, data in fixtures.items():
             self.log_validation(f"Fixture '{name}': {data['status']}")
