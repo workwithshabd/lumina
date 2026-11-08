@@ -1747,7 +1747,7 @@ Visual quality metrics computed against ground truth Pillow `Image.Resampling.LA
 
 > [!IMPORTANT]
 > **NARROW COMPARISON SAMPLE DISCLOSURE ($N=2$)**:
-> Across the 20 real-world calibration images, only 2 images (`moraine_lake.jpg` and `alacritty_logo_alpha.png`) met category quality thresholds on *both* Atihsrah and imgproxy under explicit AVIF $q=90$. The other 18 images were disqualified from head-to-head comparison because imgproxy failed the SSIM quality gate against the Pillow reference (17 photos scored SSIM 0.79–0.94 vs ≥ 0.95 gate; 1 alpha logo scored 0.9329 vs ≥ 0.98 gate).
+> Across the 20 real-world calibration images, only 2 images (`moraine_lake.jpg` and `alacritty_logo_alpha.png`) met category quality thresholds on *both* Atihsrah and imgproxy under explicit AVIF $q=90$. The other 18 images were disqualified from head-to-head comparison because either imgproxy or Atihsrah failed category SSIM quality gates against the Pillow reference: imgproxy failed 14 photos (SSIM 0.79–0.94 vs ≥ 0.95 gate) and 3 UI/graphics assets (SSIM 0.89–0.95 vs ≥ 0.98 gate); Atihsrah failed 1 alpha logo (`python_logo_alpha.png`: SSIM 0.9799 vs ≥ 0.98 gate). imgproxy passed `moraine_lake.jpg` (SSIM 0.9652), `python_logo_alpha.png` (SSIM 0.9897), and `alacritty_logo_alpha.png` (SSIM 0.9800).
 > While Atihsrah produced smaller files on both eligible images (-21.2% and -46.6%, conventional median **-33.9%**), **$N=2$ mutually eligible pairs is a narrow, illustrative observation**. It demonstrates technical viability on these specific test cases, but does **not** constitute a statistically robust demonstration of market superiority over imgproxy across general web workloads.
 
 ### 3.2 Working Hypotheses on Resampling and Color Space Discrepancies
