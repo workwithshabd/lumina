@@ -10,7 +10,7 @@
 
 ## 1. Hardware & Environment Specifications
 
-- **Evaluation Date**: 2026-11-08 15:28:30 UTC
+- **Evaluation Date**: 2026-11-08 17:14:25 UTC
 - **Hardware Platform**: Mac16,10 (Apple M4, 10 logical cores, 16.0 GB Unified Memory, `arm64`)
 - **Operating System**: macOS 27.2 (Build 26B123)
 - **Kernel**: `Darwin Mac-mini.local 27.2.0 Darwin Kernel Version 27.2.0: Wed Oct 14 23:47:07 PDT 2026; root:xnu-13432.41.4~25/RELEASE_ARM64_T8132 arm64`
@@ -38,22 +38,22 @@
 
 | Scenario | Metric | Atihsrah Native | Atihsrah Docker | imgproxy OSS | imgproxy + Nginx | Thumbor Native | Winner | Notes |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :--- |
-| **Cold Request (JPEG)** | Median ± Spread (N=5) | 52.9 ± 17.3 ms | 55.4 ± 26.3 ms | 23.2 ± 26.4 ms | N/A | 23.1 ± 12.3 ms | Thumbor Native | Cold decode/encode |
-| **Cold Request (PNG)** | Median ± Spread (N=5) | 9.2 ± 2.7 ms | 10.4 ± 2.2 ms | 33.2 ± 4.6 ms | N/A | 27.7 ± 13.5 ms | Atihsrah Native | Lossless encoding |
-| **Cold Request (WebP)** | Median ± Spread (N=5) | 10.5 ± 4.0 ms | 10.2 ± 2.1 ms | 52.3 ± 15.8 ms | N/A | 40.2 ± 26.0 ms | Atihsrah Native | Pure Rust vs libwebp |
-| **Cold Request (AVIF)** | Median ± Spread (N=5) | 139.2 ± 14.0 ms | 308.6 ± 41.4 ms | 44.5 ± 15.9 ms | N/A | 59.4 ± 18.0 ms | imgproxy | ravif vs libheif |
-| **Warm Cache (p50)** | Median Latency | 0.32 ms | 1.17 ms | 20.38 ms | 0.67 ms | 15.23 ms | **Atihsrah Native** | In-process Moka LRU cache |
-| **Warm Cache (p90)** | 90th Percentile | 0.38 ms | 1.89 ms | 22.54 ms | 0.77 ms | 16.49 ms | **Atihsrah Native** | Tail latency (N=100) |
-| **Warm Cache (p95)** | 95th Percentile | 0.41 ms | 2.32 ms | 24.92 ms | 0.79 ms | 16.91 ms | **Atihsrah Native** | Sub-millisecond memory hits |
-| **Warm Cache (p99)** | 99th Percentile | 0.6 ms | 2.54 ms | 27.53 ms | 1.03 ms | 20.55 ms | **Atihsrah Native** | Zero disk / reverse-proxy hop |
-| **Warm Cache (Mean ± Std)** | Distribution | 0.33 ± 0.05 ms | 1.31 ± 0.37 ms | 20.73 ± 1.84 ms | 0.69 ± 0.06 ms | 15.58 ± 0.84 ms | **Atihsrah Native** | Full distribution (N=100) |
+| **Cold Request (JPEG)** | Median ± Spread (N=5) | 51.5 ± 6.4 ms | 53.4 ± 8.4 ms | 23.7 ± 13.6 ms | N/A | 22.9 ± 5.5 ms | Thumbor Native | Cold decode/encode |
+| **Cold Request (PNG)** | Median ± Spread (N=5) | 9.5 ± 1.3 ms | 9.1 ± 0.8 ms | 32.2 ± 2.2 ms | N/A | 27.6 ± 11.2 ms | Atihsrah Native | Lossless encoding |
+| **Cold Request (WebP)** | Median ± Spread (N=5) | 9.7 ± 1.5 ms | 9.1 ± 1.5 ms | 49.5 ± 4.2 ms | N/A | 38.2 ± 19.9 ms | Atihsrah Native | Pure Rust vs libwebp |
+| **Cold Request (AVIF)** | Median ± Spread (N=5) | 128.4 ± 8.9 ms | 287.0 ± 22.0 ms | 40.3 ± 12.3 ms | N/A | 57.8 ± 7.2 ms | imgproxy | ravif vs libheif |
+| **Warm Cache (p50)** | Median Latency | 0.34 ms | 0.97 ms | 19.25 ms | 0.64 ms | 15.08 ms | **Atihsrah Native** | In-process Moka LRU cache |
+| **Warm Cache (p90)** | 90th Percentile | 0.4 ms | 1.26 ms | 20.17 ms | 0.69 ms | 16.78 ms | **Atihsrah Native** | Tail latency (N=100) |
+| **Warm Cache (p95)** | 95th Percentile | 0.42 ms | 1.4 ms | 21.17 ms | 0.7 ms | 26.19 ms | **Atihsrah Native** | Sub-millisecond memory hits |
+| **Warm Cache (p99)** | 99th Percentile | 0.63 ms | 2.27 ms | 40.33 ms | 0.96 ms | 39.36 ms | **Atihsrah Native** | Zero disk / reverse-proxy hop |
+| **Warm Cache (Mean ± Std)** | Distribution | 0.34 ± 0.05 ms | 1.04 ± 0.19 ms | 19.69 ± 2.59 ms | 0.65 ± 0.04 ms | 16.26 ± 4.07 ms | **Atihsrah Native** | Full distribution (N=100) |
 | **100 Concurrent (Same URL)** | Origin Fetches | **1 req** | N/A | 100 req | N/A | N/A | **Atihsrah** | Single-flight request coalescing |
-| **100 Concurrent (Same URL)** | Total Duration | 36.2 ms | N/A | 1714.7 ms | N/A | N/A | **Atihsrah** | Thundering-herd protection |
-| **100 Concurrent (Diff URLs)**| Throughput | 96.1 req/s | 201.3 req/s | 103.6 req/s | N/A | N/A | imgproxy | Multi-worker parallel load |
-| **100 Concurrent (Diff URLs)**| Tail Latency p95 | 33.7 ms | 70.5 ms | 118.9 ms | N/A | N/A | Atihsrah Native | Tail latency under saturation |
-| **Slow Origin (2.0s delay)** | Elapsed Duration | 2.01 s | N/A | 2.02 s | N/A | N/A | Tie | Non-blocking async fetch |
+| **100 Concurrent (Same URL)** | Total Duration | 33.7 ms | N/A | 1566.6 ms | N/A | N/A | **Atihsrah** | Thundering-herd protection |
+| **100 Concurrent (Diff URLs)**| Throughput | 94.5 req/s | 96.5 req/s | 105.8 req/s | N/A | N/A | imgproxy | Multi-worker parallel load |
+| **100 Concurrent (Diff URLs)**| Tail Latency p95 | 34.8 ms | 58.6 ms | 119.4 ms | N/A | N/A | Atihsrah Native | Tail latency under saturation |
+| **Slow Origin (2.0s delay)** | Elapsed Duration | 2.02 s | N/A | 2.02 s | N/A | N/A | Tie | Non-blocking async fetch |
 | **Failing Origin (HTTP 500)** | Status Code | HTTP 502 | N/A | HTTP 502 | N/A | N/A | **Atihsrah** | Maps to 502 Bad Gateway |
-| **Sustained RSS Memory** | Start -> End RSS | 125.94 -> 84.77 MB | 183.1 -> 182.8 MB | 112.9 -> 99.94 MB | N/A | 73.56 -> 68.84 MB | N/A | Observed RSS stability (10 cached assets; does not verify 500MB LRU limit) |
+| **Sustained RSS Memory** | Start -> End RSS | 112.34 -> 84.59 MB | 164.7 -> 164.4 MB | 117.1 -> 107.0 MB | N/A | 72.0 -> 65.39 MB | N/A | Observed RSS stability (10 cached assets; does not verify 500MB LRU limit) |
 
 ---
 
