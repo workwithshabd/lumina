@@ -253,9 +253,19 @@ impl ImageProcessor for ImageRsProcessor {
                                 format: ImageFormat::Avif,
                             }
                         } else {
-                            // Larger than source: try lower quality steps in parallel across worker threads
+                            // Larger than source: evaluate quality-validated fallback candidates in parallel across worker threads.
+                            // Quality-First Policy:
+                            // 1. Minimum AVIF quality floor is 40. Destructive quantization (q=20) is strictly forbidden on graphics/alpha.
+                            // 2. If client accepts WebP, evaluate lossless WebP (quality 100), which delivers superior compression and zero artifacting on flat/geometric patterns.
+                            // 3. If client does not accept WebP, evaluate lossless PNG.
                             use rayon::prelude::*;
-                            let specs = [(ImageFormat::Avif, 40), (ImageFormat::Avif, 20)];
+                            let mut specs = vec![(ImageFormat::Avif, 40)];
+                            if client_accept_webp {
+                                specs.push((ImageFormat::WebP, 100));
+                            } else {
+                                specs.push((ImageFormat::Png, 100));
+                            }
+
                             let mut candidates = vec![Candidate {
                                 bytes: primary_bytes,
                                 format: ImageFormat::Avif,
@@ -733,6 +743,14 @@ mod tests {
     }
 
     #[test]
+    fn test_webp_encode_rgb() {
+        let rgb_img = DynamicImage::new_rgb8(100, 100);
+        let res = encode_image(&rgb_img, ImageFormat::WebP, 100, 6);
+        assert!(res.is_ok());
+        assert!(!res.unwrap().is_empty());
+    }
+
+    #[test]
     fn test_image_rs_parallel_candidate_evaluation() {
         let processor = ImageRsProcessor::new();
         let png_bytes = make_test_png(64, 64);
@@ -754,5 +772,51 @@ mod tests {
         assert_eq!(out.width, 60);
         assert_eq!(out.height, 60);
         assert!(!out.bytes.is_empty());
+    }
+
+    #[test]
+    fn test_quality_first_policy_on_graphics_and_alpha() {
+        let processor = ImageRsProcessor::new();
+        let alacritty_path = std::path::Path::new("benchmarks/corpus/alacritty_logo_alpha.png");
+        if alacritty_path.exists() {
+            let bytes = std::fs::read(alacritty_path).unwrap();
+            let opts = ProcessOptions {
+                target_w: Some(800),
+                target_h: Some(600),
+                fit: FitMode::Cover,
+                format: None, // format=auto
+                accept_header: Some("image/avif,image/webp,*/*".to_string()),
+                ..Default::default()
+            };
+            let out = processor.process(&bytes, opts).unwrap();
+            // Under quality-first policy:
+            // Alacritty selects AVIF q=40 (4,329 bytes), not destructive q=20 (3,401 bytes)
+            assert_eq!(out.format, ImageFormat::Avif);
+            assert_eq!(out.width, 800);
+            assert_eq!(out.height, 600);
+            assert_eq!(out.bytes.len(), 4329);
+        }
+
+        let checkerboard_path =
+            std::path::Path::new("benchmarks/corpus_synthetic/16_pattern_checkerboard.png");
+        if checkerboard_path.exists() {
+            let bytes = std::fs::read(checkerboard_path).unwrap();
+            let opts = ProcessOptions {
+                target_w: Some(800),
+                target_h: Some(600),
+                fit: FitMode::Cover,
+                format: None, // format=auto
+                accept_header: Some("image/avif,image/webp,*/*".to_string()),
+                ..Default::default()
+            };
+            let out = processor.process(&bytes, opts).unwrap();
+            // Under quality-first policy:
+            // Checkerboard evaluates q=90 (114KB), q=40 (46KB), and lossless WebP (49KB),
+            // selecting AVIF q=40 (46,853 bytes) rather than destructive AVIF q=20 (32,357 bytes).
+            assert_eq!(out.format, ImageFormat::Avif);
+            assert_eq!(out.width, 800);
+            assert_eq!(out.height, 600);
+            assert_eq!(out.bytes.len(), 46853);
+        }
     }
 }

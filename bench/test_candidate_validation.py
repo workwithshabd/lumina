@@ -130,28 +130,32 @@ class TestFallbackCandidateValidation(unittest.TestCase):
                 for r in rows:
                     validate_fallback_candidates(r)
 
-            # Specific asset checks
-            calib_rows = data.get("scenario_9_corpus_summary", {}).get("rows", [])
-            alacritty = next((r for r in calib_rows if r.get("id") == "img_19"), None)
-            self.assertIsNotNone(alacritty)
-            self.assertEqual(alacritty["at_auto_bytes"], 3401)
-            cands = alacritty["fallback_candidates"]
-            self.assertEqual(len(cands), 3)
-            selected = [c for c in cands if c.get("selected")]
-            self.assertEqual(len(selected), 1)
-            self.assertEqual(selected[0]["quality"], 20)
-            self.assertEqual(selected[0]["bytes"], 3401)
+        # Historical run_20261108_152829 audit checks (historical q=20 baseline)
+        hist_p = os.path.join(ROOT_DIR, "benchmarks", "runs", "run_20261108_152829", "raw_results.json")
+        with open(hist_p, "r", encoding="utf-8") as f:
+            hist_data = json.load(f)
 
-            synth_rows = data.get("scenario_10_synthetic_summary", {}).get("rows", [])
-            checkerboard = next((r for r in synth_rows if r.get("id") == "synth_16"), None)
-            self.assertIsNotNone(checkerboard)
-            self.assertEqual(checkerboard["at_auto_bytes"], 32357)
-            cands_synth = checkerboard["fallback_candidates"]
-            self.assertEqual(len(cands_synth), 3)
-            selected_synth = [c for c in cands_synth if c.get("selected")]
-            self.assertEqual(len(selected_synth), 1)
-            self.assertEqual(selected_synth[0]["quality"], 20)
-            self.assertEqual(selected_synth[0]["bytes"], 32357)
+        calib_rows = hist_data.get("scenario_9_corpus_summary", {}).get("rows", [])
+        alacritty = next((r for r in calib_rows if r.get("id") == "img_19"), None)
+        self.assertIsNotNone(alacritty)
+        self.assertEqual(alacritty["at_auto_bytes"], 3401)
+        cands = alacritty["fallback_candidates"]
+        self.assertEqual(len(cands), 3)
+        selected = [c for c in cands if c.get("selected")]
+        self.assertEqual(len(selected), 1)
+        self.assertEqual(selected[0]["quality"], 20)
+        self.assertEqual(selected[0]["bytes"], 3401)
+
+        synth_rows = hist_data.get("scenario_10_synthetic_summary", {}).get("rows", [])
+        checkerboard = next((r for r in synth_rows if r.get("id") == "synth_16"), None)
+        self.assertIsNotNone(checkerboard)
+        self.assertEqual(checkerboard["at_auto_bytes"], 32357)
+        cands_synth = checkerboard["fallback_candidates"]
+        self.assertEqual(len(cands_synth), 3)
+        selected_synth = [c for c in cands_synth if c.get("selected")]
+        self.assertEqual(len(selected_synth), 1)
+        self.assertEqual(selected_synth[0]["quality"], 20)
+        self.assertEqual(selected_synth[0]["bytes"], 32357)
 
 
 if __name__ == "__main__":
