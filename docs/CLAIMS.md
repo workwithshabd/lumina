@@ -103,18 +103,18 @@
 
 - **Warm In-Memory Cache Latency**:
   - Atihsrah serves cached assets directly from in-memory RAM (`moka`) without CPU transcoding overhead.
-  - Measured Result (Apple M4, 10 cores, macOS 27.2, `run_20261108_171424`): **0.34 ms median p50** (p95: **0.42 ms**, p99: **0.63 ms**), compared to imgproxy Direct (19.25 ms p50, p95: 21.17 ms) and imgproxy + Nginx cache (0.64 ms p50, p95: 0.70 ms).
+  - Measured Result (Apple M4, 10 cores, macOS 27.2, `run_20261108_191324`): **0.32 ms median p50** (p95: **0.42 ms**, p99: **0.64 ms**), compared to imgproxy Direct (19.18 ms p50, p95: 20.23 ms) and imgproxy + Nginx cache (0.68 ms p50, p95: 0.80 ms).
 - **Single-Flight Request Coalescing**:
-  - Under 100 concurrent requests for the exact same uncached URL, Atihsrah initiates **exactly 1 origin fetch** in 33.7 ms, eliminating thundering-herd cache stampedes. Uncached imgproxy initiates 100 origin fetches in 1,566.6 ms.
+  - Under 100 concurrent requests for the exact same uncached URL, Atihsrah initiates **exactly 1 origin fetch** in 36.2 ms, eliminating thundering-herd cache stampedes. Uncached imgproxy initiates 100 origin fetches in 1,536.5 ms.
 - **Cold Transformation Throughput (100 Concurrent Different URLs)**:
-  - `libvips` utilizes multi-threaded C pipelines and SIMD vectorization for image transformation, reaching **105.8 req/s** (p95: 119.4 ms) under 100 concurrent uncached requests.
-  - Pure-Rust `image-rs` and `ravif` run single-process software codecs within Tokio blocking threads, achieving **94.5 req/s** (native, p95: 34.8 ms) and **96.5 req/s** (containerized, p95: 58.6 ms).
+  - `libvips` utilizes multi-threaded C pipelines and SIMD vectorization for image transformation, reaching **105.1 req/s** (p95: 113.5 ms) under 100 concurrent uncached requests.
+  - Pure-Rust `image-rs` and `ravif` run single-process software codecs within Tokio blocking threads, achieving **95.2 req/s** (native, p95: 33.6 ms) and **204.1 req/s** (containerized, p95: 70.0 ms).
 - **20-Image Corpus Compression & Quality**:
-  - On the 20-image real calibration corpus under explicit AVIF $q=90$, Atihsrah met quality gates on **19 of 20 images** (95.0%, all 15 photos, 1/2 alpha, 3/3 graphics) with average SSIM of **0.9936** vs imgproxy's **0.9304**.
+  - On the 20-image real calibration corpus under explicit AVIF $q=90$, Atihsrah met quality gates on **19 of 20 images** (95.0%, all 15 photos, 1/2 alpha, 3/3 graphics) with average SSIM of **0.9807** vs imgproxy's **0.9110**.
   - On the $N=2$ mutually quality-passing pairs (`moraine_lake.jpg` and `alacritty_logo_alpha.png`), Atihsrah delivered smaller files on both (-21.2% and -46.6%, conventional median **-33.9%**). $N=2$ is an illustrative observation on specific images, not a broad demonstration of market superiority.
-  - Under `format=auto`, all 20 calibration outputs in `run_20261108_171424` met the source byte limit, with 18 of 20 passing quality gates. The 19/20 post-fix figure for calibration is an inferred analytical projection based on evaluating the $q=40$ candidate on `alacritty` (SSIM 0.9807 $\ge 0.98$, exceeding source); `python_logo_alpha.png` (0.9799) and synthetic checkerboard (0.9721) remain below the 0.98 gate. A full post-fix corpus benchmark run remains pending.
+  - Under `format=auto`, Atihsrah met quality gates on **19 of 20 images** (95.0%) on the real calibration corpus, confirmed empirically in `run_20261108_191324`. On `alacritty_logo_alpha.png`, the engine selected the quality-passing AVIF $q=40$ candidate (4,329 B, SSIM 0.9807 $\ge 0.98$), exceeding source (3,612 B) and incrementing `atihsrah_output_larger_than_source_total`. `python_logo_alpha.png` misses the 0.98 gate by 0.0001 (SSIM 0.9799), and synthetic checkerboard scores 0.9721 (< 0.98 gate under $q=40$). Output size was $\le$ source on 19 of 20 calibration images (95.0%) and 19 of 20 synthetic images (95.0%).
 - **Docker Virtualization Overhead on macOS**:
-  - Running Atihsrah containerized inside Colima's Linux VM incurs a **~0.63 ms network and virtualization penalty** on warm cache lookups (0.97 ms vs 0.34 ms native).
+  - Running Atihsrah containerized inside Colima's Linux VM incurs a **~0.63 ms network and virtualization penalty** on warm cache lookups (0.95 ms vs 0.32 ms native).
 
 ---
 

@@ -2,9 +2,9 @@
 
 **Evaluation Date**: 2026-11-08  
 **Repository**: `atihsrah` (Folder: `/Users/shabd/Desktop/dev/lumina`)  
-**Tested Code Commit**: [`aafd82e4`](../)  
-**Committed Artifacts Commit**: [`04cdabad`](../)  
-**Active Run**: `run_20261108_171424`  
+**Tested Code Commit**: [`9f106bb6`](../)  
+**Committed Artifacts Commit**: [`9f106bb6`](../)  
+**Active Run**: `run_20261108_191324`  
 **Host Platform**: Apple M4 (10 cores, 16 GB Unified Memory), macOS 27.2 (Darwin 27.2.0)  
 **Safety Invariant**: Strict `#![forbid(unsafe_code)]` in first-party code; zero C image codec libraries  
 
@@ -15,17 +15,17 @@
 | Dimension | Empirical Finding | Verdict |
 | :--- | :--- | :---: |
 | **Correctness & Tests** | 159 Rust unit, integration, and security tests pass; 7 candidate validation fixtures pass; zero compiler warnings (`-D warnings`). | **PASS** |
-| **Warm Cache Latency** | Native p50: **0.34 ms**, p95: **0.42 ms** (<0.8 ms target), p99: **0.63 ms** via in-process Moka LRU cache. | **PASS** |
-| **Concurrency Shield** | Inflight request coalescing collapses 100 concurrent identical requests into **1 origin fetch** (33.7 ms vs 1,566.6 ms for unshielded imgproxy). | **PASS** |
-| **Cold Transform Speed** | Faster on PNG (9.5 ms vs 32.2 ms) and WebP (9.7 ms vs 49.5 ms); slower on cold AVIF (128.4 ms vs 40.3 ms) and JPEG (51.5 ms vs 23.7 ms). | **TRADE-OFF** |
-| **Byte Budget Guard** | Auto mode delivered 20/20 calibration outputs and 20/20 synthetic outputs $\le$ source bytes (100% on tested corpora in `run_20261108_171424`). | **QUALIFIED PASS** |
+| **Warm Cache Latency** | Native p50: **0.32 ms**, p95: **0.42 ms** (<0.8 ms target), p99: **0.64 ms** via in-process Moka LRU cache. | **PASS** |
+| **Concurrency Shield** | Inflight request coalescing collapses 100 concurrent identical requests into **1 origin fetch** (36.2 ms vs 1,536.5 ms for unshielded imgproxy). | **PASS** |
+| **Cold Transform Speed** | Faster on PNG (8.7 ms vs 29.1 ms) and WebP (9.5 ms vs 47.9 ms); slower on cold AVIF (120.3 ms vs 40.0 ms) and JPEG (49.9 ms vs 23.0 ms). | **TRADE-OFF** |
+| **Byte Budget Guard** | Auto mode delivered 19/20 calibration outputs and 19/20 synthetic outputs $\le$ source bytes in `run_20261108_191324`. | **QUALIFIED PASS** |
 | **Quality Gate: Explicit AVIF** | 19 of 20 calibration assets pass (15/15 photos, 1/2 alpha, 3/3 graphics/UI). Failed: `python_logo_alpha.png` (SSIM 0.9799 < 0.98). | **FAIL** |
-| **Quality Gate: Auto Mode** | 18 of 20 calibration pass in recorded run (both alpha fail); 19 of 20 synthetic pass (`synth_16` checkerboard fails at 0.9397 in run, 0.9721 under $q=40$). | **FAIL** |
+| **Quality Gate: Auto Mode** | 19 of 20 calibration pass (Alacritty passes at 0.9807; Python logo misses at 0.9799); 19 of 20 synthetic pass (checkerboard misses at 0.9721). | **FAIL** |
 | **OVERALL STATUS** | **READY FOR CONTROLLED PILOT / GATED FROM BROAD PRODUCTION BY QUALITY THRESHOLDS** | **NO BROAD PRODUCTION PASS** |
 
 ---
 
-## 2. Reconciled Calibration Corpus Ground Truth (`run_20261108_171424`)
+## 2. Reconciled Calibration Corpus Ground Truth (`run_20261108_191324`)
 
 All metrics below are drawn directly from [`benchmarks/raw_results.json`](../benchmarks/raw_results.json):
 
@@ -50,10 +50,9 @@ All metrics below are drawn directly from [`benchmarks/raw_results.json`](../ben
   - Conventional Median Delta ($N=2$): **-33.9%** (Mean: **-33.9%**).
 
 ### 2.2 Auto-Negotiation Pipeline (`format=auto`)
-- **Calibration Quality**: **18 / 20 passed** in the recorded baseline run (`run_20261108_171424`). Failures: `python_logo_alpha.png` (SSIM 0.9799) and `alacritty_logo_alpha.png` (SSIM 0.9674).
-  *Post-Fix Analytical Projection*: Under the $q \ge 40$ policy, `alacritty_logo_alpha.png` evaluates to $q=40$ (SSIM 0.9807 $\ge 0.98$), projecting 19/20 passes. However, this is an inferred analytical projection based on isolated candidate evaluation and unit tests (`test_quality_first_policy_on_graphics_and_alpha`); a full-corpus quality run on the updated code has not been committed.
-- **Held-Out Synthetic Quality**: **19 / 20 passed**. Failure: `synth_16` / `16_pattern_checkerboard.png` (SSIM 0.9397 in baseline run; 0.9721 under $q=40$, still below the 0.98 gate).
-- **Byte Budget Compliance**: **20 / 20 calibration** and **20 / 20 synthetic** outputs $\le$ source bytes in recorded baseline `run_20261108_171424`.
+- **Calibration Quality**: **19 / 20 passed (95.0%)**, empirically verified in `run_20261108_191324`. Failure: `python_logo_alpha.png` (SSIM 0.9799 < 0.98, missing by 0.0001). Under the quality-first $q \ge 40$ policy, `alacritty_logo_alpha.png` selected AVIF $q=40$ (4,329 B vs 3,612 B source) preserving visual quality at SSIM 0.9807 $\ge 0.98$.
+- **Held-Out Synthetic Quality**: **19 / 20 passed (95.0%)**. Failure: `synth_16` / `16_pattern_checkerboard.png` (SSIM 0.9721 under AVIF $q=40$, still below the 0.98 gate).
+- **Byte Budget Compliance**: **19 / 20 calibration** and **19 / 20 synthetic** outputs $\le$ source bytes in `run_20261108_191324` (95.0%). Both Alacritty and Checkerboard were permitted to exceed source bytes to preserve quality, recorded via `atihsrah_output_larger_than_source_total`.
 - **Scope Clarification**: Quality metrics and auto-negotiation evaluations were performed on **Atihsrah Native**. The Docker tier was evaluated for cold/warm latency and concurrency; the harness does not collect duplicate per-image quality grids for Docker.
 
 ---
@@ -87,8 +86,8 @@ In the baseline implementation (`aafd82e4`), candidate selection is driven prima
 | **Deployment Model** | Self-hosted, single binary or container in customer infrastructure/VPC. | Self-hosted standalone container in customer infrastructure/VPC. | Managed cloud SaaS across Cloudflare's global edge network. |
 | **Local macOS Execution** | **Yes** (tested: Native binary and Docker container). | **Yes** (tested: Docker container). | **No** (proprietary edge service; cannot be run locally). |
 | **Internal Implementation** | First-party pure Rust (`#![forbid(unsafe_code)]`); excludes C image-codec libraries. | C / C++ (`libvips`, `glib`, `libheif`, `libwebp`). | **Proprietary / vendor-internal** (undisclosed edge architecture). |
-| **Caching Model** | Embedded in-process Moka LRU RAM cache (Native: 0.34 ms p50, 0.42 ms p95 in this run). | Standalone stateless operation (Direct: 19.25 ms p50, 21.17 ms p95; with Nginx proxy_cache: 0.64 ms p50, 0.70 ms p95). Persistent internal cache is an **imgproxy Pro** feature. Fronting with NGINX or a CDN is an optional deployment choice. | Distributed edge caching across Cloudflare PoPs with tiered caching and data center request collapsing. *(Network latency unmeasured in this benchmark)*. |
-| **Cold Concurrency** | 100 uncached concurrent requests: **94.5 req/s** (Native), **96.5 req/s** (Docker). | 100 uncached concurrent requests: **105.8 req/s** (multi-threaded libvips pipeline). | Managed global edge network processing. *(Unmeasured in local benchmark)*. |
+| **Caching Model** | Embedded in-process Moka LRU RAM cache (Native: 0.32 ms p50, 0.42 ms p95 in this run). | Standalone stateless operation (Direct: 19.18 ms p50, 20.23 ms p95; with Nginx proxy_cache: 0.68 ms p50, 0.80 ms p95). Persistent internal cache is an **imgproxy Pro** feature. Fronting with NGINX or a CDN is an optional deployment choice. | Distributed edge caching across Cloudflare PoPs with tiered caching and data center request collapsing. *(Network latency unmeasured in this benchmark)*. |
+| **Cold Concurrency** | 100 uncached concurrent requests: **95.2 req/s** (Native), **204.1 req/s** (Docker). | 100 uncached concurrent requests: **105.1 req/s** (multi-threaded libvips pipeline). | Managed global edge network processing. *(Unmeasured in local benchmark)*. |
 | **Request Coalescing** | Built-in `InflightManager` coalesced 100 concurrent requests into **1 origin fetch** in this run. | Standalone OSS passes concurrent requests through to origin unless protected by an upstream shield. | Cloudflare documents request collapsing per edge data center to shield customer origins. |
 | **Licensing & Costs** | **No software license fee** (AGPL-3.0); customer pays only their own server compute/hosting. | **No software license fee** for OSS (MIT); Pro features require a commercial license. | **Metered SaaS pricing**: includes 5,000 unique transformations, then **\$0.50 per 1,000 transformations**; storage is **\$5 per 100,000 images**; delivery is **\$1 per 100,000 delivered images**. |
 

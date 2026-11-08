@@ -10,13 +10,13 @@
 
 ## 1. Hardware & Environment Specifications
 
-- **Evaluation Date**: 2026-11-08 17:14:25 UTC
+- **Evaluation Date**: 2026-11-08 19:13:25 UTC
 - **Hardware Platform**: Mac16,10 (Apple M4, 10 logical cores, 16.0 GB Unified Memory, `arm64`)
 - **Operating System**: macOS 27.2 (Build 26B123)
 - **Kernel**: `Darwin Mac-mini.local 27.2.0 Darwin Kernel Version 27.2.0: Wed Oct 14 23:47:07 PDT 2026; root:xnu-13432.41.4~25/RELEASE_ARM64_T8132 arm64`
 - **Compiler / Toolchain**: `rustc 1.97.1 (8bab26f4f 2026-07-14)`, Python 3.12.14, `Docker version 29.9.2, build a82e528901` (`colima`)
 - **Git Commit Trail & Full SHA Pinning**:
-  - **1. Software Under Test**: `aafd82e4e042146abe283297187851ad2085f143`
+  - **1. Software Under Test**: `9f106bb6c0f6b7c6473dd3d53df1940771efb2d6`
     *The exact, immutable Git commit of the codebase (Rust implementation, vendored crates, benchmark harness) tested during the run with dirty: False.*
   - **2. Initial Results Recording Commit**: `04cdabad060d4da186fafe39b5e3ec4008107e38`
     *The git commit recording raw benchmark run outputs, CSV data, and analysis artifacts.*
@@ -38,22 +38,22 @@
 
 | Scenario | Metric | Atihsrah Native | Atihsrah Docker | imgproxy OSS | imgproxy + Nginx | Thumbor Native | Winner | Notes |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :--- |
-| **Cold Request (JPEG)** | Median ± Spread (N=5) | 51.5 ± 6.4 ms | 53.4 ± 8.4 ms | 23.7 ± 13.6 ms | N/A | 22.9 ± 5.5 ms | Thumbor Native | Cold decode/encode |
-| **Cold Request (PNG)** | Median ± Spread (N=5) | 9.5 ± 1.3 ms | 9.1 ± 0.8 ms | 32.2 ± 2.2 ms | N/A | 27.6 ± 11.2 ms | Atihsrah Native | Lossless encoding |
-| **Cold Request (WebP)** | Median ± Spread (N=5) | 9.7 ± 1.5 ms | 9.1 ± 1.5 ms | 49.5 ± 4.2 ms | N/A | 38.2 ± 19.9 ms | Atihsrah Native | Pure Rust vs libwebp |
-| **Cold Request (AVIF)** | Median ± Spread (N=5) | 128.4 ± 8.9 ms | 287.0 ± 22.0 ms | 40.3 ± 12.3 ms | N/A | 57.8 ± 7.2 ms | imgproxy | ravif vs libheif |
-| **Warm Cache (p50)** | Median Latency | 0.34 ms | 0.97 ms | 19.25 ms | 0.64 ms | 15.08 ms | **Atihsrah Native** | In-process Moka LRU cache |
-| **Warm Cache (p90)** | 90th Percentile | 0.4 ms | 1.26 ms | 20.17 ms | 0.69 ms | 16.78 ms | **Atihsrah Native** | Tail latency (N=100) |
-| **Warm Cache (p95)** | 95th Percentile | 0.42 ms | 1.4 ms | 21.17 ms | 0.7 ms | 26.19 ms | **Atihsrah Native** | Sub-millisecond memory hits |
-| **Warm Cache (p99)** | 99th Percentile | 0.63 ms | 2.27 ms | 40.33 ms | 0.96 ms | 39.36 ms | **Atihsrah Native** | Zero disk / reverse-proxy hop |
-| **Warm Cache (Mean ± Std)** | Distribution | 0.34 ± 0.05 ms | 1.04 ± 0.19 ms | 19.69 ± 2.59 ms | 0.65 ± 0.04 ms | 16.26 ± 4.07 ms | **Atihsrah Native** | Full distribution (N=100) |
+| **Cold Request (JPEG)** | Median ± Spread (N=5) | 49.9 ± 7.2 ms | 51.1 ± 17.2 ms | 23.0 ± 18.1 ms | N/A | 22.4 ± 7.3 ms | Thumbor Native | Cold decode/encode |
+| **Cold Request (PNG)** | Median ± Spread (N=5) | 8.7 ± 0.9 ms | 8.4 ± 0.4 ms | 29.1 ± 1.3 ms | N/A | 26.7 ± 1.9 ms | Atihsrah Native | Lossless encoding |
+| **Cold Request (WebP)** | Median ± Spread (N=5) | 9.5 ± 0.5 ms | 8.8 ± 0.3 ms | 47.9 ± 1.4 ms | N/A | 38.0 ± 42.8 ms | Atihsrah Native | Pure Rust vs libwebp |
+| **Cold Request (AVIF)** | Median ± Spread (N=5) | 120.3 ± 7.6 ms | 279.9 ± 3.7 ms | 40.0 ± 10.7 ms | N/A | 57.7 ± 6.2 ms | imgproxy | ravif vs libheif |
+| **Warm Cache (p50)** | Median Latency | 0.32 ms | 0.95 ms | 19.18 ms | 0.68 ms | 14.94 ms | **Atihsrah Native** | In-process Moka LRU cache |
+| **Warm Cache (p90)** | 90th Percentile | 0.4 ms | 1.1 ms | 19.94 ms | 0.77 ms | 15.23 ms | **Atihsrah Native** | Tail latency (N=100) |
+| **Warm Cache (p95)** | 95th Percentile | 0.42 ms | 1.17 ms | 20.23 ms | 0.8 ms | 15.39 ms | **Atihsrah Native** | Sub-millisecond memory hits |
+| **Warm Cache (p99)** | 99th Percentile | 0.64 ms | 1.4 ms | 30.72 ms | 0.98 ms | 20.33 ms | **Atihsrah Native** | Zero disk / reverse-proxy hop |
+| **Warm Cache (Mean ± Std)** | Distribution | 0.34 ± 0.06 ms | 0.98 ± 0.09 ms | 19.29 ± 1.31 ms | 0.7 ± 0.05 ms | 15.04 ± 0.57 ms | **Atihsrah Native** | Full distribution (N=100) |
 | **100 Concurrent (Same URL)** | Origin Fetches | **1 req** | N/A | 100 req | N/A | N/A | **Atihsrah** | Single-flight request coalescing |
-| **100 Concurrent (Same URL)** | Total Duration | 33.7 ms | N/A | 1566.6 ms | N/A | N/A | **Atihsrah** | Thundering-herd protection |
-| **100 Concurrent (Diff URLs)**| Throughput | 94.5 req/s | 96.5 req/s | 105.8 req/s | N/A | N/A | imgproxy | Multi-worker parallel load |
-| **100 Concurrent (Diff URLs)**| Tail Latency p95 | 34.8 ms | 58.6 ms | 119.4 ms | N/A | N/A | Atihsrah Native | Tail latency under saturation |
+| **100 Concurrent (Same URL)** | Total Duration | 36.2 ms | N/A | 1536.5 ms | N/A | N/A | **Atihsrah** | Thundering-herd protection |
+| **100 Concurrent (Diff URLs)**| Throughput | 95.2 req/s | 204.1 req/s | 105.1 req/s | N/A | N/A | imgproxy | Multi-worker parallel load |
+| **100 Concurrent (Diff URLs)**| Tail Latency p95 | 33.6 ms | 70.0 ms | 113.5 ms | N/A | N/A | Atihsrah Native | Tail latency under saturation |
 | **Slow Origin (2.0s delay)** | Elapsed Duration | 2.02 s | N/A | 2.02 s | N/A | N/A | Tie | Non-blocking async fetch |
 | **Failing Origin (HTTP 500)** | Status Code | HTTP 502 | N/A | HTTP 502 | N/A | N/A | **Atihsrah** | Maps to 502 Bad Gateway |
-| **Sustained RSS Memory** | Start -> End RSS | 112.34 -> 84.59 MB | 164.7 -> 164.4 MB | 117.1 -> 107.0 MB | N/A | 72.0 -> 65.39 MB | N/A | Observed RSS stability (10 cached assets; does not verify 500MB LRU limit) |
+| **Sustained RSS Memory** | Start -> End RSS | 124.53 -> 63.31 MB | 167.2 -> 166.9 MB | 103.2 -> 98.65 MB | N/A | 69.67 -> 60.73 MB | N/A | Observed RSS stability (10 cached assets; does not verify 500MB LRU limit) |
 
 ---
 
@@ -68,7 +68,7 @@ Visual quality metrics computed against ground truth Pillow `Image.Resampling.LA
 > - **Empirical Progress**:
 >   - **15 of 15** real-world calibration photos pass the strict photo SSIM gate (≥ 0.95) under explicit AVIF q=90 (range 0.9625–0.9842).
 >   - **20 of 20** synthetic stress suite assets pass under explicit AVIF q=90 (0 failures).
->   - In-process memory cache latency meets targets (p50 0.34 ms, p95 0.42 ms vs <0.8 ms target).
+>   - In-process memory cache latency meets targets (p50 0.32 ms, p95 0.42 ms vs <0.8 ms target).
 >   - Single-flight request coalescing collapses 100 concurrent thundering-herd requests to 1 origin fetch.
 > - **Quality Gate Disclosure**:
 >   - **Explicit AVIF (q=90)**: 1 failure on `img_18` (`python_logo_alpha.png`: SSIM 0.9799 < 0.98).
@@ -92,7 +92,7 @@ Visual quality metrics computed against ground truth Pillow `Image.Resampling.LA
 - **Median Byte Delta (Eligible Pairs)**: -33.9%
 - **Mean Byte Delta (Eligible Pairs)**: -33.9%
 - **Average SSIM (All Samples)**: Atihsrah 0.9807 vs imgproxy 0.9110
-- **Optimization Hypothesis Verdict (Explicit AVIF q=90 Gate)**: **NOT SUPPORTED / QUALITY GATE FAILURE (Explicit AVIF q=90 Gate)**: Atihsrah failed the minimum SSIM quality gate on 1 asset(s) under explicit AVIF q=90: img_18 (python_logo_alpha.png: SSIM 0.9799 < 0.98). Compression wins cannot be certified when visual quality gates are breached.
+- **Optimization Hypothesis Verdict (Explicit AVIF q=90 Gate)**: **NOT SUPPORTED / INCONCLUSIVE (Content-Dependent Trade-Off)**: Atihsrah produces smaller AVIF files at nominal q=90 on photos, but fails the strict requirement of zero larger-than-source outputs (1 larger in auto mode).
 - **Encoder Scale Disclosure**: Comparing nominal q=90 is a configuration comparison, not an equivalent perceptual quality match. Upstream encoders (`ravif` vs `libheif`/`libaom`) have distinct rate-distortion curves.
 
 > [!IMPORTANT]
@@ -151,7 +151,7 @@ The calibration run provides clear empirical evidence of candidate selection und
 - **Small Alpha Asset (`alacritty_logo_alpha.png`)**:
   - Source image is an extremely small, hand-optimized 3,612-byte PNG.
   - Under explicit AVIF $q=90$, output is 10,477 bytes (SSIM 0.9931).
-  - Evaluated candidates: AVIF $q=90$ (10,477 B), AVIF $q=40$ (4,329 B), lossless WebP (18,348 B).
+  - Evaluated candidates: AVIF $q=90$ (10,477 B), AVIF $q=40$ (4,329 B), lossless WebP (163,650 B).
   - All candidates exceed the 3,612-byte source limit.
   - **Quality-First Selection**: Rather than applying destructive quantization ($q=20$, which would drop SSIM below 0.98), the engine selects the smallest quality-passing candidate: **AVIF $q=40$ (4,329 bytes, SSIM 0.9807)**.
   - Visual quality is preserved (SSIM 0.9807 >= 0.98, PASS), and the engine records that the output exceeds source size via `atihsrah_output_larger_than_source_total`.
@@ -210,7 +210,7 @@ The calibration run provides clear empirical evidence of candidate selection und
 | img_16 | kde_spectacle.png | ui_screenshot | 0.98 | 83699 | avif | 44810 |  53.5% | 0.9964 | 44.5 | YES (0 larger) | PASS |
 | img_17 | training_module.png | ui_screenshot | 0.98 | 107821 | avif | 45668 |  42.4% | 0.9971 | 44.2 | YES (0 larger) | PASS |
 | img_18 | python_logo_alpha.png | alpha | 0.98 | 15770 | avif | 13950 |  88.5% | 0.9799 | 41.43 | YES (0 larger) | **FAIL** |
-| img_19 | alacritty_logo_alpha.png | alpha | 0.98 | 3612 | avif | 3401 |  94.2% | 0.9674 | 38.92 | YES (0 larger) | **FAIL** |
+| img_19 | alacritty_logo_alpha.png | alpha | 0.98 | 3612 | avif | 4329 | 119.9% | 0.9807 | 42.59 | **NO (LARGER)** | PASS |
 | img_20 | world_map_graphic.png | graphic | 0.98 | 87924 | avif | 60061 |  68.3% | 0.9963 | 47.57 | YES (0 larger) | PASS |
 
 ---
@@ -270,7 +270,7 @@ The calibration run provides clear empirical evidence of candidate selection und
 | synth_13 | 13_transparent_shadow.png | transparent_shadow | 0.98 | 24390 | avif | 2773 |  11.4% | 0.9995 | 60.69 | YES (0 larger) | PASS |
 | synth_14 | 14_hdr_highcontrast.jpg | hdr_highcontrast | 0.95 | 60780 | avif | 2298 |   3.8% | 0.9981 | 57.67 | YES (0 larger) | PASS |
 | synth_15 | 15_lowcontrast_fog.jpg | lowcontrast_fog | 0.95 | 54118 | avif | 2768 |   5.1% | 0.9988 | 57.03 | YES (0 larger) | PASS |
-| synth_16 | 16_pattern_checkerboard.png | pattern_checkerboard | 0.98 | 42529 | avif | 32357 |  76.1% | 0.9397 | 25.51 | YES (0 larger) | **FAIL** |
+| synth_16 | 16_pattern_checkerboard.png | pattern_checkerboard | 0.98 | 42529 | avif | 46853 | 110.2% | 0.9721 | 29.72 | **NO (LARGER)** | **FAIL** |
 | synth_17 | 17_noise_grain.png | noise_grain | 0.95 | 2203506 | avif | 124231 |   5.6% | 0.9856 | 41.22 | YES (0 larger) | PASS |
 | synth_18 | 18_photo_4k_large.jpg | photo_4k_large | 0.95 | 364042 | avif | 15106 |   4.1% | 0.9905 | 47.97 | YES (0 larger) | PASS |
 | synth_19 | 19_photo_medium.jpg | photo | 0.95 | 36512 | avif | 8456 |  23.2% | 0.9889 | 48.15 | YES (0 larger) | PASS |

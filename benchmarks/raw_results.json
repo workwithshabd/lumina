@@ -2,65 +2,65 @@
   "scenario_1_cold_requests": {
     "atihsrah_native": {
       "jpeg": {
-        "median_ms": 51.5,
-        "min_ms": 49.8,
-        "max_ms": 56.2,
-        "spread_ms": 6.4,
-        "duration_ms": 51.5,
+        "median_ms": 49.9,
+        "min_ms": 48.9,
+        "max_ms": 56.1,
+        "spread_ms": 7.2,
+        "duration_ms": 49.9,
         "runs": [
-          56.2,
-          50.0,
-          49.8,
-          52.2,
-          51.5
+          56.1,
+          50.8,
+          49.6,
+          49.9,
+          48.9
         ],
         "bytes": 122345,
         "mime": "image/jpeg"
       },
       "png": {
-        "median_ms": 9.5,
-        "min_ms": 8.7,
-        "max_ms": 10.0,
-        "spread_ms": 1.3,
-        "duration_ms": 9.5,
+        "median_ms": 8.7,
+        "min_ms": 8.2,
+        "max_ms": 9.1,
+        "spread_ms": 0.9,
+        "duration_ms": 8.7,
         "runs": [
-          10.0,
-          9.8,
-          8.9,
+          9.1,
           8.7,
-          9.5
+          8.4,
+          8.2,
+          9.0
         ],
         "bytes": 889703,
         "mime": "image/png"
       },
       "webp": {
-        "median_ms": 9.7,
-        "min_ms": 9.1,
-        "max_ms": 10.6,
-        "spread_ms": 1.5,
-        "duration_ms": 9.7,
+        "median_ms": 9.5,
+        "min_ms": 9.4,
+        "max_ms": 9.9,
+        "spread_ms": 0.5,
+        "duration_ms": 9.5,
         "runs": [
-          10.6,
-          9.7,
-          9.1,
-          10.0,
-          9.2
+          9.6,
+          9.5,
+          9.4,
+          9.9,
+          9.4
         ],
         "bytes": 656566,
         "mime": "image/webp"
       },
       "avif": {
-        "median_ms": 128.4,
-        "min_ms": 123.8,
-        "max_ms": 132.7,
-        "spread_ms": 8.9,
-        "duration_ms": 128.4,
+        "median_ms": 120.3,
+        "min_ms": 119.8,
+        "max_ms": 127.5,
+        "spread_ms": 7.6,
+        "duration_ms": 120.3,
         "runs": [
-          128.4,
-          132.7,
-          126.0,
-          123.8,
-          129.2
+          127.5,
+          122.3,
+          120.3,
+          120.3,
+          119.8
         ],
         "bytes": 51590,
         "mime": "image/avif"
@@ -68,65 +68,65 @@
     },
     "atihsrah_docker": {
       "jpeg": {
-        "median_ms": 53.4,
-        "min_ms": 51.6,
-        "max_ms": 60.0,
-        "spread_ms": 8.4,
-        "duration_ms": 53.4,
+        "median_ms": 51.1,
+        "min_ms": 49.4,
+        "max_ms": 66.6,
+        "spread_ms": 17.2,
+        "duration_ms": 51.1,
         "runs": [
-          60.0,
-          55.9,
-          52.3,
-          53.4,
-          51.6
+          66.6,
+          54.6,
+          51.1,
+          50.3,
+          49.4
         ],
         "bytes": 122345,
         "mime": "image/jpeg"
       },
       "png": {
-        "median_ms": 9.1,
-        "min_ms": 8.9,
-        "max_ms": 9.7,
-        "spread_ms": 0.8,
-        "duration_ms": 9.1,
+        "median_ms": 8.4,
+        "min_ms": 8.3,
+        "max_ms": 8.6,
+        "spread_ms": 0.4,
+        "duration_ms": 8.4,
         "runs": [
-          9.7,
-          9.1,
-          9.1,
-          9.1,
-          8.9
+          8.5,
+          8.4,
+          8.3,
+          8.4,
+          8.6
         ],
         "bytes": 889703,
         "mime": "image/png"
       },
       "webp": {
-        "median_ms": 9.1,
-        "min_ms": 8.8,
-        "max_ms": 10.2,
-        "spread_ms": 1.5,
-        "duration_ms": 9.1,
+        "median_ms": 8.8,
+        "min_ms": 8.7,
+        "max_ms": 9.0,
+        "spread_ms": 0.3,
+        "duration_ms": 8.8,
         "runs": [
-          10.2,
+          8.8,
+          8.9,
+          8.7,
           9.0,
-          10.0,
-          9.1,
           8.8
         ],
         "bytes": 656566,
         "mime": "image/webp"
       },
       "avif": {
-        "median_ms": 287.0,
-        "min_ms": 284.9,
-        "max_ms": 307.0,
-        "spread_ms": 22.0,
-        "duration_ms": 287.0,
+        "median_ms": 279.9,
+        "min_ms": 279.3,
+        "max_ms": 283.0,
+        "spread_ms": 3.7,
+        "duration_ms": 279.9,
         "runs": [
-          307.0,
-          289.6,
-          287.0,
-          284.9,
-          285.6
+          283.0,
+          281.9,
+          279.3,
+          279.3,
+          279.9
         ],
         "bytes": 50301,
         "mime": "image/avif"
@@ -134,65 +134,65 @@
     },
     "imgproxy": {
       "jpeg": {
-        "median_ms": 23.7,
-        "min_ms": 23.0,
-        "max_ms": 36.6,
-        "spread_ms": 13.6,
-        "duration_ms": 23.7,
+        "median_ms": 23.0,
+        "min_ms": 20.6,
+        "max_ms": 38.7,
+        "spread_ms": 18.1,
+        "duration_ms": 23.0,
         "runs": [
-          36.6,
+          38.7,
           24.0,
           23.0,
-          23.7,
-          23.5
+          20.7,
+          20.6
         ],
         "bytes": 94995,
         "mime": "image/jpeg"
       },
       "png": {
-        "median_ms": 32.2,
-        "min_ms": 30.8,
-        "max_ms": 33.0,
-        "spread_ms": 2.2,
-        "duration_ms": 32.2,
+        "median_ms": 29.1,
+        "min_ms": 28.8,
+        "max_ms": 30.1,
+        "spread_ms": 1.3,
+        "duration_ms": 29.1,
         "runs": [
-          31.6,
-          30.8,
-          32.2,
-          32.8,
-          33.0
+          30.1,
+          29.1,
+          28.8,
+          29.0,
+          29.8
         ],
         "bytes": 792619,
         "mime": "image/png"
       },
       "webp": {
-        "median_ms": 49.5,
-        "min_ms": 47.6,
-        "max_ms": 51.8,
-        "spread_ms": 4.2,
-        "duration_ms": 49.5,
+        "median_ms": 47.9,
+        "min_ms": 47.5,
+        "max_ms": 48.9,
+        "spread_ms": 1.4,
+        "duration_ms": 47.9,
         "runs": [
-          51.8,
-          49.5,
-          49.8,
-          47.6,
-          47.9
+          48.1,
+          47.9,
+          48.9,
+          47.7,
+          47.5
         ],
         "bytes": 90144,
         "mime": "image/webp"
       },
       "avif": {
-        "median_ms": 40.3,
-        "min_ms": 39.5,
-        "max_ms": 51.8,
-        "spread_ms": 12.3,
-        "duration_ms": 40.3,
+        "median_ms": 40.0,
+        "min_ms": 39.0,
+        "max_ms": 49.7,
+        "spread_ms": 10.7,
+        "duration_ms": 40.0,
         "runs": [
-          51.8,
-          44.4,
-          40.2,
-          40.3,
-          39.5
+          49.7,
+          40.7,
+          39.8,
+          40.0,
+          39.0
         ],
         "bytes": 31650,
         "mime": "image/avif"
@@ -200,64 +200,64 @@
     },
     "thumbor": {
       "jpeg": {
-        "median_ms": 22.9,
-        "min_ms": 22.9,
-        "max_ms": 28.4,
-        "spread_ms": 5.5,
-        "duration_ms": 22.9,
+        "median_ms": 22.4,
+        "min_ms": 22.2,
+        "max_ms": 29.5,
+        "spread_ms": 7.3,
+        "duration_ms": 22.4,
         "runs": [
-          28.4,
-          22.9,
-          22.9,
-          23.8,
-          22.9
+          29.5,
+          23.0,
+          22.4,
+          22.2,
+          22.3
         ],
         "bytes": 93685,
         "mime": "image/jpeg"
       },
       "png": {
-        "median_ms": 27.6,
-        "min_ms": 27.1,
-        "max_ms": 38.3,
-        "spread_ms": 11.2,
-        "duration_ms": 27.6,
+        "median_ms": 26.7,
+        "min_ms": 26.4,
+        "max_ms": 28.3,
+        "spread_ms": 1.9,
+        "duration_ms": 26.7,
         "runs": [
-          29.7,
-          27.6,
+          28.3,
+          26.4,
+          26.7,
           27.1,
-          27.1,
-          38.3
+          26.4
         ],
         "bytes": 827166,
         "mime": "image/png"
       },
       "webp": {
-        "median_ms": 38.2,
+        "median_ms": 38.0,
         "min_ms": 37.8,
-        "max_ms": 57.7,
-        "spread_ms": 19.9,
-        "duration_ms": 38.2,
+        "max_ms": 80.6,
+        "spread_ms": 42.8,
+        "duration_ms": 38.0,
         "runs": [
-          57.7,
-          38.3,
+          80.6,
+          37.8,
           38.2,
           37.8,
-          37.8
+          38.0
         ],
         "bytes": 98538,
         "mime": "image/webp"
       },
       "avif": {
-        "median_ms": 57.8,
-        "min_ms": 56.7,
-        "max_ms": 63.9,
-        "spread_ms": 7.2,
-        "duration_ms": 57.8,
+        "median_ms": 57.7,
+        "min_ms": 56.1,
+        "max_ms": 62.4,
+        "spread_ms": 6.2,
+        "duration_ms": 57.7,
         "runs": [
-          63.9,
+          62.4,
           57.5,
-          58.6,
-          56.7,
+          57.7,
+          56.1,
           57.8
         ],
         "bytes": 52117,
@@ -268,92 +268,92 @@
   "scenario_2_warm_cache": {
     "atihsrah_native": {
       "samples": 100,
-      "p50_ms": 0.34,
+      "p50_ms": 0.32,
       "p90_ms": 0.4,
       "p95_ms": 0.42,
-      "p99_ms": 0.63,
-      "min_ms": 0.28,
-      "max_ms": 0.63,
+      "p99_ms": 0.64,
+      "min_ms": 0.27,
+      "max_ms": 0.64,
       "mean_ms": 0.34,
-      "stddev_ms": 0.05
+      "stddev_ms": 0.06
     },
     "atihsrah_docker": {
       "samples": 100,
-      "p50_ms": 0.97,
-      "p90_ms": 1.26,
-      "p95_ms": 1.4,
-      "p99_ms": 2.27,
-      "min_ms": 0.84,
-      "max_ms": 2.27,
-      "mean_ms": 1.04,
-      "stddev_ms": 0.19
+      "p50_ms": 0.95,
+      "p90_ms": 1.1,
+      "p95_ms": 1.17,
+      "p99_ms": 1.4,
+      "min_ms": 0.86,
+      "max_ms": 1.4,
+      "mean_ms": 0.98,
+      "stddev_ms": 0.09
     },
     "imgproxy_direct": {
       "samples": 100,
-      "p50_ms": 19.25,
-      "p90_ms": 20.17,
-      "p95_ms": 21.17,
-      "p99_ms": 40.33,
-      "min_ms": 18.31,
-      "max_ms": 40.33,
-      "mean_ms": 19.69,
-      "stddev_ms": 2.59
+      "p50_ms": 19.18,
+      "p90_ms": 19.94,
+      "p95_ms": 20.23,
+      "p99_ms": 30.72,
+      "min_ms": 18.18,
+      "max_ms": 30.72,
+      "mean_ms": 19.29,
+      "stddev_ms": 1.31
     },
     "imgproxy_cached": {
       "samples": 100,
-      "p50_ms": 0.64,
-      "p90_ms": 0.69,
-      "p95_ms": 0.7,
-      "p99_ms": 0.96,
-      "min_ms": 0.58,
-      "max_ms": 0.96,
-      "mean_ms": 0.65,
-      "stddev_ms": 0.04
+      "p50_ms": 0.68,
+      "p90_ms": 0.77,
+      "p95_ms": 0.8,
+      "p99_ms": 0.98,
+      "min_ms": 0.61,
+      "max_ms": 0.98,
+      "mean_ms": 0.7,
+      "stddev_ms": 0.05
     },
     "thumbor": {
       "samples": 100,
-      "p50_ms": 15.08,
-      "p90_ms": 16.78,
-      "p95_ms": 26.19,
-      "p99_ms": 39.36,
-      "min_ms": 14.57,
-      "max_ms": 39.36,
-      "mean_ms": 16.26,
-      "stddev_ms": 4.07
+      "p50_ms": 14.94,
+      "p90_ms": 15.23,
+      "p95_ms": 15.39,
+      "p99_ms": 20.33,
+      "min_ms": 14.67,
+      "max_ms": 20.33,
+      "mean_ms": 15.04,
+      "stddev_ms": 0.57
     }
   },
   "scenario_3_concurrent_same_url": {
     "atihsrah_native": {
-      "duration_ms": 33.7,
+      "duration_ms": 36.2,
       "origin_fetches": 1,
       "success_rate": 100
     },
     "imgproxy": {
-      "duration_ms": 1566.6,
+      "duration_ms": 1536.5,
       "origin_fetches": 100,
       "success_rate": 100
     }
   },
   "scenario_4_concurrent_different_urls": {
     "atihsrah_native": {
-      "duration_ms": 1058.4,
-      "throughput_rps": 94.5,
-      "p50_ms": 25.0,
-      "p95_ms": 34.8,
+      "duration_ms": 1050.7,
+      "throughput_rps": 95.2,
+      "p50_ms": 24.8,
+      "p95_ms": 33.6,
       "success_count": 100
     },
     "atihsrah_docker": {
-      "duration_ms": 1036.0,
-      "throughput_rps": 96.5,
-      "p50_ms": 40.6,
-      "p95_ms": 58.6,
+      "duration_ms": 490.0,
+      "throughput_rps": 204.1,
+      "p50_ms": 47.9,
+      "p95_ms": 70.0,
       "success_count": 100
     },
     "imgproxy": {
-      "duration_ms": 945.5,
-      "throughput_rps": 105.8,
-      "p50_ms": 89.9,
-      "p95_ms": 119.4,
+      "duration_ms": 951.1,
+      "throughput_rps": 105.1,
+      "p50_ms": 91.5,
+      "p95_ms": 113.5,
       "success_count": 100
     }
   },
@@ -382,91 +382,91 @@
     "samples": [
       {
         "timestamp_s": 0.0,
-        "atihsrah_native_rss_mb": 112.34,
-        "atihsrah_docker_rss_mb": 164.7,
-        "imgproxy_rss_mb": 117.1,
-        "thumbor_rss_mb": 72.0
+        "atihsrah_native_rss_mb": 124.53,
+        "atihsrah_docker_rss_mb": 167.2,
+        "imgproxy_rss_mb": 103.2,
+        "thumbor_rss_mb": 69.67
       },
       {
-        "timestamp_s": 13.1,
-        "atihsrah_native_rss_mb": 103.48,
-        "atihsrah_docker_rss_mb": 164.4,
-        "imgproxy_rss_mb": 107.2,
-        "thumbor_rss_mb": 72.0
+        "timestamp_s": 13.0,
+        "atihsrah_native_rss_mb": 125.5,
+        "atihsrah_docker_rss_mb": 166.9,
+        "imgproxy_rss_mb": 97.47,
+        "thumbor_rss_mb": 69.67
       },
       {
         "timestamp_s": 26.1,
-        "atihsrah_native_rss_mb": 84.59,
-        "atihsrah_docker_rss_mb": 164.4,
-        "imgproxy_rss_mb": 107.1,
-        "thumbor_rss_mb": 65.41
+        "atihsrah_native_rss_mb": 125.52,
+        "atihsrah_docker_rss_mb": 166.9,
+        "imgproxy_rss_mb": 97.07,
+        "thumbor_rss_mb": 69.64
       },
       {
-        "timestamp_s": 39.2,
-        "atihsrah_native_rss_mb": 84.64,
-        "atihsrah_docker_rss_mb": 164.4,
-        "imgproxy_rss_mb": 107.0,
-        "thumbor_rss_mb": 65.41
+        "timestamp_s": 39.1,
+        "atihsrah_native_rss_mb": 84.48,
+        "atihsrah_docker_rss_mb": 166.9,
+        "imgproxy_rss_mb": 97.08,
+        "thumbor_rss_mb": 64.0
       },
       {
         "timestamp_s": 52.2,
-        "atihsrah_native_rss_mb": 84.59,
-        "atihsrah_docker_rss_mb": 164.4,
-        "imgproxy_rss_mb": 107.0,
-        "thumbor_rss_mb": 65.39
+        "atihsrah_native_rss_mb": 63.31,
+        "atihsrah_docker_rss_mb": 166.9,
+        "imgproxy_rss_mb": 98.65,
+        "thumbor_rss_mb": 60.73
       }
     ],
     "initial_rss": {
       "timestamp_s": 0.0,
-      "atihsrah_native_rss_mb": 112.34,
-      "atihsrah_docker_rss_mb": 164.7,
-      "imgproxy_rss_mb": 117.1,
-      "thumbor_rss_mb": 72.0
+      "atihsrah_native_rss_mb": 124.53,
+      "atihsrah_docker_rss_mb": 167.2,
+      "imgproxy_rss_mb": 103.2,
+      "thumbor_rss_mb": 69.67
     },
     "final_rss": {
       "timestamp_s": 52.2,
-      "atihsrah_native_rss_mb": 84.59,
-      "atihsrah_docker_rss_mb": 164.4,
-      "imgproxy_rss_mb": 107.0,
-      "thumbor_rss_mb": 65.39
+      "atihsrah_native_rss_mb": 63.31,
+      "atihsrah_docker_rss_mb": 166.9,
+      "imgproxy_rss_mb": 98.65,
+      "thumbor_rss_mb": 60.73
     }
   },
   "scenario_8_avif_vs_webp": [
     {
       "image": "kodim01.png",
-      "webp_ms": 11.7,
+      "webp_ms": 11.9,
       "webp_bytes": 603274,
-      "avif_ms": 151.2,
+      "avif_ms": 140.4,
       "avif_bytes": 124684,
       "byte_delta_percent": -79.3,
-      "cpu_time_ratio": 12.9
+      "cpu_time_ratio": 11.82
     },
     {
       "image": "kodim05.png",
-      "webp_ms": 11.0,
+      "webp_ms": 11.1,
       "webp_bytes": 656566,
-      "avif_ms": 167.9,
+      "avif_ms": 159.1,
       "avif_bytes": 127153,
       "byte_delta_percent": -80.6,
-      "cpu_time_ratio": 15.31
+      "cpu_time_ratio": 14.38
     },
     {
       "image": "kodim13.png",
-      "webp_ms": 10.8,
+      "webp_ms": 32.3,
       "webp_bytes": 684468,
-      "avif_ms": 134.1,
+      "avif_ms": 140.6,
       "avif_bytes": 162249,
       "byte_delta_percent": -76.3,
-      "cpu_time_ratio": 12.45
+      "cpu_time_ratio": 4.36
     },
     {
       "image": "moraine_lake.jpg",
-      "webp_ms": 51.6,
+      "webp_ms": 49.1,
       "webp_bytes": 845412,
-      "avif_ms": 218.4,
+      "avif_ms": 227.2,
       "avif_bytes": 134470,
       "byte_delta_percent": -84.1,
-      "cpu_time_ratio": 4.24
+      "cpu_time_ratio": 4.63
     }
   ],
   "scenario_9_corpus_summary": {
@@ -1091,11 +1091,11 @@
         "at_avif_meets_gate": true,
         "img_avif_meets_gate": true,
         "at_auto_format": "avif",
-        "at_auto_bytes": 3401,
-        "at_auto_ssim": 0.9674,
-        "at_auto_psnr": 38.92,
-        "at_auto_vmaf": 76.16,
-        "at_auto_larger": false,
+        "at_auto_bytes": 4329,
+        "at_auto_ssim": 0.9807,
+        "at_auto_psnr": 42.59,
+        "at_auto_vmaf": 84.4,
+        "at_auto_larger": true,
         "fallback_candidates": [
           {
             "format": "avif",
@@ -1114,18 +1114,18 @@
             "ssim": 0.9807,
             "psnr_db": 42.59,
             "larger_than_source": true,
-            "selected": false,
+            "selected": true,
             "role": "fallback_ladder"
           },
           {
-            "format": "avif",
-            "quality": 20,
-            "bytes": 3401,
-            "ssim": 0.9674,
-            "psnr_db": 38.92,
-            "larger_than_source": false,
-            "selected": true,
-            "role": "fallback_ladder"
+            "format": "webp",
+            "quality": 100,
+            "bytes": 163650,
+            "ssim": 0.9987,
+            "psnr_db": 56.68,
+            "larger_than_source": true,
+            "selected": false,
+            "role": "lossless_fallback"
           }
         ],
         "webp_delta_vs_imgproxy": 2083.7,
@@ -1689,11 +1689,11 @@
         "at_avif_meets_gate": true,
         "img_avif_meets_gate": true,
         "at_auto_format": "avif",
-        "at_auto_bytes": 32357,
-        "at_auto_ssim": 0.9397,
-        "at_auto_psnr": 25.51,
-        "at_auto_vmaf": 77.32,
-        "at_auto_larger": false,
+        "at_auto_bytes": 46853,
+        "at_auto_ssim": 0.9721,
+        "at_auto_psnr": 29.72,
+        "at_auto_vmaf": 88.3,
+        "at_auto_larger": true,
         "fallback_candidates": [
           {
             "format": "avif",
@@ -1712,18 +1712,18 @@
             "ssim": 0.9721,
             "psnr_db": 29.72,
             "larger_than_source": true,
-            "selected": false,
+            "selected": true,
             "role": "fallback_ladder"
           },
           {
-            "format": "avif",
-            "quality": 20,
-            "bytes": 32357,
-            "ssim": 0.9397,
-            "psnr_db": 25.51,
-            "larger_than_source": false,
-            "selected": true,
-            "role": "fallback_ladder"
+            "format": "webp",
+            "quality": 100,
+            "bytes": 49312,
+            "ssim": 1.0,
+            "psnr_db": 53.74,
+            "larger_than_source": true,
+            "selected": false,
+            "role": "lossless_fallback"
           }
         ],
         "webp_delta_vs_imgproxy": -7.2,
