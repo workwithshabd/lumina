@@ -233,3 +233,4 @@ Atihsrah implements zero-downtime graceful shutdown compliant with Kubernetes po
 ### 7.2 Queue Depth Saturation (`atihsrah_transform_queue_depth > 30`)
 - **Action**: Scale replicas horizontally (`kubectl scale deployment/atihsrah --replicas=6`).
 - **Tuning**: Increase `MAX_CONCURRENT_TRANSFORMS` if host CPUs are underutilized, or increase `ATIHSRAH_QUEUE_SATURATION_THRESHOLD`.
+

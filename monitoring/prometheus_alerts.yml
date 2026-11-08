@@ -98,3 +98,4 @@ groups:
           summary: "Active SSRF probing blocked by Atihsrah security guardrails"
           description: "SSRF block rate is {{ $value | printf \"%.2f\" }} blocks/s."
           runbook_url: "docs/RELEASE_OPERATIONS.md#security-incident-response"
+
