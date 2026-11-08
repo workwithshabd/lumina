@@ -81,6 +81,125 @@ def get_required_ssim(category: str) -> float:
     return MIN_SSIM_GRAPHICS if cat in graphics_categories else MIN_SSIM_PHOTO
 
 
+def validate_fallback_candidates(row: Dict[str, Any]) -> None:
+    """
+    Validates integrity of fallback candidate records for a single corpus row:
+    1. Exactly one candidate must be marked selected.
+    2. Selected candidate's bytes must match at_auto_bytes.
+    3. Selected candidate must be the minimum-byte candidate among all evaluated candidates.
+    """
+    cands = row.get("fallback_candidates")
+    if not cands:
+        return
+    auto_bytes = row.get("at_auto_bytes")
+    selected_cands = [c for c in cands if c.get("selected")]
+    if len(selected_cands) != 1:
+        raise AssertionError(
+            f"Row {row.get('id')} ({row.get('filename')}): expected exactly 1 selected candidate in raw results, "
+            f"found {len(selected_cands)}"
+        )
+    selected = selected_cands[0]
+    if selected.get("bytes") != auto_bytes:
+        raise AssertionError(
+            f"Row {row.get('id')} ({row.get('filename')}): selected candidate bytes ({selected.get('bytes')}) "
+            f"does not match at_auto_bytes ({auto_bytes})"
+        )
+    min_bytes = min(c["bytes"] for c in cands)
+    if selected.get("bytes") != min_bytes:
+        raise AssertionError(
+            f"Row {row.get('id')} ({row.get('filename')}): selected candidate ({selected.get('bytes')} B) "
+            f"is not the smallest evaluated candidate ({min_bytes} B)"
+        )
+
+
+def run_fallback_candidate_fixtures() -> None:
+    """
+    Deterministic test suite for fallback candidate validation logic:
+    Asserts that valid candidate sets pass and all failure modes (missing selection,
+    duplicate selection, byte count mismatch, non-minimum candidate selection) are caught.
+    """
+    # 1. Valid fixture: selected is the minimum-size candidate matching at_auto_bytes
+    valid_row = {
+        "id": "test_img",
+        "filename": "test.png",
+        "at_auto_bytes": 3401,
+        "fallback_candidates": [
+            {"quality": 90, "bytes": 10477, "selected": False},
+            {"quality": 40, "bytes": 4329, "selected": False},
+            {"quality": 20, "bytes": 3401, "selected": True},
+        ],
+    }
+    validate_fallback_candidates(valid_row)
+
+    # 2. Missing selection fixture
+    missing_sel_row = {
+        "id": "test_img",
+        "filename": "test.png",
+        "at_auto_bytes": 3401,
+        "fallback_candidates": [
+            {"quality": 90, "bytes": 10477, "selected": False},
+            {"quality": 40, "bytes": 4329, "selected": False},
+            {"quality": 20, "bytes": 3401, "selected": False},
+        ],
+    }
+    try:
+        validate_fallback_candidates(missing_sel_row)
+        raise AssertionError("Failed to catch missing selection fixture")
+    except AssertionError as e:
+        assert "expected exactly 1 selected candidate" in str(e), f"Unexpected message: {e}"
+
+    # 3. Duplicate selection fixture
+    dup_sel_row = {
+        "id": "test_img",
+        "filename": "test.png",
+        "at_auto_bytes": 3401,
+        "fallback_candidates": [
+            {"quality": 90, "bytes": 10477, "selected": False},
+            {"quality": 40, "bytes": 4329, "selected": True},
+            {"quality": 20, "bytes": 3401, "selected": True},
+        ],
+    }
+    try:
+        validate_fallback_candidates(dup_sel_row)
+        raise AssertionError("Failed to catch duplicate selection fixture")
+    except AssertionError as e:
+        assert "expected exactly 1 selected candidate" in str(e), f"Unexpected message: {e}"
+
+    # 4. Byte mismatch fixture
+    mismatch_row = {
+        "id": "test_img",
+        "filename": "test.png",
+        "at_auto_bytes": 9999,
+        "fallback_candidates": [
+            {"quality": 90, "bytes": 10477, "selected": False},
+            {"quality": 40, "bytes": 4329, "selected": False},
+            {"quality": 20, "bytes": 3401, "selected": True},
+        ],
+    }
+    try:
+        validate_fallback_candidates(mismatch_row)
+        raise AssertionError("Failed to catch byte mismatch fixture")
+    except AssertionError as e:
+        assert "does not match at_auto_bytes" in str(e), f"Unexpected message: {e}"
+
+    # 5. Non-minimum selection fixture (marked q=40 selected and matches at_auto_bytes, but q=20 is smaller)
+    non_min_row = {
+        "id": "test_img",
+        "filename": "test.png",
+        "at_auto_bytes": 4329,
+        "fallback_candidates": [
+            {"quality": 90, "bytes": 10477, "selected": False},
+            {"quality": 40, "bytes": 4329, "selected": True},
+            {"quality": 20, "bytes": 3401, "selected": False},
+        ],
+    }
+    try:
+        validate_fallback_candidates(non_min_row)
+        raise AssertionError("Failed to catch non-minimum selection fixture")
+    except AssertionError as e:
+        assert "is not the smallest evaluated candidate" in str(e), f"Unexpected message: {e}"
+
+
 def run_command(cmd: List[str]) -> str:
     """Helper to run a shell command safely and return stripped stdout."""
     try:
@@ -504,6 +623,10 @@ class BenchmarkRunner:
         fixtures = run_deterministic_metric_fixtures()
         for name, data in fixtures.items():
             self.log_validation(f"Fixture '{name}': {data['status']}")
+
+        self.log_validation("Running fallback candidate validation fixtures (mismatch, duplicate, non-min)...")
+        run_fallback_candidate_fixtures()
+        self.log_validation("Fallback candidate fixtures: PASS (mismatch, duplicate, non-min caught)")
 
         # Verify output directory write safety
         test_file = os.path.join(self.output_dir, ".write_test")
@@ -1126,6 +1249,7 @@ class BenchmarkRunner:
                 "webp_delta_vs_imgproxy": round(((at_webp_eval["bytes"] - img_webp_eval["bytes"]) / img_webp_eval["bytes"]) * 100.0, 1),
                 "avif_delta_vs_imgproxy": round(((at_avif_eval["bytes"] - img_avif_eval["bytes"]) / img_avif_eval["bytes"]) * 100.0, 1),
             }
+            validate_fallback_candidates(row)
             csv_rows.append(row)
             print(
                 f"  {cfile:22s} | Orig: {orig_size:7d} B | "
@@ -1520,20 +1644,9 @@ To run offline validation only (checks decoders, metric fixtures, manifest, and 
         s16_q20_b = s16_cand_q20["bytes"] if s16_cand_q20 else synth16_row.get("at_auto_bytes", 32357)
         s16_q20_ssim = s16_cand_q20["ssim"] if s16_cand_q20 else synth16_row.get("at_auto_ssim", 0.9397)
 
-        # Harness Hardening: Verify fallback candidate consistency in raw results
+        # Harness Hardening: Verify fallback candidate consistency and minimum-size invariant in raw results
         for r in rows + rows_synth:
-            cands = r.get("fallback_candidates")
-            if cands:
-                auto_bytes = r.get("at_auto_bytes")
-                selected_cands = [c for c in cands if c.get("selected")]
-                assert len(selected_cands) == 1, (
-                    f"Row {r.get('id')} ({r.get('filename')}): expected exactly 1 selected candidate in raw results, "
-                    f"found {len(selected_cands)}"
-                )
-                assert selected_cands[0]["bytes"] == auto_bytes, (
-                    f"Row {r.get('id')} ({r.get('filename')}): selected candidate bytes ({selected_cands[0]['bytes']}) "
-                    f"does not match at_auto_bytes ({auto_bytes})"
-                )
+            validate_fallback_candidates(r)
 
         content = f"""# Atihsrah vs imgproxy vs Thumbor: Empirical Benchmark Analysis
 
