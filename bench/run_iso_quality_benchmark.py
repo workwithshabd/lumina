@@ -33,6 +33,16 @@ import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Dict, List, Optional, Tuple
 
+# Auto-reexec under .venv_bench if running under system Python without numpy/PIL
+_ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+_VENV_PYTHON = os.path.join(_ROOT_DIR, ".venv_bench", "bin", "python3")
+if os.path.exists(_VENV_PYTHON) and sys.executable != _VENV_PYTHON:
+    try:
+        import numpy  # type: ignore
+        from PIL import Image  # type: ignore
+    except ImportError:
+        os.execv(_VENV_PYTHON, [_VENV_PYTHON] + sys.argv)
+
 import numpy as np
 from PIL import Image
 from skimage.metrics import peak_signal_noise_ratio as skimage_psnr
@@ -396,7 +406,7 @@ This evaluation resolves the methodological limitation of nominal quality settin
    - imgproxy's multi-threaded C `libvips` pipeline completes individual cold AVIF transformations faster (**{im_p50_ms:.1f} ms p50** vs **{at_p50_ms:.1f} ms p50**).
    - In exchange for higher CPU time per transform, Atihsrah produces substantially smaller payloads, reducing egress bandwidth costs and origin load.
 3. **Quality Gate Compliance**:
-   - In nominal comparisons where imgproxy ran at default/lower quality, imgproxy failed visual gates on high-frequency photos. Under this iso-quality sweep, imgproxy is evaluated at higher nominal settings ($q=85-95$) where it successfully reaches SSIM $\ge 0.95$, enabling statistically sound apples-to-apples comparison across the entire corpus.
+   - In nominal comparisons where imgproxy ran at default/lower quality, imgproxy failed visual gates on high-frequency photos. Under this iso-quality sweep, imgproxy is evaluated at higher nominal settings ($q=85-95$) where it successfully reaches SSIM $\\ge 0.95$, enabling statistically sound apples-to-apples comparison across the entire corpus.
 
 ---
 

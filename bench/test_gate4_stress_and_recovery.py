@@ -34,6 +34,15 @@ import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Dict, List, Tuple
 
+# Auto-reexec under .venv_bench if running under system Python without numpy
+_ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+_VENV_PYTHON = os.path.join(_ROOT_DIR, ".venv_bench", "bin", "python3")
+if os.path.exists(_VENV_PYTHON) and sys.executable != _VENV_PYTHON:
+    try:
+        import numpy  # type: ignore
+    except ImportError:
+        os.execv(_VENV_PYTHON, [_VENV_PYTHON] + sys.argv)
+
 import numpy as np
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))

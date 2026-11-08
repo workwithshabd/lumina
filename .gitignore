@@ -12,8 +12,8 @@ bench/corpus/
 __pycache__/
 **/__pycache__/
 *.py[cod]
-.venv*/
-bench/.venv*/
+.venv*
+bench/.venv*
 dashboard/node_modules/
 dashboard/client/node_modules/
 dashboard/server/uploads/*

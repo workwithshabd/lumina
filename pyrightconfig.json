@@ -1,0 +1,12 @@
+{
+  "venvPath": ".",
+  "venv": ".venv_bench",
+  "executionEnvironments": [
+    {
+      "root": "bench",
+      "extraPaths": [
+        ".venv_bench/lib/python3.12/site-packages"
+      ]
+    }
+  ]
+}

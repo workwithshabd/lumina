@@ -26,6 +26,16 @@ import os
 import sys
 import urllib.request
 from typing import Dict, List
+
+# Auto-reexec under .venv_bench if running under system Python without PIL
+_ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+_VENV_PYTHON = os.path.join(_ROOT_DIR, ".venv_bench", "bin", "python3")
+if os.path.exists(_VENV_PYTHON) and sys.executable != _VENV_PYTHON:
+    try:
+        from PIL import Image  # type: ignore
+    except ImportError:
+        os.execv(_VENV_PYTHON, [_VENV_PYTHON] + sys.argv)
+
 from PIL import Image
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
