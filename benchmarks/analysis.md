@@ -15,11 +15,15 @@
 - **Operating System**: macOS 27.2 (Build 26B123)
 - **Kernel**: `Darwin Mac-mini.local 27.2.0 Darwin Kernel Version 27.2.0: Wed Oct 14 23:47:07 PDT 2026; root:xnu-13432.41.4~25/RELEASE_ARM64_T8132 arm64`
 - **Compiler / Toolchain**: `rustc 1.97.1 (8bab26f4f 2026-07-14)`, Python 3.12.14, `Docker version 29.9.2, build a82e528901` (`colima`)
-- **Git Commit Identity Reconciliation**:
-  - **Tested Software Commit**: `b507d0b6` (Full: `b507d0b6330ab5701cee730c7c9cb75763e50fd6`, Dirty: `False`)
-    *This is the exact, immutable Git commit of the codebase (Rust implementation, vendored crates, benchmark harness) tested during the run.*
-  - **Documentation Recording Commit**: `8827dc0a296cb834aae8a8d608342da8231fde15`
-    *This was the subsequent documentation commit recording the resulting report artifacts into version control.*
+- **Git Commit Trail & Full SHA Pinning**:
+  - **1. Software Under Test**: `b507d0b6330ab5701cee730c7c9cb75763e50fd6`
+    *The exact, immutable Git commit of the codebase (Rust implementation, vendored crates, benchmark harness) tested during the run with dirty: False.*
+  - **2. Initial Results Recording Commit**: `8827dc0a296cb834aae8a8d608342da8231fde15`
+    *The initial git commit recording raw benchmark run outputs, CSV data, and analysis artifacts.*
+  - **3. Review Reconciliation Commit 1**: `22850e9abe2a99f01a67f93599af280d4a76f656`
+    *The reconciliation commit fixing eligible-pair median (-33.9%), labeling hypotheses, and publishing auto-mode audit tables.*
+  - **4. Final Corrected Report Commit**: HEAD (`master`, following reconciliation commit `22850e9a`)
+    *The final review reconciliation commit containing all finalized separated verdicts, auto-pipeline alpha routing reconciliation, and trade-off analysis.*
 - **Active Profile**: `Production Default (speed=6, max_entry=10MB)`
 - **Competitors Tested**:
   - **Atihsrah Native**: `v0.1.0` (pure-Rust native binary `target/release/atihsrah`)
@@ -58,10 +62,24 @@
 Target transformation: `w=800, h=600, fit=cover`.
 Visual quality metrics computed against ground truth Pillow `Image.Resampling.LANCZOS` reference using standard 11x11 Gaussian local-window SSIM (Wang et al. 2004) and exact PSNR.
 
+> [!IMPORTANT]
+> **OVERALL PHASE 3 BENCHMARK VERDICT**:
+> **SUBSTANTIAL PROGRESS / NO OVERALL QUALITY-GATE PASS YET**
+> - **Empirical Progress**:
+>   - **15 of 15** real-world calibration photos pass the strict photo SSIM gate (≥ 0.95) under explicit AVIF q=90 (range 0.9625–0.9842).
+>   - **20 of 20** synthetic stress suite assets pass under explicit AVIF q=90 (0 failures).
+>   - In-process memory cache latency meets targets (p50 0.32 ms, p95 0.41 ms vs <0.8 ms target).
+>   - Single-flight request coalescing collapses 100 concurrent thundering-herd requests to 1 origin fetch.
+> - **Quality Gate Failures**:
+>   - **Explicit AVIF (q=90)**: 1 failure on `img_18` (`python_logo_alpha.png`: SSIM 0.9799 < 0.98).
+>   - **Calibration Auto-Negotiation**: 2 failures (`python_logo_alpha.png`: 0.9799 < 0.98; `alacritty_logo_alpha.png`: 0.9674 < 0.98).
+>   - **Synthetic Auto-Negotiation**: 1 failure (`synth_16` / `16_pattern_checkerboard.png`: SSIM 0.9397 < 0.98).
+> Under strict quality gating, visual quality breaches disqualify both explicit AVIF and auto-negotiation modes from an overall pass.
+
 ### 3.1 Matched AVIF Compression & Quality (Nominal q=90 Setting Comparison)
 
 - **Total Calibration Corpus Images Evaluated**: 20
-- **Quality Gate Threshold**: Category-specific: SSIM $\ge 0.95$ for photos, SSIM $\ge 0.98$ for graphics/UI/alpha
+- **Quality Gate Threshold**: Category-specific: SSIM ≥ 0.95 for photos, SSIM ≥ 0.98 for graphics/UI/alpha
 - **Matched Pairs Meeting Quality Threshold**: 2 pairs
 - **Disqualified Pairs Failing Quality Gate**: 18 pairs
 - **Quality Failures**:
@@ -74,7 +92,7 @@ Visual quality metrics computed against ground truth Pillow `Image.Resampling.LA
 - **Median Byte Delta (Eligible Pairs)**: -33.9%
 - **Mean Byte Delta (Eligible Pairs)**: -33.9%
 - **Average SSIM (All Samples)**: Atihsrah 0.9807 vs imgproxy 0.9110
-- **Optimization Hypothesis Verdict**: **NOT SUPPORTED / QUALITY GATE FAILURE (Explicit AVIF q=90 Gate)**: Atihsrah failed the minimum SSIM quality gate on 1 asset(s) under explicit AVIF q=90: img_18 (python_logo_alpha.png: SSIM 0.9799 < 0.98). Compression wins cannot be certified when visual quality gates are breached.
+- **Optimization Hypothesis Verdict (Explicit AVIF q=90 Gate)**: **NOT SUPPORTED / QUALITY GATE FAILURE (Explicit AVIF q=90 Gate)**: Atihsrah failed the minimum SSIM quality gate on 1 asset(s) under explicit AVIF q=90: img_18 (python_logo_alpha.png: SSIM 0.9799 < 0.98). Compression wins cannot be certified when visual quality gates are breached.
 - **Encoder Scale Disclosure**: Comparing nominal q=90 is a configuration comparison, not an equivalent perceptual quality match. Upstream encoders (`ravif` vs `libheif`/`libaom`) have distinct rate-distortion curves.
 
 > [!IMPORTANT]
@@ -96,14 +114,40 @@ Visual quality metrics computed against ground truth Pillow `Image.Resampling.LA
 
 ### 3.4 Production Auto-Negotiation Pipeline Qualification (`format=auto`)
 
-- **Scope and Mechanism**: The requirement of zero larger-than-source outputs applies strictly to `format=auto`. In explicit format requests at nominal $q=90$, highly compressed or tiny graphics can inflate (e.g., `alacritty_logo_alpha.png` source 3,612 bytes to explicit AVIF 10,477 bytes, +190.1%). In `format=auto`, Atihsrah evaluates candidate sizes against the source and falls back along the quality ladder ($q=40$) to guarantee output byte size does not exceed source bytes (producing 3,401 bytes ≤ 3,612).
-- **Calibration Corpus Results (`format=auto`)**:
-  - Total Calibration Assets Evaluated: 20
-  - Outputs ≤ Source Bytes: **20 of 20 (100%)** (0 larger-than-source outputs)
-  - Category Quality Passes: **18 of 20** (15 of 15 photos pass ≥ 0.95; 3 of 5 graphics/UI/alpha pass ≥ 0.98; `python_logo_alpha.png` marginal miss at 0.9799, `alacritty_logo_alpha.png` at 0.9674 due to size-limiting fallback)
-  - Average SSIM: 0.9807
-  - Average PSNR: 41.67 dB
-  - Status: **Zero Larger-Than-Source Verified** under default auto-negotiation.
+- **Scope & Size Constraint Metric**: **20 of 20 outputs ≤ source bytes (100%)** (0 larger-than-source outputs across all calibration assets).
+- **Quality Gate Passes**: **18 of 20 (90%)**
+  - Photos: 15 of 15 passed (SSIM range 0.9625–0.9842 vs ≥ 0.95 gate)
+  - UI Screenshots: 2 of 2 passed (SSIM range 0.9964–0.9971 vs ≥ 0.98 gate)
+  - Graphic: 1 of 1 passed (SSIM 0.9963 vs ≥ 0.98 gate)
+  - Alpha Assets: **0 of 2 passed** (both failed the ≥ 0.98 alpha gate)
+- **Quality Failures**:
+  - `img_18` (`python_logo_alpha.png`): SSIM 0.9799 < 0.98 (marginal miss by 0.0001)
+  - `img_19` (`alacritty_logo_alpha.png`): SSIM 0.9674 < 0.98 (fallback quantization degradation)
+- **Auto-Negotiation Pipeline Verdict**: **NOT SUPPORTED / QUALITY GATE FAILURE**: Delivering 20 of 20 outputs no larger than source is an operational byte-budget success, not a quality pass. Because 2 of 20 assets breached their category SSIM thresholds, the auto-negotiation pipeline fails the strict quality gate.
+
+#### Reconciliation of Auto Mode Alpha Routing Policy
+- **Client Request Header**: The benchmark harness simulates modern browser behavior by issuing requests with:
+  `Accept: image/avif,image/webp,*/*`
+- **Routing Implementation (`src/http/params.rs:546-553`)**:
+  While earlier architectural docstrings described alpha assets as routing to lossless WebP/PNG, the actual implemented resolution logic prioritizes modern codecs when accepted:
+  ```rust
+  if source_has_alpha {
+      match accept_class {
+          AcceptClass::Avif => (ImageFormat::Avif, true),
+          AcceptClass::Webp => (ImageFormat::WebP, true),
+          AcceptClass::Legacy => (ImageFormat::Png, true),
+      }
+  }
+  ```
+  Because the client's `Accept` header included `image/avif`, `resolve_accept_class()` resolved to `AcceptClass::Avif`. Since AVIF natively supports full 8-bit alpha channels via `ravif`, Atihsrah selected AVIF for both alpha calibration assets (`img_18` and `img_19`), rather than WebP or PNG.
+
+#### Empirical Size-versus-Quality Trade-Off
+The calibration run provides clear evidence of an inherent size-versus-quality trade-off when optimizing small alpha assets:
+- For `alacritty_logo_alpha.png`, the source image is an extremely small, hand-optimized 3,612-byte PNG.
+- Under explicit AVIF at nominal q=90, Atihsrah achieved near-lossless fidelity (SSIM 0.9931 > 0.98, PSNR 49.31 dB), but container overhead and high-frequency edge encoding expanded the file to 10,477 bytes (+190.1% larger than source).
+- Under `format=auto`, Atihsrah's `never_larger_than_source` guard detected that the primary q=90 candidate exceeded 3,612 bytes and triggered the fallback quality ladder down to q=40.
+- The q=40 fallback successfully reduced the output size to 3,401 bytes (≤ 3,612 bytes, achieving the size constraint). However, coarse quantization dropped visual fidelity to SSIM 0.9674, breaching the 0.98 gate.
+- **Finding**: For highly optimized, tiny palette assets, lossy AVIF cannot simultaneously guarantee both "strictly smaller than source" and "near-lossless SSIM ≥ 0.98". Enforcing the byte budget forces quality loss below the gate.
 
 ---
 
@@ -170,6 +214,8 @@ Visual quality metrics computed against ground truth Pillow `Image.Resampling.LA
 
 ### 5.1 Explicit Matched AVIF ($q=90$) & WebP Comparison
 
+- **Explicit Synthetic Quality Verdict**: **PASS (20 of 20 Passed)**: All 20 synthetic assets met their category SSIM quality gates under explicit AVIF q=90 (0 quality failures).
+
 | ID | Filename | Category | SSIM Gate | Orig Bytes | Atihsrah AVIF Bytes | Atihsrah AVIF SSIM | Atihsrah AVIF PSNR | imgproxy AVIF Bytes | imgproxy AVIF SSIM | imgproxy AVIF PSNR | AVIF Byte Δ (%) | Quality Status | Atihsrah WebP (Lossless) | imgproxy WebP (q75) |
 | :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | synth_01 | 01_landscape.png | photo | 0.95 | 1206358 | 14702 | 0.9849 | 46.76 | 25439 | 0.9497 | 41.2 | -42.2% | At:PASS / img:**FAIL** | 453734 (lossless) | 3888 (q75) |
@@ -194,6 +240,8 @@ Visual quality metrics computed against ground truth Pillow `Image.Resampling.LA
 | synth_20 | 20_thumbnail_small.png | thumbnail_small | 0.95 | 129403 | 33651 | 0.9760 | 43.78 | 56351 | 0.9580 | 34.53 | -40.3% | At:PASS / img:PASS | 327140 (lossless) | 9200 (q75) |
 
 ### 5.2 Production Auto-Negotiation Audit (`format=auto`)
+
+- **Auto Synthetic Quality Verdict**: **NOT SUPPORTED / QUALITY GATE FAILURE (19 of 20 Passed)**: While 20 of 20 synthetic outputs met the size constraint (0 larger than source), 1 asset failed its quality gate: `synth_16` (`16_pattern_checkerboard.png`: SSIM 0.9397 < 0.98). Procedural high-frequency checkerboards suffer quality degradation when constrained by the size budget.
 
 | ID | Filename | Category | SSIM Gate | Orig Bytes | Auto Format | Auto Bytes | Ratio vs Orig | Auto SSIM | Auto PSNR | Output <= Source? | Quality Status |
 | :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
